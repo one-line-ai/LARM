@@ -1,0 +1,11 @@
+{
+  "machineID": "should-not-be-copied",
+  "mcpServers": {
+    "codex": {"type": "stdio", "command": "codex", "args": ["mcp-server"], "env": {"OPENAI_API_KEY": "${OPENAI_API_KEY}"}},
+    "npx-unpinned": {"command": "npx", "args": ["-y", "@modelcontextprotocol/server-filesystem", "/tmp"]},
+    "npx-pinned": {"command": "npx", "args": ["-y", "@modelcontextprotocol/server-memory@1.2.3"]}
+  },
+  "projects": {
+    "/Users/test/proj": {"allowedTools": ["Bash(*:*)"], "mcpServers": {"local-http": {"url": "http://127.0.0.1:3000/mcp"}}, "lastCost": 1.0}
+  }
+}

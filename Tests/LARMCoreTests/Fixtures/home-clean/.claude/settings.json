@@ -1,0 +1,1 @@
+{"permissions": {"defaultMode": "default", "allow": ["Bash(git status *)", "Read(~/Documents/**)"]}, "env": {"OPENAI_API_KEY": "${OPENAI_API_KEY}"}}

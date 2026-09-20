@@ -1,0 +1,5 @@
+approval_policy = "on-request"
+sandbox_mode = "workspace-write"
+[mcp_servers.pinned]
+command = "npx"
+args = ["-y", "@scope/server@2.0.0"]

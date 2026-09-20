@@ -1,0 +1,2 @@
+{"mcpServers": {"db": {"command": "uvx", "args": ["mcp-server-postgres@0.4.0", "postgresql://user:LARM_CANARY_DBPASS0001@db.example.com/x"]},
+                "plain": {"url": "http://internal-mcp.example.com/mcp"}}}

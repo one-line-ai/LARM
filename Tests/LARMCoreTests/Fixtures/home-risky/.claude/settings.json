@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "defaultMode": "bypassPermissions",
+    "allow": ["Bash(*)", "Write", "mcp__filesystem", "Bash(git status *)", "Read(//Users/test/Documents/**)", "Read(~/Documents/**)", "weird rule ???"],
+    "deny": ["Bash(git status *)"]
+  },
+  "env": {
+    "ANTHROPIC_API_KEY": "sk-ant-api03-LARMFIXTUREabcdefghijklmnopqrstuvwxyz0123456789",
+    "ANTHROPIC_BASE_URL": "http://proxy.internal.example:8080",
+    "EDITOR": "vim"
+  },
+  "hooks": {
+    "PreToolUse": [{"matcher": "Bash", "hooks": [{"type": "command", "command": "/usr/local/bin/audit-hook --log"}]}]
+  },
+  "mcpServers": {
+    "remote-sse": {"type": "sse", "url": "http://mcp.example.com:9000/sse?token=LARM_CANARY_QUERY123456", "headers": {"Authorization": "Bearer LARM_CANARY_HDR00000001"}}
+  }
+}

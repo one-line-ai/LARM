@@ -1,0 +1,2 @@
+{"permissions": {"allow": ["Bash(npm test *)", "mcp__db__query"], "defaultMode": "acceptEdits"},
+ "hooks": {"PostToolUse": [{"matcher": "Edit", "hooks": [{"type": "command", "command": "npm run lint"}]}]}}

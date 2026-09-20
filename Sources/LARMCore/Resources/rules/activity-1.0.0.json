@@ -1,0 +1,36 @@
+{
+  "schema": "larm-activity-rules/1",
+  "version": "1.0.0",
+  "rules": [
+    {
+      "id": "RR01",
+      "title": "작업 범위 밖 민감 자원 요청",
+      "requirements": ["F44"],
+      "verdicts": [
+        {"severity": "high", "confidence": "medium", "when": {"target_kind": ["file"], "flags_any": ["sensitive_path"], "outside_scope": true},
+         "summary": "선택 프로젝트 밖의 민감 자원(자격증명, 키, 설정)에 대한 파일 도구 요청입니다. 읽기 요청과 실제 읽기 성공, 유출은 구분합니다."},
+        {"severity": "medium", "confidence": "medium", "when": {"target_kind": ["file"], "flags_any": ["sensitive_path"], "outside_scope": false},
+         "summary": "프로젝트 안의 민감 파일(.env, 키 파일 등)에 대한 파일 도구 요청입니다."},
+        {"severity": "medium", "confidence": "low", "when": {"target_kind": ["command"], "flags_any": ["sensitive_path"]},
+         "summary": "명령 문자열이 민감 경로를 참조합니다. 문자열 참조이며 접근 성공은 미확인입니다."}
+      ],
+      "unknown_when": {"target_kind": ["none"]},
+      "limits": "요청 확인이며 실제 읽기 성공, 유출은 별도 근거가 필요합니다. 인코딩, 간접 참조는 unknown입니다.",
+      "next_action": "요청 맥락 확인 → 필요하면 벤더 설정에서 해당 경로 접근 제한 → 이후 이벤트 관찰"
+    },
+    {
+      "id": "RR02",
+      "title": "고위험 도구 요청",
+      "requirements": ["F44"],
+      "verdicts": [
+        {"severity": "high", "confidence": "high", "when": {"target_kind": ["command"], "flags_any": ["sudo", "rm_recursive", "pipe_to_shell"]},
+         "summary": "sudo, 재귀 삭제, 원격 스크립트 실행(curl|sh)류의 고위험 명령 요청입니다. 실행 성공 여부는 결과 이벤트로만 확인합니다."},
+        {"severity": "medium", "confidence": "medium", "when": {"target_kind": ["command"], "flags_any": ["eval", "shell_wrapper", "env_dump"]},
+         "summary": "간접 실행, 환경 노출 가능성이 있는 명령 요청입니다."}
+      ],
+      "unknown_when": {"flags_any": ["base64_decode", "encoded_input"]},
+      "limits": "검증된 문법만 판단합니다. 인코딩, 간접 실행, 미지원 쉘은 unknown이며, 문자열만으로 악성, 유출 성공을 단정하지 않습니다.",
+      "next_action": "세션 맥락 확인 → 벤더 승인 정책 검토 → 이후 이벤트 관찰"
+    }
+  ]
+}

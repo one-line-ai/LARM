@@ -1,0 +1,28 @@
+# fixture: never + danger-full-access
+model = "gpt-5"
+approval_policy = "never"
+sandbox_mode = "danger-full-access"
+notify = ["/usr/local/bin/notify-me", "--codex"]
+
+[sandbox_workspace_write]
+network_access = true
+
+[projects."/Users/test/proj"]
+trust_level = "trusted"
+
+[mcp_servers.node_repl]
+command = "node"
+args = ["/opt/repl/server.js"]
+startup_timeout_sec = 30
+
+[mcp_servers.node_repl.env]
+NODE_REPL_TOKEN = "LARM_CANARY_TOMLTOKEN12345"
+NODE_PATH = "/opt/node"
+
+[plugins."browser@openai-bundled"]
+enabled = true
+
+[model_providers.custom]
+name = "custom"
+base_url = "https://api.custom.example/v1"
+api_key = "LARM_CANARY_PROVIDERKEY0001"
