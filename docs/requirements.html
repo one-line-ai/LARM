@@ -1,0 +1,519 @@
+<title>LARM 요건 적용 현황</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@600;700&family=IBM+Plex+Sans+KR:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{--bg:#F4F6F8;--surface:#FFFFFF;--ink:#1B2430;--ink-2:#4A5563;--ink-3:#7A8594;--line:#D9DEE5;--accent:#0F6E74;--accent-soft:#E1F0F1;--ok:#2E7D4F;--ok-bg:#E3F2E8;--part:#9A6B12;--part-bg:#FBF0D9;--out:#6B7280;--out-bg:#E9ECF0;--none:#8A6D3B;--none-bg:#F3EBE0;--mono:'IBM Plex Mono',ui-monospace,Menlo,monospace;--sans:'IBM Plex Sans KR','Apple SD Gothic Neo','Noto Sans KR',system-ui,sans-serif;--serif:'Noto Serif KR','Apple Myungjo',Georgia,serif}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#13181E;--surface:#1B2229;--ink:#E7EBF0;--ink-2:#B3BCC7;--ink-3:#7F8A97;--line:#2B343E;--accent:#5FC9CF;--accent-soft:#163A3D;--ok:#7CD09A;--ok-bg:#1B3A28;--part:#E5B95B;--part-bg:#3D3016;--out:#A3ACB8;--out-bg:#2A313A;--none:#D9B27A;--none-bg:#3A2F20}}
+:root[data-theme="dark"]{--bg:#13181E;--surface:#1B2229;--ink:#E7EBF0;--ink-2:#B3BCC7;--ink-3:#7F8A97;--line:#2B343E;--accent:#5FC9CF;--accent-soft:#163A3D;--ok:#7CD09A;--ok-bg:#1B3A28;--part:#E5B95B;--part-bg:#3D3016;--out:#A3ACB8;--out-bg:#2A313A;--none:#D9B27A;--none-bg:#3A2F20}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.65;margin:0}
+a{color:var(--accent);text-decoration:none} a:hover{text-decoration:underline} a:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.wrap{max-width:1120px;margin:0 auto;padding:40px 28px 80px;display:grid;grid-template-columns:200px minmax(0,1fr);gap:40px}
+@media (max-width:860px){.wrap{grid-template-columns:1fr} nav.toc{position:static}}
+nav.toc{position:sticky;top:24px;align-self:start;font-size:13px}
+nav.toc ol{list-style:none;padding:0;margin:0;border-left:2px solid var(--line)} nav.toc li a{display:block;padding:5px 12px;color:var(--ink-2)} nav.toc li a:hover{color:var(--accent);text-decoration:none}
+nav.toc .eyebrow{margin:0 0 10px 14px}
+.eyebrow{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);font-weight:600}
+h1{font-family:var(--serif);font-size:34px;line-height:1.25;margin:6px 0 10px;text-wrap:balance}
+h2{font-family:var(--serif);font-size:23px;margin:56px 0 14px;padding-top:18px;border-top:1px solid var(--line);text-wrap:balance}
+h3{font-size:16px;margin:0;font-weight:600;text-wrap:balance}
+p{margin:0 0 10px} .lead{font-size:16px;color:var(--ink-2);max-width:66ch}
+.meta{display:flex;flex-wrap:wrap;gap:8px 20px;font-size:13px;color:var(--ink-3);margin-top:14px} .meta b{color:var(--ink-2);font-weight:500}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:26px 0 8px}
+@media (max-width:640px){.stats{grid-template-columns:repeat(2,1fr)}}
+.stat{background:var(--surface);border:1px solid var(--line);padding:14px 16px} .stat .n{font-family:var(--serif);font-size:30px;line-height:1.1;font-variant-numeric:tabular-nums} .stat .l{font-size:12px;color:var(--ink-3);margin-top:4px}
+.stat .sub{font-size:12px;color:var(--ink-2);margin-top:8px;display:flex;gap:10px;flex-wrap:wrap}
+.chip{display:inline-block;font-size:11.5px;font-weight:600;padding:2px 8px;border-radius:3px;white-space:nowrap;line-height:1.5}
+.chip.ok{background:var(--ok-bg);color:var(--ok)} .chip.part{background:var(--part-bg);color:var(--part)} .chip.out{background:var(--out-bg);color:var(--out)} .chip.none{background:var(--none-bg);color:var(--none)}
+.req{background:var(--surface);border:1px solid var(--line);padding:16px 18px 14px;margin:0 0 10px}
+.req-head{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:12px;align-items:baseline;margin-bottom:8px}
+.rid{font-family:var(--mono);font-size:13px;color:var(--accent);font-weight:500}
+.cond{font-style:normal;font-size:11px;color:var(--part);margin-left:6px;font-weight:500}
+.src{color:var(--ink-2);max-width:78ch} .crit{color:var(--ink-2);font-size:14px;max-width:78ch} .crit b{color:var(--ink-3);font-weight:600;font-size:12px;letter-spacing:.06em;margin-right:6px}
+.applied{margin-top:10px;padding:10px 12px;background:var(--accent-soft);border-left:3px solid var(--accent)}
+.applied b{display:block;font-size:12px;letter-spacing:.06em;color:var(--accent);margin-bottom:4px} .applied p{margin:0;max-width:78ch} .applied .where{font-size:13px;color:var(--ink-2);margin-top:6px} .applied .where a{font-family:var(--mono);font-size:12px}
+.tbl{overflow-x:auto;background:var(--surface);border:1px solid var(--line)} table{border-collapse:collapse;width:100%;font-size:13.5px} th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top} th{font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);font-weight:600;background:var(--bg)} tr:last-child td{border-bottom:0}
+.mono{font-family:var(--mono);font-size:12.5px;white-space:nowrap} td.note{color:var(--ink-2);font-size:12.5px;min-width:320px}
+ul.plain{padding-left:18px;max-width:78ch} ul.plain li{margin-bottom:6px}
+.screens{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:10px} .screen{background:var(--surface);border:1px solid var(--line);padding:12px 14px} .screen h4{margin:0 0 4px;font-size:14px} .screen p{font-size:13px;color:var(--ink-2);margin:0}
+</style>
+<div class="wrap">
+<nav class="toc"><p class="eyebrow">목차</p><ol>
+<li><a href="#summary">적용 현황 요약</a></li><li><a href="#decisions">범위 결정</a></li><li><a href="#screens">화면 구성</a></li>
+<li><a href="#F01">기능 요건 F01~F44</a></li><li><a href="#N01">비기능 요건 N01~N15</a></li><li><a href="#rules">탐지 룰</a></li><li><a href="#tests">수용 시험 T01~T59</a></li><li><a href="#pending">유보·미실행</a></li></ol></nav>
+<main>
+<p class="eyebrow">LARM 0.6.1 · 요건정의서 v2.1 SLC</p>
+<h1>LARM 요건 적용 현황</h1>
+<p class="lead">요건정의서의 59개 요건(F01~F44, N01~N15), 탐지 룰 10개, 수용 시험 59개가 설치된 제품에 어떻게 반영됐는지 정리한 추적표입니다. 각 요건의 원문 요약과 수용 기준 아래에 제품이 실제로 하는 일과 확인할 화면을 적었습니다.</p>
+<div class="meta"><span><b>제품</b> LARM 0.6.1 (macOS, Apple Silicon·Intel)</span><span><b>기준</b> 2026-09-21</span><span><b>시험 환경</b> macOS 26.6.2, Claude Code 2.1.278, Codex 0.153.2</span><span><b>출처</b> products/larm/docs/acceptance.md</span></div>
+
+<h2 id="summary" style="margin-top:28px">적용 현황 요약</h2>
+<div class="stats">
+<div class="stat"><div class="n">46<span style="font-size:16px;color:var(--ink-3)"> / 59</span></div><div class="l">요건 적용</div><div class="sub"><span class="chip part">부분</span> 10건 <span class="chip out">제외</span> 3건</div></div>
+<div class="stat"><div class="n">40<span style="font-size:16px;color:var(--ink-3)"> / 44</span></div><div class="l">기능 요건 적용</div><div class="sub">부분 2 · 제외 2 (조건부 F42·F43)</div></div>
+<div class="stat"><div class="n">6<span style="font-size:16px;color:var(--ink-3)"> / 15</span></div><div class="l">비기능 요건 적용</div><div class="sub">부분 8 · 제외 1 (조건부 N15)</div></div>
+<div class="stat"><div class="n">21<span style="font-size:16px;color:var(--ink-3)"> / 59</span></div><div class="l">수용 시험 자체 통과</div><div class="sub">부분 31 · 미실행 4 · 비적용 3</div></div>
+</div>
+<p class="lead" style="font-size:14px">"적용"은 요건의 동작이 제품에 들어가 자체 시험이나 이 Mac에서의 확인을 거친 상태, "부분"은 동작은 있으나 요건의 시험 일부(실기·독립 검증·장기 시험)가 남은 상태입니다. 자체 통과는 개발자 자동 시험 33개의 결과이며 독립 검증(LG2)이 아닙니다.</p>
+
+<h2 id="decisions">범위 결정</h2>
+<ul class="plain">
+<li><b>조건부 요건 제외.</b> F42(실행 전 확인)·F43(정책 집행)·N15(조건부 통제 무결성)는 요건정의서 11.1에 따라 관측 모드로 제한합니다. Claude Code hook은 허용·차단 결정을 반환하지 않고 기록만 합니다. 시험 T54·T55·T59는 비적용으로 기록했습니다.</li>
+<li><b>서명.</b> ad-hoc 서명으로 배포합니다. Developer ID 서명·공증(N06)은 출시 게이트 LG5 항목으로 유보했습니다.</li>
+<li><b>지원 도구.</b> Claude Code·Codex CLI 설정 점검과 Claude Code hook 활동 기록을 지원합니다. Cursor는 MCP 설정 점검만 지원하며 이 Mac에 설치돼 있지 않아 fixture로만 검증했습니다.</li>
+<li><b>기술 방식.</b> SwiftPM 네이티브 앱(외부 의존성 0). 룰과 안내는 데이터 파일이고 실행 코드가 아닙니다. 모든 기능이 오프라인으로 동작합니다.</li>
+</ul>
+
+<h2 id="screens">화면 구성</h2>
+<div class="screens">
+<div class="screen"><h4>개요</h4><p>감시 상태, 마지막 점검, 백그라운드 감시와 공백, 지원 도구, 점검 범위, 오늘 확인할 항목 (F13, F22, F29, F36, F40)</p></div>
+<div class="screen"><h4>발견 사항</h4><p>룰별 발견 사항 목록·필터, 근거·한계·조치 안내, 조치 중·재점검·예외·오탐 검토 (F17~F21, F23)</p></div>
+<div class="screen"><h4>AI 활동</h4><p>Claude Code hook 연동 상태·등록(변경 전후 확인)·시험 이벤트, 요청·결과 이벤트와 RR01·RR02 판단 (F39, F44, N14)</p></div>
+<div class="screen"><h4>변경 사항</h4><p>기준점 지정, 기준점 대비 추가·삭제·수정·비교 불가 (F15, F16)</p></div>
+<div class="screen"><h4>점검 범위</h4><p>어댑터별 항목의 성공·부재·거절·초과·미지원·오류와 복구 안내 (F13, R08)</p></div>
+<div class="screen"><h4>그래프</h4><p>전체·주변·변경 보기, 확대·이동·고정, 호버 강조, 저장 보기, 표 보기 (F31~F35)</p></div>
+<div class="screen"><h4>증빙과 설정</h4><p>자동 시작·알림·조용한 시간, 증빙 내보내기·검증, 보존·초기화, 진단, 룰 갱신 (F24~F28, F30, F37)</p></div>
+<div class="screen"><h4>메뉴바</h4><p>감시 상태, 지금 점검, 일시중지·재개, 창 열기, 감시 종료 (F37, F41)</p></div>
+</div>
+
+<h2 id="F01">기능 요건 F01~F44</h2>
+<article class="req" id="F01">
+  <div class="req-head"><span class="rid">F01</span><h3>설치 후 첫 점검</h3><span class="chip part">부분</span></div>
+  <p class="src">서명된 macOS 앱에서 계정 가입 없이 점검 범위 확인, 첫 점검, 결과 열기까지 한 흐름으로 제공한다. 처음 실행할 때 읽을 위치와 저장할 정보를 설명한다. 첫 점검 뒤 자동 시작·활동 연동·알림 사용 여부를 확인하고 시험 이벤트로 감시 상태를 확인한다.</p>
+  <p class="crit"><b>수용 기준</b> 새 사용자 계정에서 설치 후 5분 이내 결과 화면에 도달한다. 지원 대상이 없으면 0건 안전 판정 대신 “지원 대상 없음”과 폴더 추가 방법을 표시한다.</p>
+  <div class="applied"><b>제품 적용</b><p>설치 스크립트 또는 DMG로 설치한 뒤 계정 가입 없이 첫 점검과 결과 화면까지 한 흐름. 첫 실행 안내에 읽는 위치와 저장 정보를 표시. 지원 대상이 없으면 &quot;점검할 지원 대상이 없습니다&quot;와 프로젝트 추가 안내. 자동 시작·알림·hook 연동은 설정 화면에서 선택.</p><p class="where">화면·구성요소: 개요, 증빙과 설정 · 시험 <a href="#T01">T01</a></p></div>
+</article>
+<article class="req" id="F02">
+  <div class="req-head"><span class="rid">F02</span><h3>명시적 점검 범위</h3><span class="chip ok">적용</span></div>
+  <p class="src">기본 사용자 설정 위치와 사용자가 선택한 프로젝트만 읽는다. 변경된 설정 루트는 사용자가 등록하고 화면에서 확인한다. 홈 전체·다른 사용자·클라우드 동기화 병합은 자동 탐색하지 않는다.</p>
+  <p class="crit"><b>수용 기준</b> 등록 20개 프로젝트를 재실행 후 복원한다. 범위 밖 심볼릭 링크, 권한 거절, 제외 폴더를 읽지 않으며 각각 점검 제외 사유를 기록한다.</p>
+  <div class="applied"><b>제품 적용</b><p>사용자 설정 위치와 사용자가 추가한 프로젝트만 읽음. 홈 전체·다른 사용자·클라우드 병합은 탐색하지 않음. 범위 밖 심볼릭 링크·권한 거절·제외 폴더는 읽지 않고 사유를 남김.</p><p class="where">화면·구성요소: 개요 &gt; 점검 범위 · 시험 <a href="#T02">T02</a></p></div>
+</article>
+<article class="req" id="F03">
+  <div class="req-head"><span class="rid">F03</span><h3>지원 대상 식별</h3><span class="chip ok">적용</span></div>
+  <p class="src">Claude Code, Codex CLI와 Cursor MCP 설정을 어댑터별로 식별한다. 설치 식별과 구성 존재를 구분한다. 파일·앱 메타데이터를 사용하고 발견한 실행 파일을 실행해 버전을 알아내지 않는다. 정적 점검 지원과 실행 이벤트 연동 지원을 별도 항목으로 표시한다.</p>
+  <p class="crit"><b>수용 기준</b> 가짜 claude 실행 파일을 넣어도 실행되지 않는다. 버전 불명과 미설치·설정 잔존을 구분한다. 지원 버전 미확인은 제한 지원 상태로 표시한다.</p>
+  <div class="applied"><b>제품 적용</b><p>Claude Code·Codex·Cursor를 어댑터별로 식별. 실행 파일을 실행하지 않고 심볼릭 링크 대상·Info.plist에서 버전을 읽음. 설치됨·설정 잔존·미설치, 버전 불명을 구분하고 시험 버전 밖은 제한 지원으로 표시.</p><p class="where">화면·구성요소: 개요 &gt; 지원 도구 · 시험 <a href="#T03">T03</a></p></div>
+</article>
+<article class="req" id="F04">
+  <div class="req-head"><span class="rid">F04</span><h3>설정 출처와 우선순위</h3><span class="chip ok">적용</span></div>
+  <p class="src">JSON/TOML을 안전하게 파싱하고 각 값에 어댑터 버전, 원본 위치, 설정 범위, 해석 근거를 붙인다. 벤더별·버전별 우선순위를 적용한다. 실제 세션의 CLI·환경·관리 정책이 관측되지 않으면 유효 설정 확정을 보류한다.</p>
+  <p class="crit"><b>수용 기준</b> 서로 충돌하는 관리·사용자·프로젝트 설정을 정확히 구분한다. 중복 키, 파싱 실패, 미지원 키는 조용히 무시하지 않는다. 가정한 프로젝트 신뢰 상태를 명시한다.</p>
+  <div class="applied"><b>제품 적용</b><p>JSON·TOML 안전 파서(중복 키 거부, 미지원 문법은 미지원으로 보고). 값마다 어댑터 버전·위치·범위·우선순위(managed &gt; local &gt; project &gt; user)를 기록. Codex profile을 읽지 못하면 유효값 보류.</p><p class="where">화면·구성요소: 발견 사항 상세 &gt; 출처 · 시험 <a href="#T04">T04</a></p></div>
+</article>
+<article class="req" id="F05">
+  <div class="req-head"><span class="rid">F05</span><h3>MCP 구성 목록</h3><span class="chip ok">적용</span></div>
+  <p class="src">지원 설정에 선언된 MCP 서버와 에이전트별 연결을 목록화한다. 이름, 전송 방식, 명령 유형, 인자 개수, URL의 scheme·host·port, env/header 키 이름을 보존한다. 원문 인자와 토큰은 저장하지 않는다.</p>
+  <p class="crit"><b>수용 기준</b> 3개 어댑터·50개 MCP 정의에서 누락 없이 읽거나 누락 사유를 낸다. 동명 서버는 에이전트·scope·설정 위치로 구분한다. tools/list 호출, 서버 실행, URL 접속은 0건이다.</p>
+  <div class="applied"><b>제품 적용</b><p>MCP 서버 이름·전송 방식·명령 종류·인자 개수·URL의 scheme/host/port·env/header 키 이름만 보존. 원문 인자·토큰은 저장하지 않고 서버 실행·URL 접속 없음.</p><p class="where">화면·구성요소: 그래프, 증빙 inventory.json · 시험 <a href="#T05">T05</a></p></div>
+</article>
+<article class="req" id="F06">
+  <div class="req-head"><span class="rid">F06</span><h3>승인 정책 점검</h3><span class="chip ok">적용</span></div>
+  <p class="src">승인 질의 여부와 도구 허용 범위를 별도 속성으로 표시한다. 승인 생략 설정은 사용자가 검토할 위험 신호이며, 샌드박스 해제와 같은 의미로 취급하지 않는다.</p>
+  <p class="crit"><b>수용 기준</b> Codex approval_policy=never + read-only와 never + danger-full-access를 서로 다른 결과로 표시한다. 관측하지 않은 실행 플래그는 “미관측”으로 남긴다.</p>
+  <div class="applied"><b>제품 적용</b><p>승인 정책(approval_policy, defaultMode)과 샌드박스 설정을 별개 속성으로 표시. 관측되지 않은 실행 플래그는 &quot;확인 안 됨&quot;.</p><p class="where">화면·구성요소: 발견 사항 R01 · 시험 <a href="#T06">T06</a></p></div>
+</article>
+<article class="req" id="F07">
+  <div class="req-head"><span class="rid">F07</span><h3>파일·네트워크 경계 점검</h3><span class="chip ok">적용</span></div>
+  <p class="src">읽기·쓰기 범위, 샌드박스 구성, 외부 네트워크 허용 설정을 분리해 표시한다. 명시된 구성과 실행 시 적용 여부를 구분하며 근거가 없는 보안 점수를 생성하지 않는다.</p>
+  <p class="crit"><b>수용 기준</b> 지원 fixture의 제한·확장·알 수 없음 3상태를 구별한다. sandbox 키 하나가 켜져 있다는 이유로 민감 경로·통신이 안전하다고 판정하지 않는다.</p>
+  <div class="applied"><b>제품 적용</b><p>읽기·쓰기·샌드박스·네트워크 설정을 분리해 표시하고 제한·확장·미관측 3상태를 구별. 점수화하지 않음.</p><p class="where">화면·구성요소: 발견 사항 R01 · 시험 <a href="#T07">T07</a></p></div>
+</article>
+<article class="req" id="F08">
+  <div class="req-head"><span class="rid">F08</span><h3>넓은 허용 규칙 식별</h3><span class="chip ok">적용</span></div>
+  <p class="src">문서로 확인된 어댑터 문법의 전체 셸 허용·광범위 쓰기·도구 와일드카드 등을 식별한다. 개별 allow/ask/deny의 범위와 해석 가능 여부를 함께 보여준다.</p>
+  <p class="crit"><b>수용 기준</b> 유효 광범위 허용, deny로 제한된 규칙, 해석 불가 패턴을 별도 표시한다. 단순히 rm·curl 문자열이 들어 있다는 이유로 실행·악성 여부를 단정하지 않는다.</p>
+  <div class="applied"><b>제품 적용</b><p>허용 규칙 문법을 해석해 전체 셸·광범위 쓰기·MCP 와일드카드·네트워크 와일드카드를 식별. deny로 막힌 규칙과 해석 불가 규칙을 별도 표시.</p><p class="where">화면·구성요소: 발견 사항 R02 · 시험 <a href="#T08">T08</a></p></div>
+</article>
+<article class="req" id="F09">
+  <div class="req-head"><span class="rid">F09</span><h3>엔드포인트 검토</h3><span class="chip ok">적용</span></div>
+  <p class="src">명시된 원격 MCP·모델 엔드포인트의 새 등록, 변경 및 비루프백 평문 HTTP를 표시한다. 사용자 검토 목록은 정확한 host·scheme·port·scope 단위로 관리한다.</p>
+  <p class="crit"><b>수용 기준</b> 회사 프록시를 등록하면 “검토 완료”만 표시한다. 토큰·URL userinfo·query·fragment는 저장하지 않는다. 인증 헤더 부재를 무인증 확정으로 해석하지 않는다.</p>
+  <div class="applied"><b>제품 적용</b><p>비루프백 평문 HTTP와 미검토 원격 엔드포인트를 host·scheme·port 단위로 표시. &quot;엔드포인트 검토 완료&quot; 기록으로 해당 주소만 검토 처리. userinfo·query·fragment는 저장하지 않음.</p><p class="where">화면·구성요소: 발견 사항 R06 · 시험 <a href="#T09">T09</a></p></div>
+</article>
+<article class="req" id="F10">
+  <div class="req-head"><span class="rid">F10</span><h3>비밀정보 후보 점검</h3><span class="chip ok">적용</span></div>
+  <p class="src">지원 설정 파일의 env/header·토큰 키와 승인된 비밀정보 파일을 로컬에서 검사한다. 구조·패턴·엔트로피의 근거를 구분하고 유효성 확인을 위한 외부 요청은 하지 않는다.</p>
+  <p class="crit"><b>수용 기준</b> 합성 fixture의 확정 형식 40개를 모두 찾고 음성 100개에서 오탐 5개 이하를 목표로 한다. 실제 키 유효성은 항상 미확인이다. 변수 참조와 평문 값을 구별한다.</p>
+  <div class="applied"><b>제품 적용</b><p>알려진 토큰 형식 14종과 고엔트로피·민감 키 이름 근거를 구분. 합성 40종 전부 탐지, 음성 100종 오탐 5 이하를 시험으로 고정. 외부 검증 요청 없음.</p><p class="where">화면·구성요소: 발견 사항 R03 · 시험 <a href="#T10">T10</a></p></div>
+</article>
+<article class="req" id="F11">
+  <div class="req-head"><span class="rid">F11</span><h3>민감 파일 권한 점검</h3><span class="chip ok">적용</span></div>
+  <p class="src">지원 자격증명 위치 및 비밀정보 후보가 있는 파일의 소유자·POSIX 권한을 확인한다. 읽기 범위가 불명확한 ACL 등은 확인 필요로 남긴다. 시스템 전체 자격증명 저장소는 읽지 않는다.</p>
+  <p class="crit"><b>수용 기준</b> 0600/0644/타 소유자/권한 거절 fixture를 구분한다. 권한이 넓다는 사실과 유출 발생을 구별하며, 읽지 못한 파일을 비밀정보 없음으로 집계하지 않는다.</p>
+  <div class="applied"><b>제품 적용</b><p>자격증명 저장 위치와 비밀정보 후보가 있는 파일의 소유자·POSIX 권한 확인. ACL은 확인 필요로 남김. 내용은 읽지 않음.</p><p class="where">화면·구성요소: 발견 사항 R04 · 시험 <a href="#T11">T11</a></p></div>
+</article>
+<article class="req" id="F12">
+  <div class="req-head"><span class="rid">F12</span><h3>프로젝트 사전 검토</h3><span class="chip ok">적용</span></div>
+  <p class="src">사용자가 고른 프로젝트의 지원 설정, MCP 선언, CLAUDE.md·AGENTS.md 및 등록된 지시·훅·스킬 파일의 존재·변경을 확인한다. 실행 가능한 설정의 존재와 실행 발생을 구분한다.</p>
+  <p class="crit"><b>수용 기준</b> 새 프로젝트의 명령 포함 설정을 실행하지 않고 보고한다. 파일 변경은 발견하되 자연어 지시가 악성인지 단정하지 않는다. 전 프로젝트·전체 저장소를 임의 수집하지 않는다.</p>
+  <div class="applied"><b>제품 적용</b><p>프로젝트의 설정·MCP 선언·CLAUDE.md·AGENTS.md·등록된 skills/agents/commands/hooks 파일의 존재와 해시를 기록. 내용을 해석하거나 실행하지 않음.</p><p class="where">화면·구성요소: 발견 사항 R07, 그래프 · 시험 <a href="#T12">T12</a></p></div>
+</article>
+<article class="req" id="F13">
+  <div class="req-head"><span class="rid">F13</span><h3>점검 완결성과 중단 처리</h3><span class="chip ok">적용</span></div>
+  <p class="src">매 점검에 계획·성공·실패·제외 항목, 시작·종료 시각, 어댑터 지원 상태를 남긴다. 부분 성공은 결과를 보존하되 전체 완료로 표시하지 않는다. 취소는 읽기 작업을 종료하고 이전 성공 결과를 유지한다. 마지막 점검의 완결성과 현재 상주 서비스의 건강 상태는 별도 표시한다.</p>
+  <p class="crit"><b>수용 기준</b> 파일 1개 거절, 파싱 오류, 중간 취소 모두 부분/취소 상태가 된다. 완료 시각이 오래된 결과에는 경과 시간을 표시하며 실패한 최신 실행을 숨기지 않는다.</p>
+  <div class="applied"><b>제품 적용</b><p>매 점검에 계획·성공·실패·제외 항목과 시각을 기록. 부분 성공은 &quot;부분&quot;으로 표시하고 취소는 이전 결과를 유지. 마지막 점검 상태와 감시 건강 상태를 분리 표시.</p><p class="where">화면·구성요소: 개요 &gt; 마지막 점검, 점검 범위 · 시험 <a href="#T13">T13</a></p></div>
+</article>
+<article class="req" id="F14">
+  <div class="req-head"><span class="rid">F14</span><h3>비밀정보 없는 스냅샷</h3><span class="chip ok">적용</span></div>
+  <p class="src">비밀값을 제거한 정규화 구성과 관측 상태를 스냅샷으로 저장한다. 원문 설정·비밀값 변화 비교에는 설치별 키 기반 HMAC 지문을 사용한다. 시각·scan_id가 바뀌어도 내용 식별자는 안정적이어야 한다.</p>
+  <p class="crit"><b>수용 기준</b> 내용이 같은 2회 점검의 content_digest가 같다. 토큰 1자 변경은 별도 secret_fingerprint 변화로 검출한다. 키 교체 시 이전 지문과 비교 불가임을 표시한다.</p>
+  <div class="applied"><b>제품 적용</b><p>비밀값을 제거한 스냅샷을 저장하고 설치별 Keychain HMAC 지문으로 비밀값 변화만 비교. 내용 digest는 시각·scan_id를 제외해 안정적.</p><p class="where">화면·구성요소: 증빙과 설정 · 시험 <a href="#T14">T14</a></p></div>
+</article>
+<article class="req" id="F15">
+  <div class="req-head"><span class="rid">F15</span><h3>구성 변경 비교</h3><span class="chip ok">적용</span></div>
+  <p class="src">동일 호스트·범위·지원 버전의 기준 스냅샷과 비교해 추가·삭제·수정·비교 불가를 구분한다. 정상적으로 끝까지 읽은 범위에서만 삭제를 확정한다. 상주 중 감지한 구성 변화는 F38로 재점검하고 같은 기준점·diff 흐름에 연결한다.</p>
+  <p class="crit"><b>수용 기준</b> MCP 명령 변경, 승인 정책 변경, 지시 파일 변경을 별도 diff로 표시한다. 범위 제외나 권한 거절은 삭제·해결로 처리하지 않는다. 어댑터 변경은 재평가 사유가 된다.</p>
+  <div class="applied"><b>제품 적용</b><p>기준점 대비 추가·삭제·수정·비교 불가를 구분. 읽기 실패·범위 제거는 삭제로 처리하지 않음. 백그라운드에서 감지한 변경도 같은 흐름으로 재점검.</p><p class="where">화면·구성요소: 변경 사항 · 시험 <a href="#T15">T15</a></p></div>
+</article>
+<article class="req" id="F16">
+  <div class="req-head"><span class="rid">F16</span><h3>사용자 기준점 관리</h3><span class="chip ok">적용</span></div>
+  <p class="src">사용자가 비교 결과를 검토한 뒤 기준점을 지정한다. 검토자, 시각, 범위, 사유, snapshot_id를 남긴다. 기준점은 알려진 구성 상태이며 안전 인증이 아니다.</p>
+  <p class="crit"><b>수용 기준</b> 기준점 지정만으로 고위험 finding이 사라지지 않는다. 부분 점검은 전체 기준점으로 지정할 수 없으며 범위를 좁혀 명시적으로 재점검하도록 안내한다.</p>
+  <div class="applied"><b>제품 적용</b><p>완료된 점검만 기준점으로 지정. 검토자·시각·사유·점검 ID 기록. 기준점 지정으로 고위험 발견 사항이 사라지지 않음.</p><p class="where">화면·구성요소: 변경 사항 &gt; 기준점 · 시험 <a href="#T16">T16</a></p></div>
+</article>
+<article class="req" id="F17">
+  <div class="req-head"><span class="rid">F17</span><h3>결정론 탐지 규칙</h3><span class="chip ok">적용</span></div>
+  <p class="src">R01~R08을 고정 입력·어댑터·룰 버전에 대해 재현 가능하게 평가한다. 결과에는 룰 ID, 근거, 심각도, 확실성, 한계, 다음 행동을 포함한다. LLM 판정을 필수 경로에 넣지 않는다. 정적 R01~R08은 유지하며 활동 이벤트 룰 RR01~RR02는 F44의 별도 버전으로 평가한다.</p>
+  <p class="crit"><b>수용 기준</b> 같은 fixture와 버전에서 판정·대상 ID가 일치한다. 미지원 입력은 unknown이다. 룰 로딩 실패 시 이전 검증 버전 또는 점검 불가를 명시하며 무탐지로 종료하지 않는다.</p>
+  <div class="applied"><b>제품 적용</b><p>룰은 JSON 데이터. 닫힌 연산자 집합만 허용하고 같은 입력·버전이면 같은 결과. 룰 로딩 실패 시 &quot;점검 불가&quot;를 표시하고 무탐지로 끝내지 않음.</p><p class="where">화면·구성요소: 룰 파일 static-1.0.0.json · 시험 <a href="#T17">T17</a></p></div>
+</article>
+<article class="req" id="F18">
+  <div class="req-head"><span class="rid">F18</span><h3>발견 사항 생명주기</h3><span class="chip ok">적용</span></div>
+  <p class="src">동일 대상·동일 근거의 반복 탐지는 하나로 묶고 최초·최근 발견 및 횟수를 남긴다. 열림, 조치 중, 재점검 해소, 예외, 오탐 검토를 구별한다. 사용자 상태 변경과 탐지 사실은 별도로 보존한다. 실행 요청 사건의 관측·사용자 결정·실행 결과는 별도 상태로 기록하며 거절 확인을 설정 위험의 영구 해소로 바꾸지 않는다.</p>
+  <p class="crit"><b>수용 기준</b> 원인 설정이 같으면 중복 카드가 늘지 않는다. 대상 정의가 바뀌거나 예외가 만료되면 재평가한다. 사용자가 완료를 눌러도 재점검 해소 상태가 되지 않는다.</p>
+  <div class="applied"><b>제품 적용</b><p>같은 룰·대상은 하나의 발견 사항으로 묶고 최초·최근·횟수 기록. 열림·조치 중·재점검 해소·예외·오탐 검토 상태. 사용자는 조치 중까지만 바꿀 수 있고 해소는 재점검만 만듦.</p><p class="where">화면·구성요소: 발견 사항 · 시험 <a href="#T18">T18</a></p></div>
+</article>
+<article class="req" id="F19">
+  <div class="req-head"><span class="rid">F19</span><h3>실행 가능한 수동 조치 안내</h3><span class="chip ok">적용</span></div>
+  <p class="src">발견 사항마다 이유, 확인 위치, 벤더 근거, 수정 전 확인사항, 되돌리기 방법, 재점검 버튼을 제공한다. LARM은 에이전트 설정·파일·프로세스·네트워크를 자동 변경하지 않는다. 지원 경로의 실행 전 확인과 정책 집행은 F42~F43에서 별도 제공한다. 설정 자동 수정·파일 삭제·프로세스 kill은 이 요건에 포함하지 않는다.</p>
+  <p class="crit"><b>수용 기준</b> 비밀정보 후보는 발급처에서 회전/폐기 여부를 검토하도록 안내한다. 외부 이동은 사용자가 선택하며 URL에 진단 내용이 실리지 않는다. 복사한 안내에도 비밀값이 없다.</p>
+  <div class="applied"><b>제품 적용</b><p>발견 사항마다 이유·확인 위치·벤더 근거·수정 전 확인·되돌리기·재점검 안내(R01~R08). 안내 복사 시 비밀값 제거. 설정을 자동 변경하지 않음.</p><p class="where">화면·구성요소: 발견 사항 상세 &gt; 수동 조치 안내 · 시험 <a href="#T19">T19</a></p></div>
+</article>
+<article class="req" id="F20">
+  <div class="req-head"><span class="rid">F20</span><h3>재점검을 통한 해소</h3><span class="chip ok">적용</span></div>
+  <p class="src">조치 후 관련 범위를 다시 읽고 동일 룰로 비교한다. 해당 항목이 실제로 점검 가능하고 위험 조건이 사라졌을 때만 재점검 해소로 전환한다.</p>
+  <p class="crit"><b>수용 기준</b> 평문 토큰을 환경변수 참조로 바꾸면 해당 정적 finding이 해소된다. 파일 접근 거절·범위 제거·파싱 실패는 검증 불가로 유지하며 과거 유출까지 해소했다고 표현하지 않는다.</p>
+  <div class="applied"><b>제품 적용</b><p>조치 후 같은 범위를 다시 읽어 원인이 사라진 경우에만 해소. 읽지 못하면 &quot;재점검으로 확인하지 못했습니다&quot;로 유지.</p><p class="where">화면·구성요소: 발견 사항 &gt; 재점검 · 시험 <a href="#T20">T20</a></p></div>
+</article>
+<article class="req" id="F21">
+  <div class="req-head"><span class="rid">F21</span><h3>기한 있는 예외</h3><span class="chip ok">적용</span></div>
+  <p class="src">예외에는 finding의 대상 지문·룰 버전·사유·작성자·만료일을 요구한다. 기본 7일, 최대 30일로 제한하고 구성이나 룰 의미가 바뀌면 재검토한다. 사건 한 번 허용은 F42의 요청 결속 승인으로 처리하며 이 예외 목록에 자동 등록하지 않는다.</p>
+  <p class="crit"><b>수용 기준</b> 기한 없는 예외는 저장할 수 없다. 만료 후 열림 상태가 되고 집계에 복귀한다. 예외는 위험 수용이며 무탐지·안전·재점검 해소와 구분된다.</p>
+  <div class="applied"><b>제품 적용</b><p>예외에 사유·기한(기본 7일, 최대 30일) 필수. 만료·룰 버전 변경·대상 변경 시 열림으로 복귀. 위험 수용으로 표시.</p><p class="where">화면·구성요소: 발견 사항 상세 &gt; 예외와 검토 · 시험 <a href="#T21">T21</a></p></div>
+</article>
+<article class="req" id="F22">
+  <div class="req-head"><span class="rid">F22</span><h3>상태 중심 개요</h3><span class="chip ok">적용</span></div>
+  <p class="src">홈 화면은 현재 감시 상태, 마지막 건강 확인, 마지막 점검, 지원 범위, 열린 위험, 조치 중, 예외, 관측 공백과 변경 수를 표시한다. 감시 정상 여부와 위험 발견 여부를 분리하고 에이전트·프로젝트·심각도·상태 필터를 제공한다. 단일 안전 점수는 사용하지 않는다.</p>
+  <p class="crit"><b>수용 기준</b> 미해결 0건이어도 관측 공백이 있으면 “점검 필요”를 표시한다. 1,000개 finding에서 필터·상세 진입은 기준 장비 p95 1초 이내를 목표로 한다. 감시 연동이 끊기면 마지막 정상 결과로 덮지 않고 해당 범위를 부분 감시로 표시한다.</p>
+  <div class="applied"><b>제품 적용</b><p>감시 상태·마지막 건강 확인·마지막 점검·지원 도구·열린 위험·조치 중·예외·점검 공백·변경 수를 분리 표시. &quot;발견 사항 0건 / 점검 공백 있음 → 점검 필요&quot; 문구. 단일 점수 없음.</p><p class="where">화면·구성요소: 개요 · 시험 <a href="#T22">T22</a></p></div>
+</article>
+<article class="req" id="F23">
+  <div class="req-head"><span class="rid">F23</span><h3>근거를 읽을 수 있는 상세</h3><span class="chip ok">적용</span></div>
+  <p class="src">설정 위치 별칭, 필드 경로, 관측값의 안전한 요약, 설정 해석 한계, 변경 전후, 룰 버전, 수동 조치를 한 화면에서 연결한다. 상세 화면에서 원문 비밀값을 보여주는 기능을 제공하지 않는다. 활동 사건에는 요청 주체·대상 별칭·phase·결정·실제 회신과 관측 공백을 표시한다.</p>
+  <p class="crit"><b>수용 기준</b> R03 상세에 값 대신 “평문 후보 있음·유효성 미확인”이 표시된다. 출처·범위·점검 시각을 두 번 이내의 화면 이동으로 확인한다.</p>
+  <div class="applied"><b>제품 적용</b><p>위치 별칭·필드·값 요약·해석 한계·룰 버전·조치를 한 화면에. 비밀값은 &quot;[제거됨]·유효성 미확인&quot;으로만 표시.</p><p class="where">화면·구성요소: 발견 사항 상세 · 시험 <a href="#T23">T23</a></p></div>
+</article>
+<article class="req" id="F24">
+  <div class="req-head"><span class="rid">F24</span><h3>절제된 알림</h3><span class="chip ok">적용</span></div>
+  <p class="src">사용자가 허용한 경우 상주 서비스가 신규 높은 위험과 감시 공백을 macOS 알림으로 전달한다. 창이 닫혀도 감시는 유지한다. 같은 대상·룰의 반복 알림은 24시간 묶되 위험 상승·새 요청·새 공백·복구는 별도 사건으로 남긴다. F36의 조용한 시간에도 앱 내부 기록과 상태 배지는 유지한다.</p>
+  <p class="crit"><b>수용 기준</b> 알림 거부 상태에서도 감시와 앱 이력은 유지한다. 제목·본문에 파일 원문·사용자명·토큰·프로젝트 이름을 넣지 않는다. 동일 사건 100회는 중복 억제하되 원천 건수를 보존하고 신규 고위험·감시 장애를 누락하지 않는다.</p>
+  <div class="applied"><b>제품 적용</b><p>macOS 알림(신규 높은 위험·감시 공백·복구). 같은 항목은 24시간 한 번, 건수 보존. 조용한 시간. 알림 거부와 감시 종료 구분. 본문에 파일·프로젝트 이름·토큰 없음.</p><p class="where">화면·구성요소: 증빙과 설정 &gt; 알림 · 시험 <a href="#T24">T24</a></p></div>
+</article>
+<article class="req" id="F25">
+  <div class="req-head"><span class="rid">F25</span><h3>증빙 묶음 내보내기</h3><span class="chip ok">적용</span></div>
+  <p class="src">선택한 점검 범위와 시점의 inventory·coverage·findings·diff·사용자 판단·버전 및 사람이 읽는 요약을 ZIP으로 내보낸다. 미리보기에서 포함 항목과 미해결·예외·공백 수를 확인한다. 선택 기간의 활동 사건·감시 공백·결정·집행 결과도 마스킹 후 포함하고 관측만 한 사건과 실제 실행 근거를 구별한다.</p>
+  <p class="crit"><b>수용 기준</b> 내보내기 후 모든 파일 해시가 manifest와 일치한다. 파일명·내용에 원문 비밀정보가 없다. 빈 결과도 점검 범위와 제외 사유가 존재하며 과거 결과를 현재처럼 표시하지 않는다.</p>
+  <div class="applied"><b>제품 적용</b><p>manifest.json·summary.html·inventory·coverage·findings·diff·decisions·versions·graph·events·coverage_gaps·action_results·README를 ZIP으로 내보냄. 미리보기에 건수 표시. 비밀값·지문·실제 경로·사용자명 없음.</p><p class="where">화면·구성요소: 증빙과 설정 &gt; 증빙 내보내기 · 시험 <a href="#T25">T25</a></p></div>
+</article>
+<article class="req" id="F26">
+  <div class="req-head"><span class="rid">F26</span><h3>오프라인 증빙 검증</h3><span class="chip ok">적용</span></div>
+  <p class="src">증빙 수신자가 인터넷·LARM 계정 없이 파일 목록·크기·SHA-256을 검증할 수 있는 절차와 검증기를 제공한다. 성공은 내부 일관성 확인이며 생성자 신원·실제 실행·시점 공증을 증명하지 않는다.</p>
+  <p class="crit"><b>수용 기준</b> 파일 수정·누락·추가, 경로 이탈, 중복 ZIP 경로, 중복 JSON 키를 실패 처리한다. manifest까지 재작성한 위조는 독립 기준 해시 없이는 검출 불가임을 결과에 표시한다.</p>
+  <div class="applied"><b>제품 적용</b><p>larm-verify 명령과 앱 내 검증. 개수·크기·SHA-256·중복 경로·경로 이탈·중복 JSON 키 검사. 성공은 내부 일관성이며 신원·시점 보증이 아님을 표시.</p><p class="where">화면·구성요소: larm-verify, 증빙과 설정 · 시험 <a href="#T26">T26</a></p></div>
+</article>
+<article class="req" id="F27">
+  <div class="req-head"><span class="rid">F27</span><h3>어댑터·룰 갱신</h3><span class="chip ok">적용</span></div>
+  <p class="src">출시 앱에 고정된 어댑터·룰 버전을 포함하고 사용자가 확인한 서명된 패키지만 갱신한다. 서명·schema·호환성 검사 후 원자적으로 전환한다. 룰은 데이터이며 셸·스크립트를 담을 수 없다.</p>
+  <p class="crit"><b>수용 기준</b> 변조·오래된 버전·미지원 schema 업데이트가 거부된다. 잘못된 갱신은 마지막 검증 버전으로 되돌릴 수 있고 기존 finding은 이전 룰 버전을 유지한다.</p>
+  <div class="applied"><b>제품 적용</b><p>Ed25519 서명·schema·버전 검사를 통과한 룰 패키지만 원자적으로 전환하고 되돌리기 제공. 룰에 실행 구문이 있으면 거부. 배포 공개키는 출시 시 교체 필요.</p><p class="where">화면·구성요소: 증빙과 설정 &gt; 룰 갱신 · 시험 <a href="#T27">T27</a></p></div>
+</article>
+<article class="req" id="F28">
+  <div class="req-head"><span class="rid">F28</span><h3>보존과 삭제</h3><span class="chip ok">적용</span></div>
+  <p class="src">정적 점검 이력은 기본 30일, 선택값 7·30·90일로 유지한다. 활동 이벤트는 최소 수집을 위해 기본 7일로 제안하고 7·30·90일 선택 시 저장량과 개인정보 영향을 알린다. 현재 기준점은 별도 표시한다. 기록·기준점·설치 키를 구분해 삭제하며 내보낸 사본은 별도임을 알린다.</p>
+  <p class="crit"><b>수용 기준</b> 만료 데이터는 상주 정리 작업 또는 다음 시작 시 삭제한다. 전체 초기화 후 키·DB·임시 파일을 제거한다. SSD·백업·클라우드 사본의 물리적 완전 삭제를 약속하지 않는다.</p>
+  <div class="applied"><b>제품 적용</b><p>정적 점검 이력 7·30·90일(기본 30), 활동 이벤트 7·30·90일(기본 7). 기준점·최신 점검 유지. 전체 초기화로 기록·기준점·설치 키 삭제.</p><p class="where">화면·구성요소: 증빙과 설정 &gt; 보존과 삭제 · 시험 <a href="#T28">T28</a></p></div>
+</article>
+<article class="req" id="F29">
+  <div class="req-head"><span class="rid">F29</span><h3>수동 점검과 상주 대조</h3><span class="chip ok">적용</span></div>
+  <p class="src">수동 전체 점검과 선택 범위 재점검을 유지한다. 상주 중 설정 변화는 이벤트로 재점검하고, 이벤트 누락 확인을 위한 30분 주기 대조를 병행한다. 중복 작업을 병합하며 절전 복귀 시 현재 설정·연동 상태를 확인한다. 창 닫기와 감시 종료를 구분한다.</p>
+  <p class="crit"><b>수용 기준</b> 창을 닫은 뒤에도 F37의 허용된 상주 서비스가 유지된다. 사용자가 감시 종료를 선택하면 중단한다. 절전 복귀 시 중복 없이 대조하고 공백 중 모든 행위를 수집했다고 표시하지 않는다.</p>
+  <div class="applied"><b>제품 적용</b><p>수동 전체 점검과 범위 재점검. 백그라운드 변경은 이벤트로 재점검하고 30분마다 대조. 중복 요청 병합, 절전 복귀 시 대조. 창 닫기와 감시 종료 구분.</p><p class="where">화면·구성요소: 개요, 메뉴바 · 시험 <a href="#T29">T29</a></p></div>
+</article>
+<article class="req" id="F30">
+  <div class="req-head"><span class="rid">F30</span><h3>도움말과 진단</h3><span class="chip ok">적용</span></div>
+  <p class="src">지원 범위, 수동 조치, 업데이트, 완전 제거, 점검 실패 복구를 앱 안에서 안내한다. 사용자가 미리 보는 진단 파일은 앱·룰·OS 버전과 오류 코드만 포함하며 자동 전송하지 않는다. 자동 시작·연동 해제·일시중지·감시 공백·장애 복구·제거를 안내한다.</p>
+  <p class="crit"><b>수용 기준</b> 오류 상태에서 범위 재선택·재시도·진단 내보내기로 복구할 수 있다. 진단 파일에 프로젝트 경로·설정 원문·비밀정보·기기 일련번호가 없다.</p>
+  <div class="applied"><b>제품 적용</b><p>지원 범위·조치·제거·복구 안내와 진단 파일(버전·오류 코드·audit만). 자동 전송 없음.</p><p class="where">화면·구성요소: 증빙과 설정 &gt; 진단 · 시험 <a href="#T30">T30</a></p></div>
+</article>
+<article class="req" id="F31">
+  <div class="req-head"><span class="rid">F31</span><h3>근거 기반 온톨로지</h3><span class="chip ok">적용</span></div>
+  <p class="src">Device·Agent·Project·Configuration·MCPServer·Endpoint·SecretCandidate·Finding·Rule·Evidence의 타입과 관계의 출발/도착 타입을 정의한다. 각 관계에 근거 ID·scan_id·관측/도출/사용자 확인 구분을 둔다. Session·Process·ToolRequest·ActionResult·Resource·Decision·CoverageGap을 추가하고 요청·성공·거절 확인의 관계를 구분한다.</p>
+  <p class="crit"><b>수용 기준</b> 중복 이름만으로 다른 MCP 서버를 병합하지 않는다. 근거 없는 간선·타입 위반·다른 기기 연결을 거부한다. 비밀정보 노드는 값·앞뒤 글자·export HMAC을 포함하지 않는다.</p>
+  <div class="applied"><b>제품 적용</b><p>Device·Agent·Project·Configuration·MCPServer·Endpoint·SecretCandidate·Finding·Rule·Evidence와 활동 타입(Session·ToolRequest·ActionResult·Resource·Decision·CoverageGap)의 관계를 정의. 근거 없는 간선·타입 위반·다른 범위 연결 거부.</p><p class="where">화면·구성요소: 그래프, graph.json · 시험 <a href="#T43">T43</a></p></div>
+</article>
+<article class="req" id="F32">
+  <div class="req-head"><span class="rid">F32</span><h3>전체·주변 그래프 탐색</h3><span class="chip ok">적용</span></div>
+  <p class="src">옵시디언형 전체 그래프와 선택 노드의 주변 그래프를 제공한다. 이동·확대·노드 끌기/고정·검색·타입/심각도/상태 필터·깊이 1~2 선택·배치 초기화를 지원한다.</p>
+  <p class="crit"><b>수용 기준</b> 500노드/1,000간선 fixture에서 첫 표시 p95 2초 이하, 선택 반응 p95 200ms 이하를 목표로 한다. 기본 최대 200노드 표시, 초과는 요약/숨김 건수를 알리고 표 보기로 전환 가능하다.</p>
+  <div class="applied"><b>제품 적용</b><p>전체·주변(깊이 1~2)·변경 보기. 확대·이동·드래그 고정·검색·타입/심각도/상태 필터·배치 초기화. 200노드 상한과 표 보기.</p><p class="where">화면·구성요소: 그래프 · 시험 <a href="#T44">T44</a></p></div>
+</article>
+<article class="req" id="F33">
+  <div class="req-head"><span class="rid">F33</span><h3>그래프에서 근거와 조치 연결</h3><span class="chip ok">적용</span></div>
+  <p class="src">노드·간선을 누르면 타입, 관계 의미, 출처, 관측 시점, 관련 finding과 조치를 상세 패널로 연다. 구성 연관 경로를 표시할 수 있으나 실제 통신·실행·유출 경로라고 표현하지 않는다. 활동 관계는 요청 근거와 결과 근거를 별도로 열며, 결과가 없으면 실행 여부 미확인으로 표시한다.</p>
+  <p class="crit"><b>수용 기준</b> Agent→Configuration→MCP→Endpoint의 각 간선을 근거와 대조할 수 있다. finding에서 원인 필드·수동 안내·재점검까지 두 번 이내 화면 이동으로 접근한다.</p>
+  <div class="applied"><b>제품 적용</b><p>노드·간선 클릭 시 타입·관계 의미·출처(직접 확인/추론)·근거 건수·관련 발견 사항과 조치 열기. 설정 관계를 실제 통신·실행으로 표현하지 않음.</p><p class="where">화면·구성요소: 그래프 &gt; 상세 · 시험 <a href="#T45">T45</a></p></div>
+</article>
+<article class="req" id="F34">
+  <div class="req-head"><span class="rid">F34</span><h3>그래프 변경 비교</h3><span class="chip ok">적용</span></div>
+  <p class="src">선택한 두 완료 스냅샷의 추가·수정·삭제를 그래프와 목록에서 동기화한다. 관측 공백·범위 변경은 비교 불가로 구별한다. 위치를 안정적으로 유지하고 시점/필터를 명시한다. 정적 시점 비교와 활동 시간선 필터를 구분하고 관측 공백을 함께 표시한다.</p>
+  <p class="crit"><b>수용 기준</b> MCP endpoint 변경은 이전/현재 간선으로 구분한다. 읽기 실패를 삭제로 표현하지 않는다. 같은 scope의 반복 비교에서 사용자 고정 위치가 유지된다.</p>
+  <div class="applied"><b>제품 적용</b><p>기준점 diff를 그래프에 추가·삭제·수정·비교 불가로 표시. 고정 위치 유지.</p><p class="where">화면·구성요소: 그래프 &gt; 변경 보기 · 시험 <a href="#T46">T46</a></p></div>
+</article>
+<article class="req" id="F35">
+  <div class="req-head"><span class="rid">F35</span><h3>관심 대상과 빠른 작업</h3><span class="chip ok">적용</span></div>
+  <p class="src">관심 에이전트/프로젝트를 고정하고 필터·그래프 중심/깊이·배치를 최대 5개 보기로 저장한다. 단축키 검색과 선택 범위 빠른 재점검을 제공한다. 기한 예외·해소는 별도 확인 흐름을 유지한다. 관심 대상의 활동 사건과 감시 공백에도 같은 저장 필터를 적용한다.</p>
+  <p class="crit"><b>수용 기준</b> 앱 재실행 후 저장 보기 복원; 선택 범위만 점검되어 coverage가 일치한다. 단축키·일괄 선택으로 원문 설정 변경·자동 해소·예외 대량 수용이 발생하지 않는다.</p>
+  <div class="applied"><b>제품 적용</b><p>저장 보기 5개(필터·중심·깊이·고정 위치), 검색, 선택 범위 재점검.</p><p class="where">화면·구성요소: 그래프 · 시험 <a href="#T47">T47</a></p></div>
+</article>
+<article class="req" id="F36">
+  <div class="req-head"><span class="rid">F36</span><h3>첫 사용·오늘 할 일·알림 편의</h3><span class="chip part">부분</span></div>
+  <p class="src">첫 실행 체크리스트와 “오늘 확인할 항목” 상위 3개를 제공한다. 순서는 높은 위험·예외 만료·구성 변경·오래된 결과의 규칙으로 설명한다. 알림 조용한 시간과 결과 요약 보기를 제공한다. 첫 사용에는 자동 시작·활동 연동·시험 이벤트 확인을 추가하고 상위 항목에 중대한 감시 장애를 포함한다.</p>
+  <p class="crit"><b>수용 기준</b> 사용자 10명 중 8명이 표와 그래프 중 원하는 보기로 근거→조치→재점검을 완료하는 것을 목표로 한다. 조용한 시간에도 앱 내 위험·공백 배지는 남고 완료 체크만으로 이슈가 해소되지 않는다.</p>
+  <div class="applied"><b>제품 적용</b><p>첫 실행 안내, 오늘 확인할 항목 상위 3개(높은 위험 순), 조용한 시간. 사용자 10명 목표는 파일럿 게이트 항목.</p><p class="where">화면·구성요소: 개요, 증빙과 설정 · 시험 <a href="#T48">T48</a></p></div>
+</article>
+<article class="req" id="F37">
+  <div class="req-head"><span class="rid">F37</span><h3>자동 시작과 상주 서비스</h3><span class="chip ok">적용</span></div>
+  <p class="src">사용자가 허용하면 로그인 시 감시 서비스를 시작하고 메뉴바 상태와 단일 앱으로 관리한다. 창 닫기·감시 일시중지·감시 종료를 구분한다. 초기 점검·상시 관측·재점검·증빙의 기존 흐름을 같은 앱에서 제공한다.</p>
+  <p class="crit"><b>수용 기준</b> 재로그인·재부팅 각 10회에서 허용된 자동 시작과 창 종료 후 수집을 확인한다. 자동 시작 거부·설정 해제·감시 종료를 정확히 표시하고 사용자 중지를 자동 복구로 우회하지 않는다.</p>
+  <div class="applied"><b>제품 적용</b><p>로그인 자동 시작 토글(SMAppService). 단일 앱이 메뉴바에 상주하며 창을 닫아도 유지. 일시중지·종료를 구분하고 사용자 중지를 우회하지 않음.</p><p class="where">화면·구성요소: 메뉴바, 증빙과 설정 · 시험 <a href="#T49">T49</a></p></div>
+</article>
+<article class="req" id="F38">
+  <div class="req-head"><span class="rid">F38</span><h3>설정 변화의 상시 감지</h3><span class="chip ok">적용</span></div>
+  <p class="src">선택 범위의 설정 변경 이벤트를 수집하고 안정된 파일 내용을 안전 파싱해 기존 F15 diff와 R01~R08에 연결한다. 파일 감시 알림은 변경 주체·파일 읽기·실제 실행의 증거로 취급하지 않는다.</p>
+  <p class="crit"><b>수용 기준</b> rename·부분 쓰기·삭제·심볼릭 링크·권한 철회·이벤트 병합·누락 fixture에서 변화 또는 공백을 표시한다. 범위 밖 읽기 0건이며 누락 시 F29의 현재 상태 대조로 복구한다.</p>
+  <div class="applied"><b>제품 적용</b><p>설정 폴더 FSEvents 감시와 루트 파일 60초 폴링. 안정된 내용을 안전 파싱해 기존 diff·룰에 연결. 이벤트 유실 플래그는 공백으로 기록하고 대조로 복구.</p><p class="where">화면·구성요소: 개요 &gt; 백그라운드 감시 · 시험 <a href="#T50">T50</a></p></div>
+</article>
+<article class="req" id="F39">
+  <div class="req-head"><span class="rid">F39</span><h3>지원 AI 활동 수집과 사건 기록</h3><span class="chip ok">적용</span></div>
+  <p class="src">첫 출시에서 최소 한 개의 검증된 도구 연동으로 세션·실행 요청·제공 가능한 결과를 수집한다. 기본 후보는 Claude Code hook이며 실제 버전·schema·오류 동작은 지원표에서 확정한다. 설정 점검만 지원하는 도구의 활동은 미관측으로 표시한다.</p>
+  <p class="crit"><b>수용 기준</b> 고정 양성·음성·실패 fixture에서 주체·phase·대상 별칭·근거·버전을 연결한다. 중복·순서 역전·재전송·PID 재사용을 구분한다. 결과 이벤트가 없으면 미확인으로 남기고 실행 성공 간선을 생성하지 않는다.</p>
+  <div class="applied"><b>제품 적용</b><p>Claude Code hook(PreToolUse·PostToolUse·SessionStart·SessionEnd) 연동. 소켓 수신, 앱 종료 시 보관 후 수집. 중복·순서 역전·재전송·PID 재사용 구분. 결과 이벤트가 없으면 &quot;실행 여부 미확인&quot;. Codex·Cursor 활동은 미지원.</p><p class="where">화면·구성요소: AI 활동 · 시험 <a href="#T51">T51</a></p></div>
+</article>
+<article class="req" id="F40">
+  <div class="req-head"><span class="rid">F40</span><h3>감시 건강 상태와 공백</h3><span class="chip ok">적용</span></div>
+  <p class="src">설정 감시·AI 활동 연동·선택 센서별로 감시 중·부분 감시·일시중지·장애·미지원 상태와 마지막 정상 확인 시각을 제공한다. 10초 능동 상태 확인과 30초 이내 공백 표시를 초기 목표로 한다.</p>
+  <p class="crit"><b>수용 기준</b> 서비스 kill·deadlock·로컬 연결 단절·권한 철회·이벤트 유실을 주입한다. 유휴와 장애를 구별하고 확인 가능한 장애 발생 후 30초 이내 해당 범위를 공백으로 표시한다. 재연결과 시험 이벤트 확인 전 정상으로 복귀시키지 않는다.</p>
+  <div class="applied"><b>제품 적용</b><p>설정 감시·AI 활동 연동별 감시 중·부분·일시중지·장애·연결 안 됨 상태와 마지막 정상 시각. 10초 건강 확인. 미실행·절전·장애 구간을 공백으로 기록.</p><p class="where">화면·구성요소: 개요 &gt; 백그라운드 감시 · 시험 <a href="#T52">T52</a></p></div>
+</article>
+<article class="req" id="F41">
+  <div class="req-head"><span class="rid">F41</span><h3>기한 일시중지와 재개</h3><span class="chip ok">적용</span></div>
+  <p class="src">15분·1시간·수동 재개의 감시 일시중지를 제공한다. 종료 기한과 중지 범위를 메뉴바·앱에 표시한다. 절전·로그아웃·권한 회수·장애 기간도 공백으로 기록하며 사용자 중지는 자동 시작보다 우선한다.</p>
+  <p class="crit"><b>수용 기준</b> 기한 만료 후 현재 설정·연동 건강을 확인하고 실패하면 공백을 유지한다. 중지 중 관측한 것처럼 기록하지 않는다. 다른 보안 제품과 대상 AI 도구 자체의 제한을 해제하지 않는다.</p>
+  <div class="applied"><b>제품 적용</b><p>15분·1시간·수동 재개 일시중지. 기한 만료 시 건강 확인 후 재개, 실패하면 공백 유지. 중지 중 관측한 것처럼 기록하지 않음.</p><p class="where">화면·구성요소: 메뉴바, 개요 · 시험 <a href="#T53">T53</a></p></div>
+</article>
+<article class="req" id="F42">
+  <div class="req-head"><span class="rid">F42</span><h3>지원 요청의 실행 전 확인 <em class="cond">조건부</em></h3><span class="chip out">제외</span></div>
+  <p class="src">조건부 요건이다. 대화형 보류를 검증한 사전 개입 지점에서만 한 번 허용·거절을 제공한다. 결정은 request_id·세션·대상·인자 지문·정책 버전·만료에 결속하고 기존 도구의 승인·거절 정책을 존중한다.</p>
+  <p class="crit"><b>수용 기준</b> 대상·인자·정책 변경, 만료·중복 재전송 시 기존 승인이 무효화된다. 사후 이벤트에는 보류 버튼을 표시하지 않는다. 전달 실패·timeout을 허용 또는 차단 성공으로 꾸미지 않는다.</p>
+  <div class="applied"><b>제품 적용</b><p>조건부 기능. 사용자 결정으로 첫 빌드에서 제공하지 않음. hook은 허용·차단 결정을 반환하지 않고 기록만 함.</p><p class="where">화면·구성요소: — · 시험 <a href="#T54">T54</a></p></div>
+</article>
+<article class="req" id="F43">
+  <div class="req-head"><span class="rid">F43</span><h3>등록 정책 집행과 결과 확인 <em class="cond">조건부</em></h3><span class="chip out">제외</span></div>
+  <p class="src">조건부 요건이다. 사용자가 선택한 검증된 경로에서 사전 등록한 로컬 결정론 규칙을 집행한다. 요청된 모드와 실제 유효 모드를 분리하고 거절 결정 전달과 실제 거절 회신을 구별한다.</p>
+  <p class="crit"><b>수용 기준</b> 실제 연동 회신이 있을 때만 해당 요청의 거절 확인을 표시한다. fail-open·연결 장애·우회 경로를 강제 보호로 표시하지 않는다. 전역 프로세스 kill·파일 삭제·네트워크 차단 기능은 포함하지 않는다.</p>
+  <div class="applied"><b>제품 적용</b><p>조건부 기능. 정책 집행과 결과 확인을 제공하지 않음(관측 모드).</p><p class="where">화면·구성요소: — · 시험 <a href="#T55">T55</a></p></div>
+</article>
+<article class="req" id="F44">
+  <div class="req-head"><span class="rid">F44</span><h3>활동 위험 규칙과 상태 구분</h3><span class="chip ok">적용</span></div>
+  <p class="src">정적 R01~R08과 별도로 RR01 작업 범위 밖 민감 자원 요청, RR02 지원 문법의 고위험 도구 요청을 평가한다. 입력 schema·도구 버전·허용 범위·룰 버전을 고정하며 관측·판정·결정·실행 결과를 분리한다.</p>
+  <p class="crit"><b>수용 기준</b> 동일 정규화 입력과 룰 버전은 같은 판정이어야 한다. 정상 요청·인코딩·간접 실행·쉘·경로 변형·불명 인자는 각각 음성 또는 unknown fixture로 검증한다. 문자열 일치만으로 악성·유출 성공을 단정하지 않는다.</p>
+  <div class="applied"><b>제품 적용</b><p>RR01(범위 밖 민감 자원 요청)·RR02(고위험 도구 요청) 룰을 JSON으로 고정. 인코딩·간접 실행은 판단 보류. 관측·판단·사용자 확인·실제 결과를 분리.</p><p class="where">화면·구성요소: AI 활동 &gt; 판단 · 시험 <a href="#T56">T56</a></p></div>
+</article>
+
+<h2 id="N01">비기능 요건 N01~N15</h2>
+<article class="req" id="N01">
+  <div class="req-head"><span class="rid">N01</span><h3>점검기의 실행 안전성</h3><span class="chip ok">적용</span></div>
+  <p class="src">설정과 프로젝트는 신뢰하지 않는 데이터로 취급한다. 발견한 binary·hook·MCP·package manager·shell·URL을 실행/호출하지 않는다. 동적 eval, 환경 치환 실행, 외부 엔티티·원격 참조를 허용하지 않는다. 수집 연동은 제품이 서명·검증한 어댑터만 명시적으로 등록한다. 발견한 임의 hook을 실행하는 것과 구분하며 입력 데이터로 수집기 명령을 생성하지 않는다.</p>
+  <p class="crit"><b>수용 기준</b> 파일당 2MB, 2,000파일, 20프로젝트, 총 200MB, 깊이 10을 기본 상한으로 시험한다. 초과·링크 이탈·TOCTOU 변화·비정상 인코딩은 공백으로 보고한다. canary 실행 및 네트워크 요청은 0건이다.</p>
+  <div class="applied"><b>제품 적용</b><p>발견한 실행 파일·hook·MCP·URL을 실행/호출하지 않음. 동적 eval 없음. 파일당 2MB·2,000파일·20프로젝트·200MB·깊이 10 상한, 초과·링크 이탈·읽는 중 변경은 공백으로 보고. 자체 hook 실행만 허용.</p><p class="where">화면·구성요소: 시험 T31 · 시험 <a href="#T31">T31</a></p></div>
+</article>
+<article class="req" id="N02">
+  <div class="req-head"><span class="rid">N02</span><h3>비밀정보 비저장</h3><span class="chip ok">적용</span></div>
+  <p class="src">원문은 메모리에서 최소 시간 처리하고 UI·DB·로그·오류·임시 파일·내보내기에 쓰기 전에 제거한다. 값의 앞뒤 글자도 보여주지 않는다. 중복 식별은 설치별 HMAC 지문으로만 한다. 활동 이벤트의 raw prompt·응답·파일 내용·원문 인자도 기본 수집·저장하지 않는다.</p>
+  <p class="crit"><b>수용 기준</b> 합성 canary를 모든 저장면·실패 경로에서 검색해 0건이어야 한다. 인자·URL·env·header·파일명도 검사한다. 크래시 본문 덤프와 운영체제 진단의 원문 포함 위험을 최소화한다.</p>
+  <div class="applied"><b>제품 적용</b><p>원문은 파싱 직후 제거. UI·DB·로그·오류·증빙·진단에 원문 없음. 중복 식별은 설치별 HMAC. 활동 이벤트의 프롬프트·인자·파일 내용 미수집. 전 저장면 canary 시험.</p><p class="where">화면·구성요소: 시험 T32 · 시험 <a href="#T32">T32</a></p></div>
+</article>
+<article class="req" id="N03">
+  <div class="req-head"><span class="rid">N03</span><h3>로컬 저장 보호</h3><span class="chip ok">적용</span></div>
+  <p class="src">앱 데이터 폴더 0700, DB·증빙 임시 파일 0600을 기본으로 한다. 설치별 HMAC 키는 macOS Keychain에 보관한다. 인증 프롬프트 실패 시 임시 약한 키로 대체하지 않는다.</p>
+  <p class="crit"><b>수용 기준</b> 다른 일반 계정이 앱 데이터에 접근할 수 없다. Keychain 잠금·키 분실 시 이전 비교가 불가함을 알리고 재기준화를 요구한다. 로컬 관리자 침해에 대한 불변 저장소로 주장하지 않는다.</p>
+  <div class="applied"><b>제품 적용</b><p>앱 데이터 폴더 0700, DB·소켓 0600. HMAC 키는 Keychain. 키 준비 실패 시 약한 임시 키로 대체하지 않고 시작을 막음.</p><p class="where">화면·구성요소: 시작 화면 · 시험 <a href="#T33">T33</a></p></div>
+</article>
+<article class="req" id="N04">
+  <div class="req-head"><span class="rid">N04</span><h3>오프라인 기본 동작</h3><span class="chip ok">적용</span></div>
+  <p class="src">점검·조치 안내·기준 비교·내보내기·검증은 인터넷 없이 완료한다. 앱의 자동 원격 측정·원격 진단·토큰 검증은 없다. 수동 업데이트 확인과 사용자 선택 링크 열기는 별도 동작이다. 상주 감시·로컬 판정·기록도 오프라인으로 동작하며 매 이벤트 LLM 또는 중앙 AVI 호출을 요구하지 않는다.</p>
+  <p class="crit"><b>수용 기준</b> 격리 네트워크에서 모든 핵심 여정을 통과한다. 기본 점검의 앱 발생 outbound 요청은 0건이다. 업데이트 요청에도 설정·finding·식별자가 포함되지 않는다. OS 자체 공증 조회는 측정 범위에서 구분한다.</p>
+  <div class="applied"><b>제품 적용</b><p>점검·안내·비교·내보내기·검증·감시 모두 오프라인. 네트워크 호출 코드 없음. 원격 측정 없음.</p><p class="where">화면·구성요소: — · 시험 <a href="#T34">T34</a></p></div>
+</article>
+<article class="req" id="N05">
+  <div class="req-head"><span class="rid">N05</span><h3>반응성과 자원 사용</h3><span class="chip part">부분</span></div>
+  <p class="src">M1·16GB 이상 기준 장비, 20프로젝트·2,000파일·50MCP·200MB fixture에서 성능을 검증한다. 냉간 전체 점검과 변경 점검을 각각 20회 측정하고 장비·OS·분포를 보존한다. 서비스와 UI 프로세스의 합산 자원 사용량을 측정하고 상주 비용은 N13의 72시간 시험에서 별도 확인한다.</p>
+  <p class="crit"><b>수용 기준</b> 목표 p95: 전체 60초, 변경 점검 10초, 취소 응답 2초. 최대 RSS 350MB, 점검 외 유휴 15분 평균 CPU 1% 이하(논리 CPU 1개=100%). 목표 미달은 범위/성능 조정 후 재검증한다.</p>
+  <div class="applied"><b>제품 적용</b><p>자체 성능 하니스: 20프로젝트·약 1,900파일·50MCP 전체 점검 20회 p95 0.39초, RSS 118MB(이 Mac). 변경 점검·취소·유휴 CPU 실측 미완.</p><p class="where">화면·구성요소: 시험 T35 · 시험 <a href="#T35">T35</a></p></div>
+</article>
+<article class="req" id="N06">
+  <div class="req-head"><span class="rid">N06</span><h3>배포와 제거의 완결성</h3><span class="chip part">부분</span></div>
+  <p class="src">Developer ID 서명·공증된 앱을 배포하고 검증 가능한 해시와 설치 안내를 제공한다. 기본 설정 감시에는 관리자·FDA·Accessibility·Endpoint Security 권한을 필수로 요구하지 않는다. 자동 시작·지원 hook 등록은 사용자가 허용한 범위에서 수행하고 OS 센서는 별도 선택 확장으로 관리한다.</p>
+  <p class="crit"><b>수용 기준</b> 새 계정의 설치·서명·공증·자동 시작·제거를 시험한다. 연동을 선택하지 않으면 기존 에이전트 설정은 바이트 단위로 보존한다. 선택한 연동은 변경 전후 diff를 기록하고 N14 기준으로 설치·제거한다. 사용자 내보내기 파일의 보존 여부를 설명한다.</p>
+  <div class="applied"><b>제품 적용</b><p>install.sh·uninstall.sh·유니버설 DMG. ad-hoc 서명이며 Developer ID·공증은 유보. 연동 미선택 시 기존 설정 미접근. 제거 시 LARM 항목만 삭제.</p><p class="where">화면·구성요소: install.sh, make-dist.sh · 시험 <a href="#T36">T36</a></p></div>
+</article>
+<article class="req" id="N07">
+  <div class="req-head"><span class="rid">N07</span><h3>장애·업데이트 복구</h3><span class="chip part">부분</span></div>
+  <p class="src">점검 쓰기는 트랜잭션으로 처리하고 불완전 결과는 별도로 표시한다. 앱·schema 갱신 전 로컬 백업과 호환성 검사를 수행하며 실패 후 이전 앱/데이터로 복원할 수 있어야 한다. 서비스·연동 장애와 이벤트 큐 유실은 감시 공백으로 기록한다. 복구 후 건강 확인과 현재 상태 대조를 수행하며 사용자 중지 의사는 우회하지 않는다.</p>
+  <p class="crit"><b>수용 기준</b> 점검·DB commit·갱신 중 강제 종료 후 마지막 완료 결과를 복구하고 손상 데이터를 격리한다. 오류를 0건 성공으로 표시하지 않는다. 관측 모드는 대상 작업을 중단하지 않으며 조건부 집행 모드는 N15의 검증된 장애 동작을 따른다.</p>
+  <div class="applied"><b>제품 적용</b><p>SQLite WAL·트랜잭션, schema 버전 관리. 장애·큐 유실을 공백으로 기록. 강제 종료 실기 시험 미실행.</p><p class="where">화면·구성요소: — · 시험 <a href="#T37">T37</a></p></div>
+</article>
+<article class="req" id="N08">
+  <div class="req-head"><span class="rid">N08</span><h3>한국어·접근성</h3><span class="chip part">부분</span></div>
+  <p class="src">한국어 기본 UI에 필요한 영문 용어를 병기한다. 색상과 상태 문구를 함께 쓰고 키보드 이동·VoiceOver 이름·확대 시 레이아웃을 제공한다.</p>
+  <p class="crit"><b>수용 기준</b> 1024×768 화면·200% 글자 크기에서 주요 행동에 접근 가능하다. 긴 경로는 안전한 축약과 접근 가능한 전체 별칭으로 제공한다. 등급 색을 제거해도 상태를 구분할 수 있다.</p>
+  <div class="applied"><b>제품 적용</b><p>한국어 UI. 색과 상태 문구 병기, 표 보기 대안. VoiceOver·확대 시험 미실행.</p><p class="where">화면·구성요소: 전체 · 시험 <a href="#T38">T38</a></p></div>
+</article>
+<article class="req" id="N09">
+  <div class="req-head"><span class="rid">N09</span><h3>지원 매트릭스 관리</h3><span class="chip part">부분</span></div>
+  <p class="src">Apple Silicon Mac을 대상으로 실제 시험한 macOS 빌드·에이전트 버전·설정 schema·어댑터 버전을 출시에 동봉한다. Desktop/Cowork/브라우저 제품을 CLI 지원에서 자동 파생하지 않는다. 지원표는 설정 점검·활동 관측·실행 전 확인·정책 집행을 각각 표시한다. 한 기능의 지원을 다른 기능으로 자동 확장하지 않는다.</p>
+  <p class="crit"><b>수용 기준</b> LG0에서 맥북·맥미니의 실제 OS를 확인하고 최소 2개 OS 빌드 조합을 확정한다. 새 버전·버전 불명은 검증 범위를 낮춰 표시하며 미지원 키 fixture가 unknown을 반환한다.</p>
+  <div class="applied"><b>제품 적용</b><p>지원표(docs/support-matrix.md): macOS 26.6.2 × Claude Code 2.1.278 × Codex 0.153.2. 시험 버전 밖은 &quot;제한 지원&quot;. 두 번째 OS 빌드 미확정.</p><p class="where">화면·구성요소: 개요 &gt; 지원 도구 · 시험 <a href="#T39">T39</a></p></div>
+</article>
+<article class="req" id="N10">
+  <div class="req-head"><span class="rid">N10</span><h3>독립 검증과 출시 통제</h3><span class="chip part">부분</span></div>
+  <p class="src">개발자의 자체 시험과 별도로 검증 담당자가 고정 Golden Set·미공개 challenge set·변경 영향·증빙을 확인한다. 기존 48개 요건을 유지·개정하고 추가 11개를 포함한 59개 요건과 수용 시험을 추적한다.</p>
+  <p class="crit"><b>수용 기준</b> 59개 수용 시험 중 필수 56개는 모두 통과해야 한다. 조건부 F42·F43·N15를 제공하면 T54·T55·T59도 통과해야 하며 미제공 시 기능 비노출과 비적용 사유를 기록한다. 정적 R01~R08과 활동 RR01~RR02의 양성·음성·미관측 fixture를 독립 확인한다. 비밀 유출·임의 실행·허위 정상/차단·증빙 손상 미탐은 출시 차단이다.</p>
+  <div class="applied"><b>제품 적용</b><p>59개 요건·시험 추적표(docs/acceptance.md). 자체 시험 33개 자동화. 독립 검증자(LG2)는 미실행.</p><p class="where">화면·구성요소: docs/acceptance.md · 시험 <a href="#T40">T40</a></p></div>
+</article>
+<article class="req" id="N11">
+  <div class="req-head"><span class="rid">N11</span><h3>시각과 기록 의미</h3><span class="chip ok">적용</span></div>
+  <p class="src">UTC ISO 8601과 사용자의 시간대를 함께 기록하고 scan_id·단조 증가 sequence를 둔다. 기간 비교는 관측 시점을 사용한다. 파일 mtime만으로 변경 주체나 실제 실행 시점을 추론하지 않는다. 활동 이벤트에는 원천 생성·수집 시각과 source_event_id를 분리한다. PID 재사용은 시작 시각·세션 식별자로 구별하며 시계 불명 시 전체 지연을 미측정으로 표시한다.</p>
+  <p class="crit"><b>수용 기준</b> 시계 역행·타임존 변경 fixture에서 순서를 복원한다. 서명/외부 타임스탬프 없는 기록을 공증 시점으로 표시하지 않는다. 기록 삭제·내보내기·예외도 로컬 이력에 남는다.</p>
+  <div class="applied"><b>제품 적용</b><p>UTC ISO 8601과 시간대 병기, scan_id·단조 sequence. 활동 이벤트는 발생·수신 시각과 source_event_id 분리, PID는 시작 시각과 함께. 삭제·내보내기·예외를 감사 기록.</p><p class="where">화면·구성요소: — · 시험 <a href="#T41">T41</a></p></div>
+</article>
+<article class="req" id="N12">
+  <div class="req-head"><span class="rid">N12</span><h3>공급망·라이선스 검토</h3><span class="chip part">부분</span></div>
+  <p class="src">의존 버전·lockfile·SBOM·라이선스와 빌드 출처를 관리한다. 외부 탐지 도구는 선택 평가 대상이며 네트워크 설치나 별도 프로세스라는 이유만으로 라이선스 의무가 사라진다고 가정하지 않는다.</p>
+  <p class="crit"><b>수용 기준</b> 릴리스별 SBOM·라이선스 검토·고위험 취약점 검토 결과를 보관한다. 승인되지 않은 의존·실행 플러그인·미서명 룰은 패키지에 포함되지 않는다.</p>
+  <div class="applied"><b>제품 적용</b><p>외부 의존성 0. SBOM 문서(docs/sbom.md). 릴리스별 보관 절차는 출시 게이트 항목.</p><p class="where">화면·구성요소: docs/sbom.md · 시험 <a href="#T42">T42</a></p></div>
+</article>
+<article class="req" id="N13">
+  <div class="req-head"><span class="rid">N13</span><h3>상주 안정성과 운영 비용</h3><span class="chip part">부분</span></div>
+  <p class="src">N05의 기준 장비와 상한을 유지하고 72시간 상주·절전 복귀·이벤트 폭주를 시험한다. 큐 상한·유실 건수·지연·합산 CPU·RSS를 기록한다. 상주 경로는 LLM 호출 없이 동작한다.</p>
+  <p class="crit"><b>수용 기준</b> 수집→알림 p95 3초, 설정 이벤트 수집→재점검 반영 p95 5초를 초기 목표로 한다. N05의 최대 RSS 350MB·유휴 CPU 1% 기준을 적용한다. 가용성 목표 99%의 분모는 감시해야 하는 활성 시간이며 장애는 제외하지 않는다. 배터리·작업 지연은 대조군 실측 후 허용치를 고정한다.</p>
+  <div class="applied"><b>제품 적용</b><p>변화 없는 대조는 저장 생략. 큐 유실·지연 기록. 72시간 시험·배터리 실측 미실행.</p><p class="where">화면·구성요소: — · 시험 <a href="#T57">T57</a></p></div>
+</article>
+<article class="req" id="N14">
+  <div class="req-head"><span class="rid">N14</span><h3>연동 설치와 권한 원복</h3><span class="chip ok">적용</span></div>
+  <p class="src">자동 시작과 hook 등록은 설치 전후 차이를 제시하고 기존 사용자 설정과 공존하도록 한다. 제거 시 LARM 소유 항목만 제거한다. OS 센서는 entitlement·OS 승인·접근 권한·빌드별 검증을 별도 수행한 경우에만 노출한다.</p>
+  <p class="crit"><b>수용 기준</b> 기존 hook·동시 수정·설치 실패·업데이트·제거 fixture를 통과한다. 설치 뒤 사용자가 바꾼 값을 과거 백업으로 덮어쓰지 않는다. 선택 센서 거부는 해당 범위만 공백으로 처리하고 기본 설정 감시를 중단하지 않는다.</p>
+  <div class="applied"><b>제품 적용</b><p>hook 등록 전후 diff를 보여 주고 확인 후 원자적 적용. 기존 hook과 공존, 사용자가 바꾼 값 보존, 제거 시 LARM 항목만 삭제. OS 센서 없음.</p><p class="where">화면·구성요소: AI 활동 &gt; 연동 상태 · 시험 <a href="#T58">T58</a></p></div>
+</article>
+<article class="req" id="N15">
+  <div class="req-head"><span class="rid">N15</span><h3>조건부 통제의 무결성 <em class="cond">조건부</em></h3><span class="chip out">제외</span></div>
+  <p class="src">F42 또는 F43 제공 시 필수다. 실제 어댑터의 timeout·프로세스 종료·재시도·우회 동작을 시험한다. OS AUTH 경로에 LLM이나 사람 응답 대기를 넣지 않는다. 고객 권리·자금·회계·규제 반영은 별도 조직 4-Eyes와 Report Gate를 따른다.</p>
+  <p class="crit"><b>수용 기준</b> 허위 차단 완료·미해결 승인 재사용·기존 정책 우회가 1건이라도 있으면 해당 기능을 출시하지 않는다. 개인의 한 번 허용이 조직 승인을 대체하지 않는다. 금융 중요 반영 통제는 내부 강화 기준이며 일반 법정 의무로 표현하지 않는다.</p>
+  <div class="applied"><b>제품 적용</b><p>조건부. F42·F43을 제공하지 않으므로 비적용.</p><p class="where">화면·구성요소: — · 시험 <a href="#T59">T59</a></p></div>
+</article>
+
+<h2 id="rules">탐지 룰</h2>
+<p class="lead" style="font-size:14px">정적 룰 R01~R08은 static-1.0.0.json, 활동 룰 RR01~RR02는 activity-1.0.0.json에 데이터로 들어 있습니다. 심각도는 검토 우선순위이며 사고 확률이나 점수가 아닙니다. R08은 위험이 아닌 "점검 필요" 상태입니다.</p>
+<div class="tbl"><table><thead><tr><th>룰</th><th>제목</th><th>심각도</th><th>판단 대상</th></tr></thead><tbody><tr><td class="mono">R01</td><td>승인·격리 경계 확대</td><td>높음/중간</td><td>승인 생략과 파일·네트워크 제한 해제를 독립 평가</td></tr>
+<tr><td class="mono">R02</td><td>광범위 도구 허용</td><td>높음/중간</td><td>전체 셸·과도한 쓰기·MCP 와일드카드</td></tr>
+<tr><td class="mono">R03</td><td>평문 비밀정보 후보</td><td>높음/중간</td><td>알려진 형식·고엔트로피·민감 키 구분, 유효성 미확인</td></tr>
+<tr><td class="mono">R04</td><td>민감 파일 접근 범위</td><td>높음/중간</td><td>자격증명·후보 파일의 권한·소유자</td></tr>
+<tr><td class="mono">R05</td><td>미검토·변경 MCP 구성</td><td>중간</td><td>기준점 대비 추가·변경, 버전 미고정</td></tr>
+<tr><td class="mono">R06</td><td>엔드포인트 확인 필요</td><td>높음/중간</td><td>비루프백 HTTP, 미검토 원격 주소</td></tr>
+<tr><td class="mono">R07</td><td>프로젝트 설정·지시 변경</td><td>중간</td><td>훅·지시 파일의 추가·변경</td></tr>
+<tr><td class="mono">R08</td><td>점검 범위·가시성 공백</td><td>점검 필요</td><td>접근 거절·상한 초과·미지원·부분 점검</td></tr>
+<tr><td class="mono">RR01</td><td>작업 범위 밖 민감 자원 요청</td><td>높음/중간</td><td>파일 도구 요청의 대상 별칭과 범위 대조</td></tr>
+<tr><td class="mono">RR02</td><td>고위험 도구 요청</td><td>높음/중간</td><td>sudo·재귀 삭제·curl|sh·간접 실행, 인코딩은 보류</td></tr></tbody></table></div>
+
+<h2 id="tests">수용 시험 T01~T59</h2>
+<p class="lead" style="font-size:14px">상태는 products/larm/docs/acceptance.md와 같습니다. 자체 통과는 <code>./test.sh</code> 자동 시험 또는 이 Mac에서의 실기 확인이고, 부분은 구현은 있으나 시험 일부가 남은 항목입니다.</p>
+<div class="tbl"><table><thead><tr><th>시험</th><th>요건</th><th>시나리오</th><th>상태</th><th>근거·남은 것</th></tr></thead><tbody><tr id="T01"><td class="mono">T01</td><td class="mono"><a href="#F01">F01</a></td><td>새 계정에서 첫 점검</td><td><span class="chip part">부분</span></td><td class="note">설치→첫 점검 흐름·시험 이벤트 확인 구현. 새 계정 5분 시험·자동 시작 실기 미실행</td></tr>
+<tr id="T02"><td class="mono">T02</td><td class="mono"><a href="#F02">F02</a></td><td>경로·동의 경계</td><td><span class="chip part">부분</span></td><td class="note">범위 밖 symlink 거부·제외 폴더 구현. 20개 프로젝트 재실행 복원 시험 미실행</td></tr>
+<tr id="T03"><td class="mono">T03</td><td class="mono"><a href="#F03">F03</a></td><td>위장 실행 파일·버전 불명</td><td><span class="chip ok">자체 통과</span></td><td class="note">RulesGoldenTests.noExecutionOfDiscoveredBinaries: 가짜 claude 실행 0, 버전 불명·설치 구분</td></tr>
+<tr id="T04"><td class="mono">T04</td><td class="mono"><a href="#F04">F04</a></td><td>우선순위·신뢰·중복 키</td><td><span class="chip part">부분</span></td><td class="note">중복 키 오류(ParserTests), profile 미해결→unknown. 관리 설정 충돌 fixture 미작성</td></tr>
+<tr id="T05"><td class="mono">T05</td><td class="mono"><a href="#F05">F05</a></td><td>MCP 50개·민감 인자</td><td><span class="chip part">부분</span></td><td class="note">정의·env·header·URL 정규화, 외부 호출 0. 50개 fixture 미작성</td></tr>
+<tr id="T06"><td class="mono">T06</td><td class="mono"><a href="#F06">F06</a></td><td>승인과 sandbox 교차 4조합</td><td><span class="chip part">부분</span></td><td class="note">never+full(high)·on-request+workspace(음성) 확인. never+read-only, on-request+full fixture 미작성</td></tr>
+<tr id="T07"><td class="mono">T07</td><td class="mono"><a href="#F07">F07</a></td><td>파일·통신 설정 3상태</td><td><span class="chip part">부분</span></td><td class="note">제한/확장/미관측 필드 존재. fixture 미작성</td></tr>
+<tr id="T08"><td class="mono">T08</td><td class="mono"><a href="#F08">F08</a></td><td>allow/deny 충돌·낯선 문법</td><td><span class="chip ok">자체 통과</span></td><td class="note">Golden: Bash(*) high, Write/mcp__x medium, deny 제한, 해석 불가→unknown</td></tr>
+<tr id="T09"><td class="mono">T09</td><td class="mono"><a href="#F09">F09</a></td><td>사내 프록시·OAuth·HTTP</td><td><span class="chip ok">자체 통과</span></td><td class="note">엔드포인트 검토 기록(host·scheme·port 단위)→medium 해소, 평문 HTTP high 유지 (baselineAndExceptions)</td></tr>
+<tr id="T10"><td class="mono">T10</td><td class="mono"><a href="#F10">F10</a></td><td>합성 비밀정보·변수 참조</td><td><span class="chip ok">자체 통과</span></td><td class="note">secretCanarySet: 40/40 탐지, 음성 100 중 오탐 ≤5, ${VAR} 제외, live 검증 0</td></tr>
+<tr id="T11"><td class="mono">T11</td><td class="mono"><a href="#F11">F11</a></td><td>0600/0644/ACL/거절</td><td><span class="chip part">부분</span></td><td class="note">0644 auth.json high, ACL unknown. 타 소유자·거절 fixture 미작성</td></tr>
+<tr id="T12"><td class="mono">T12</td><td class="mono"><a href="#F12">F12</a></td><td>명령 포함 프로젝트 열기 전 점검</td><td><span class="chip ok">자체 통과</span></td><td class="note">project-risky: 임의 코드 실행 0, hook·지시 파일 digest만 보고</td></tr>
+<tr id="T13"><td class="mono">T13</td><td class="mono"><a href="#F13">F13</a></td><td>부분 오류·취소·오래된 결과</td><td><span class="chip part">부분</span></td><td class="note">거절→partial, 취소→cancelled 상태. 경과 시간 표시 있음. 취소 UI 시험 미실행</td></tr>
+<tr id="T14"><td class="mono">T14</td><td class="mono"><a href="#F14">F14</a></td><td>안정 지문·토큰 변경·키 교체</td><td><span class="chip ok">자체 통과</span></td><td class="note">EvidenceTests.stableDigestAndSecretChange: 내용 동일→digest 동일, 토큰 1자 변경→secret digest만 변경, 키 교체→지문 비교 불가</td></tr>
+<tr id="T15"><td class="mono">T15</td><td class="mono"><a href="#F15">F15</a></td><td>추가·삭제·범위 이탈 비교</td><td><span class="chip ok">자체 통과</span></td><td class="note">EvidenceTests.diffDistinguishesRemovedFromIncomparable: 파일 부재→삭제 확정, 권한 거절→비교 불가. 어댑터 버전은 digest에 포함</td></tr>
+<tr id="T16"><td class="mono">T16</td><td class="mono"><a href="#F16">F16</a></td><td>위험 설정을 기준점으로 지정</td><td><span class="chip ok">자체 통과</span></td><td class="note">EvidenceTests.baselineAndExceptions: 부분 점검 기준점 거절, 기준점 후 고위험 유지, R05 미검토만 해소</td></tr>
+<tr id="T17"><td class="mono">T17</td><td class="mono"><a href="#F17">F17</a></td><td>8룰 Golden/unknown 반복 실행</td><td><span class="chip ok">자체 통과</span></td><td class="note">deterministicAcrossRuns: 판정·target_fp 동일. 룰 로딩 실패→점검 불가 표시(코드) 시험 미작성</td></tr>
+<tr id="T18"><td class="mono">T18</td><td class="mono"><a href="#F18">F18</a></td><td>반복·재발·수동 완료</td><td><span class="chip ok">자체 통과</span></td><td class="note">LifecycleTests: 중복 카드 없음, 사용자 전환은 in_progress까지, 재점검 해소는 엔진만</td></tr>
+<tr id="T19"><td class="mono">T19</td><td class="mono"><a href="#F19">F19</a></td><td>수동 조치·복사·외부 링크</td><td><span class="chip part">부분</span></td><td class="note">안내·복사(비밀값 제거) 구현. 외부 링크 없음</td></tr>
+<tr id="T20"><td class="mono">T20</td><td class="mono"><a href="#F20">F20</a></td><td>실제 수정과 권한 거절 재점검</td><td><span class="chip ok">자체 통과</span></td><td class="note">LifecycleTests: 수정→resolved_by_rescan, 거절→open+unverifiable</td></tr>
+<tr id="T21"><td class="mono">T21</td><td class="mono"><a href="#F21">F21</a></td><td>7/30일·만료·대상 변경 예외</td><td><span class="chip ok">자체 통과</span></td><td class="note">기한 0일·31일 거부, 7일 예외→excepted, 만료 후 open 복귀. UI: 발견 사항 상세</td></tr>
+<tr id="T22"><td class="mono">T22</td><td class="mono"><a href="#F22">F22</a></td><td>0 finding+공백·1,000건 필터</td><td><span class="chip part">부분</span></td><td class="note">&#x27;발견 0건/공백 있음→점검 필요&#x27; 표시. 1,000건 p95 시험 미실행</td></tr>
+<tr id="T23"><td class="mono">T23</td><td class="mono"><a href="#F23">F23</a></td><td>원문 없는 상세·근거 탐색</td><td><span class="chip part">부분</span></td><td class="note">R03 상세에 &#x27;[제거됨: 평문 후보 …]·유효성 미확인&#x27; 표시. 두 번 이내 이동 검증은 사용자 확인 필요</td></tr>
+<tr id="T24"><td class="mono">T24</td><td class="mono"><a href="#F24">F24</a></td><td>알림 거절·반복·민감 경로</td><td><span class="chip part">부분</span></td><td class="note">MonitoringTests.notificationDedupeAndQuietHours: 동일 사건 100회 억제·원천 건수 보존, 조용한 시간 기록만, 본문에 경로 없음. 실제 macOS 알림 전달·거부 상태 시험은 사용자 확인 필요</td></tr>
+<tr id="T25"><td class="mono">T25</td><td class="mono"><a href="#F25">F25</a></td><td>필터·미리보기·증빙 생성</td><td><span class="chip ok">자체 통과</span></td><td class="note">EvidenceTests.exportThenVerifyOK + 실기: 13파일 manifest 해시 일치(system unzip 대조), 원문 비밀·사용자명·실제 경로 없음</td></tr>
+<tr id="T26"><td class="mono">T26</td><td class="mono"><a href="#F26">F26</a></td><td>변조·누락·추가·ZIP 경로 공격</td><td><span class="chip ok">자체 통과</span></td><td class="note">tamperedMissingExtraAndPathAttacksFail: 변조·누락·추가·중복 경로·상위 이동·중복 JSON 키 실패, manifest 재작성은 기준 해시 있을 때만 검출 + 실기 tampered.zip 실패</td></tr>
+<tr id="T27"><td class="mono">T27</td><td class="mono"><a href="#F27">F27</a></td><td>서명 변조·구버전·schema 충돌</td><td><span class="chip ok">자체 통과</span></td><td class="note">HardeningTests.ruleUpdateSignatureAndCompatibility: 변조·다른 키·구버전·미지원 schema 거부, 원자적 전환·되돌리기. 배포 공개키는 개발용 자리표시자(릴리스 키로 교체 필요)</td></tr>
+<tr id="T28"><td class="mono">T28</td><td class="mono"><a href="#F28">F28</a></td><td>보존 만료·초기화</td><td><span class="chip part">부분</span></td><td class="note">Retention.apply: 7/30/90일, 기준점·최신 유지, cascade 삭제(시험 통과). 전체 초기화는 UI 구현, 실기 시험 미실행</td></tr>
+<tr id="T29"><td class="mono">T29</td><td class="mono"><a href="#F29">F29</a></td><td>종료·절전·동시 점검</td><td><span class="chip part">부분</span></td><td class="note">창 닫기 후 상주 유지(applicationShouldTerminateAfterLastWindowClosed=false), 절전/복귀·세션 비활성 훅 구현, 스캔 병합 큐. 실기 절전 시험 미실행</td></tr>
+<tr id="T30"><td class="mono">T30</td><td class="mono"><a href="#F30">F30</a></td><td>파서 실패 후 사용자 복구</td><td><span class="chip part">부분</span></td><td class="note">진단 파일 생성(버전·오류 코드·audit만, 홈 경로 제거) + canary 시험 통과. 파서 실패→coverage error→재시도 UI. 실기 사용자 복구 시험은 사용자 확인 필요</td></tr>
+<tr id="T31"><td class="mono">T31</td><td class="mono"><a href="#N01">N01</a></td><td>악성 입력·자원 상한</td><td><span class="chip ok">자체 통과</span></td><td class="note">HardeningTests.limitsOversizeDepthSymlinkAndCounts: 2MB 초과→oversize, 범위 밖 symlink→denied, 프로젝트 25개→상한 초과 5건 공백. canary 실행·네트워크 0 (코드상 호출 없음)</td></tr>
+<tr id="T32"><td class="mono">T32</td><td class="mono"><a href="#N02">N02</a></td><td>canary 전 저장면 검사</td><td><span class="chip ok">자체 통과</span></td><td class="note">HardeningTests.canaryAcrossAllStorageSurfaces: DB 바이트·증빙 ZIP·진단 텍스트·활동 사건·오류 문자열에서 canary 0</td></tr>
+<tr id="T33"><td class="mono">T33</td><td class="mono"><a href="#N03">N03</a></td><td>다른 계정·Keychain 실패</td><td><span class="chip part">부분</span></td><td class="note">0700/0600, Keychain 실패 시 약한 키 대체 없음(코드). 타 계정 시험 미실행</td></tr>
+<tr id="T34"><td class="mono">T34</td><td class="mono"><a href="#N04">N04</a></td><td>네트워크 차단 전체 여정</td><td><span class="chip none">미실행</span></td><td class="note">코드에 네트워크 호출 없음. 격리 네트워크 시험 미실행</td></tr>
+<tr id="T35"><td class="mono">T35</td><td class="mono"><a href="#N05">N05</a></td><td>기준 장비 20회 성능</td><td><span class="chip part">부분</span></td><td class="note">PerfTests(LARM_PERF=1) 실측 2026-09-20, 이 Mac(macOS 26.6.2, Apple Silicon): 20프로젝트·약 1,900파일·50MCP 냉간 전체 점검 20회 p50 0.348s · p95 0.394s · max 0.442s (목표 60s), 시험 프로세스 RSS 118MB (목표 350MB). 변경 점검·취소 응답·유휴 CPU 15분 평균은 미측정</td></tr>
+<tr id="T36"><td class="mono">T36</td><td class="mono"><a href="#N06">N06</a></td><td>설치·공증·제거</td><td><span class="chip part">부분</span></td><td class="note">install/uninstall(hook 항목 제거 포함)·make-dist.sh DMG 실기. Developer ID·공증 불가(유보). 연동 미선택 시 설정 바이트 보존(코드상 미접근)</td></tr>
+<tr id="T37"><td class="mono">T37</td><td class="mono"><a href="#N07">N07</a></td><td>전원 중단·DB/업데이트 실패</td><td><span class="chip part">부분</span></td><td class="note">WAL+트랜잭션. 강제 종료 시험 미실행</td></tr>
+<tr id="T38"><td class="mono">T38</td><td class="mono"><a href="#N08">N08</a></td><td>키보드·VoiceOver·확대</td><td><span class="chip none">미실행</span></td><td class="note">M6</td></tr>
+<tr id="T39"><td class="mono">T39</td><td class="mono"><a href="#N09">N09</a></td><td>지원/미지원 버전 교차</td><td><span class="chip part">부분</span></td><td class="note">docs/support-matrix.md 1개 OS 빌드. 2번째 빌드·미지원 키 unknown fixture 미작성</td></tr>
+<tr id="T40"><td class="mono">T40</td><td class="mono"><a href="#N10">N10</a></td><td>독립 challenge·추적성</td><td><span class="chip none">미실행</span></td><td class="note">LG2 독립 검증자 몫. 현재 자체 시험 26개 통과 (./test.sh)</td></tr>
+<tr id="T41"><td class="mono">T41</td><td class="mono"><a href="#N11">N11</a></td><td>시계 역행·타임존 변경</td><td><span class="chip part">부분</span></td><td class="note">UTC ISO 8601 + tz 기록, 삭제·내보내기·예외 audit 기록. 시계 역행 fixture 미작성</td></tr>
+<tr id="T42"><td class="mono">T42</td><td class="mono"><a href="#N12">N12</a></td><td>SBOM·릴리스 출처 검토</td><td><span class="chip part">부분</span></td><td class="note">외부 의존성 0 (Package.swift), 실행 플러그인·미서명 룰 없음. SBOM 문서 docs/sbom.md 작성, 릴리스별 보관 절차는 LG5</td></tr>
+<tr id="T43"><td class="mono">T43</td><td class="mono"><a href="#F31">F31</a></td><td>타입·동명 객체·근거 없는 간선</td><td><span class="chip ok">자체 통과</span></td><td class="note">graphRejectsInvalidEdgesAndKeepsSecretsOut (근거 없는 간선·타입 위반·다른 범위 연결 거부, 동명 MCP 미병합, 비밀 노드 값·지문 없음)</td></tr>
+<tr id="T44"><td class="mono">T44</td><td class="mono"><a href="#F32">F32</a></td><td>전체/주변 탐색·대용량·키보드</td><td><span class="chip part">부분</span></td><td class="note">GraphLayoutTests: 500노드/1000간선 배치 2초 미만(자동), 결정론·pin 존중. Canvas 첫 표시 p95·선택 200ms 실측은 기준 장비 UI 시험 필요. 200노드 상한·숨김 건수·표 전환 구현</td></tr>
+<tr id="T45"><td class="mono">T45</td><td class="mono"><a href="#F33">F33</a></td><td>노드/간선→근거→조치</td><td><span class="chip part">부분</span></td><td class="note">노드/간선 상세: 타입·관계 의미·출처(관측/도출)·근거 건수·발견 사항→근거·조치 열기(1~2회 이동). 사용자 UI 확인 필요</td></tr>
+<tr id="T46"><td class="mono">T46</td><td class="mono"><a href="#F34">F34</a></td><td>시점 diff·공백·레이아웃 보존</td><td><span class="chip part">부분</span></td><td class="note">변경 보기: 기준점 diff로 추가/삭제/수정/비교 불가 색·라벨, 비교 불가 점선. 고정 위치는 saved view·pins에 보존. 실기 확인 필요</td></tr>
+<tr id="T47"><td class="mono">T47</td><td class="mono"><a href="#F35">F35</a></td><td>저장 보기·빠른 재점검</td><td><span class="chip part">부분</span></td><td class="note">저장 보기 5개(필터·중심·깊이·pin) 설정 테이블 보존, ⌘F 검색, 이 범위 재점검(coverage 일치). 앱 재실행 복원 실기 확인 필요</td></tr>
+<tr id="T48"><td class="mono">T48</td><td class="mono"><a href="#F36">F36</a></td><td>처음 사용·오늘 할 일·조용한 시간</td><td><span class="chip part">부분</span></td><td class="note">첫 사용 안내·오늘 할 일 상위 3·조용한 시간·요약 알림 구현. 사용자 10명 목표는 LG4</td></tr>
+<tr id="T49"><td class="mono">T49</td><td class="mono"><a href="#F37">F37</a></td><td>자동 시작과 상주 서비스</td><td><span class="chip part">부분</span></td><td class="note">SMAppService 로그인 항목 토글·상태 표시 구현. 재로그인·재부팅 10회 시험 미실행 (ad-hoc 서명 재설치 후 재등록 필요)</td></tr>
+<tr id="T50"><td class="mono">T50</td><td class="mono"><a href="#F38">F38</a></td><td>설정 변화의 상시 감지</td><td><span class="chip ok">자체 통과</span></td><td class="note">MonitoringTests FSEvents 변경 수신 + 실기: 감시 프로젝트 settings.json 변경 → 2초 내 event 점검 → R02 high 생성. rename·부분 쓰기·권한 철회 fixture 미작성(PARTIAL 성격)</td></tr>
+<tr id="T51"><td class="mono">T51</td><td class="mono"><a href="#F39">F39</a></td><td>지원 AI 활동 수집과 사건 기록</td><td><span class="chip ok">자체 통과</span></td><td class="note">ActivityTests: 양성(sudo/rm/curl</td></tr>
+<tr id="T52"><td class="mono">T52</td><td class="mono"><a href="#F40">F40</a></td><td>감시 건강 상태와 공백</td><td><span class="chip part">부분</span></td><td class="note">10초 건강 확인·last_alive 갱신 실기 확인, 미실행 구간→not_running 공백, 이벤트 유실 플래그→fs_overflow 공백+대조. kill·deadlock 주입 시험 미실행</td></tr>
+<tr id="T53"><td class="mono">T53</td><td class="mono"><a href="#F41">F41</a></td><td>기한 일시중지와 재개</td><td><span class="chip part">부분</span></td><td class="note">15분·1시간·수동 일시중지, 기한 만료 시 건강 확인→재개 실패면 공백 유지 (코드+PauseState 시험). 실기 UI 시험 사용자 확인 필요</td></tr>
+<tr id="T54"><td class="mono">T54</td><td class="mono"><a href="#F42">F42</a></td><td>지원 요청의 실행 전 확인</td><td><span class="chip out">비적용</span></td><td class="note">조건부 기능 미제공. 사유: 조건부 통제 미검증, 관측 모드로 제한 (요건 11.1, 사용자 결정 2026-09-20)</td></tr>
+<tr id="T55"><td class="mono">T55</td><td class="mono"><a href="#F43">F43</a></td><td>등록 정책 집행과 결과 확인</td><td><span class="chip out">비적용</span></td><td class="note">조건부 기능 미제공. 사유 동일</td></tr>
+<tr id="T56"><td class="mono">T56</td><td class="mono"><a href="#F44">F44</a></td><td>활동 위험 규칙과 상태 구분</td><td><span class="chip ok">자체 통과</span></td><td class="note">activityRulesAndIngestLifecycle: 동일 입력 동일 판정, 정상·쉘·인코딩(unknown)·경로 변형(별칭)·범위 안/밖 분리. 문자열만으로 악성 확정 안 함</td></tr>
+<tr id="T57"><td class="mono">T57</td><td class="mono"><a href="#N13">N13</a></td><td>상주 안정성과 운영 비용</td><td><span class="chip none">미실행</span></td><td class="note">72시간 상주 시험 미실행. 변화 없는 대조는 저장 생략(DB 증가 억제)</td></tr>
+<tr id="T58"><td class="mono">T58</td><td class="mono"><a href="#N14">N14</a></td><td>연동 설치와 권한 원복</td><td><span class="chip part">부분</span></td><td class="note">hookInstallerCoexistsAndRemovesOnlyOwn: 기존 hook 공존, 사용자 변경값 보존, LARM 항목만 제거, 원자적 적용·동시 수정 거부. 실제 settings.json 등록은 사용자 확인 후(UI/--yes). 갱신·설치 실패 fixture 미작성</td></tr>
+<tr id="T59"><td class="mono">T59</td><td class="mono"><a href="#N15">N15</a></td><td>조건부 통제의 무결성</td><td><span class="chip out">비적용</span></td><td class="note">조건부 기능 미제공. 사유 동일</td></tr></tbody></table></div>
+
+<h2 id="pending">유보·미실행</h2>
+<ul class="plain">
+<li>Developer ID 서명과 공증 (N06, T36): Apple Developer 계정 필요. 현재는 첫 실행 때 격리 해제 명령과 Keychain 허용이 필요합니다.</li>
+<li>72시간 상주 시험과 유휴 CPU·배터리 실측 (N13, T57, T35 일부).</li>
+<li>독립 검증자의 challenge set 검증 (N10, T40) 과 사용자 파일럿 (LG4).</li>
+<li>재로그인·재부팅 10회 자동 시작 시험 (T49), 절전·kill 주입 시험 (T29, T52), VoiceOver·확대 시험 (T38).</li>
+<li>룰 갱신 패키지의 배포 공개키 교체 (F27). 지금 들어 있는 키는 개발용 자리표시자입니다.</li>
+<li>두 번째 OS 빌드(맥미니) 지원 조합 확정 (N09).</li>
+</ul>
+</main></div>
