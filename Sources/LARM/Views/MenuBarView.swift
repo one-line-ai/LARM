@@ -30,7 +30,7 @@ struct MenuBarView: View {
         }
         Button("LARM 열기") { openWindow(id: "main"); WindowOpener.openMain() }
         Divider()
-        Text("창을 닫아도 감시는 유지됩니다").font(.footnote)
+        Text("창을 닫아도 감시는 유지됩니다").font(AppFont.footnote)
         Button("감시 종료 (앱 종료)") { NSApp.terminate(nil) }.keyboardShortcut("q")
     }
 }

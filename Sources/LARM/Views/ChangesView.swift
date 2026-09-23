@@ -12,12 +12,12 @@ struct ChangesView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text("변경 사항").font(.title2.bold())
+            Text("변경 사항").font(AppFont.title2)
             GroupBox("기준점") {
                 VStack(alignment: .leading, spacing: 6) {
                     if let b = state.baseline, let s = state.baselineSummary {
                         Text("현재 기준점: 점검 #\(s.sequence) · \(Fmt.local(s.endedAt)) · 지정 \(Fmt.local(b.createdAt)) · 검토자 \(b.actorAlias) · 사유 \"\(b.reason)\"")
-                        Text("기준점은 알려진 구성 상태이며 안전 인증이 아닙니다. 기준점 지정만으로 고위험 발견 사항이 사라지지 않습니다.").font(.footnote).foregroundStyle(.secondary)
+                        Text("기준점은 알려진 구성 상태이며 안전 인증이 아닙니다. 기준점 지정만으로 고위험 발견 사항이 사라지지 않습니다.").font(AppFont.footnote).foregroundStyle(.secondary)
                     } else {
                         Text("기준점이 없습니다. 비교 결과를 검토한 뒤 지정하세요. MCP, 훅 구성은 그때까지 '미검토'로 남습니다.").foregroundStyle(.orange)
                     }
@@ -25,9 +25,9 @@ struct ChangesView: View {
                         TextField("기준점 사유 (예: 초기 검토 완료)", text: $reason).textFieldStyle(.roundedBorder).frame(maxWidth: 360)
                         Button("마지막 점검을 기준점으로 지정") { message = state.setBaseline(reason: reason) ?? "기준점을 지정했습니다. 다음 점검부터 이 기준과 비교합니다."; reason = "" }
                             .disabled(state.lastScan == nil || state.lastScan?.status != .complete)
-                        if state.lastScan?.status == .partial { Text("부분 점검은 전체 기준점으로 지정할 수 없습니다.").font(.footnote).foregroundStyle(.orange) }
+                        if state.lastScan?.status == .partial { Text("부분 점검은 전체 기준점으로 지정할 수 없습니다.").font(AppFont.footnote).foregroundStyle(.orange) }
                     }
-                    if let m = message { Text(m).font(.footnote) }
+                    if let m = message { Text(m).font(AppFont.footnote) }
                 }.frame(maxWidth: .infinity, alignment: .leading)
             }
             HStack {

@@ -14,7 +14,7 @@ struct RootView: View {
                             Label(s.title, systemImage: s.symbol)
                             Spacer()
                             let n = badge(s)
-                            if n > 0 { Text("\(n)").font(.caption).foregroundStyle(.secondary) }
+                            if n > 0 { Text("\(n)").font(AppFont.caption).foregroundStyle(.secondary) }
                         }
                         .contentShape(Rectangle())
                     }
@@ -33,10 +33,10 @@ struct RootView: View {
                 ProgressView("준비 중")
             case .failed(let msg):
                 VStack(alignment: .leading, spacing: 12) {
-                    Text("LARM을 시작하지 못했습니다").font(.title2)
+                    Text("LARM을 시작하지 못했습니다").font(AppFont.title2)
                     Text(msg).textSelection(.enabled)
                     Text("복구: 앱을 다시 열거나 Keychain 접근을 허용하세요. 데이터 위치: \(Paths.supportDir.path)")
-                        .font(.footnote).foregroundStyle(.secondary)
+                        .font(AppFont.footnote).foregroundStyle(.secondary)
                 }.padding()
             case .ready:
                 switch state.section {
@@ -79,7 +79,7 @@ extension RootView {
 struct PlaceholderView: View {
     let title: String; let note: String
     var body: some View {
-        VStack(spacing: 8) { Text(title).font(.title2); Text(note).foregroundStyle(.secondary) }
+        VStack(spacing: 8) { Text(title).font(AppFont.title2); Text(note).foregroundStyle(.secondary) }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 }
@@ -88,7 +88,7 @@ struct SeverityBadge: View {
     let severity: Severity
     var body: some View {
         Text(severity.label)
-            .font(.caption.bold())
+            .font(AppFont.font(11, .semibold, relativeTo: .caption))
             .padding(.horizontal, 6).padding(.vertical, 2)
             .background(color.opacity(0.18)).foregroundStyle(color)
             .clipShape(RoundedRectangle(cornerRadius: 4))
@@ -102,7 +102,7 @@ struct SeverityBadge: View {
 struct StateBadge: View {
     let state: FindingState
     var body: some View {
-        Text(state.label).font(.caption).padding(.horizontal, 6).padding(.vertical, 2)
+        Text(state.label).font(AppFont.caption).padding(.horizontal, 6).padding(.vertical, 2)
             .background(Color.secondary.opacity(0.15)).clipShape(RoundedRectangle(cornerRadius: 4))
     }
 }

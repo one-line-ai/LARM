@@ -32,7 +32,7 @@ struct OverviewView: View {
 
     var headline: some View {
         VStack(alignment: .leading, spacing: 4) {
-            Text("LARM 개요").font(.largeTitle.bold())
+            Text("LARM 개요").font(AppFont.largeTitle)
             HStack {
                 Text("감시 상태: ").foregroundStyle(.secondary)
                 Text(state.healthLabel).bold().foregroundStyle(state.monitor?.health.overall == .watching ? Color.green : Color.orange)
@@ -40,19 +40,19 @@ struct OverviewView: View {
                 if let ok = state.monitor?.health.lastOKAt { Text("· 마지막 건강 확인 \(Fmt.elapsed(Clock.utc(ok)))").foregroundStyle(.secondary) }
             }
             if state.lastScan == nil {
-                Text("아직 점검하지 않았습니다. 오른쪽 위 '점검'을 누르세요.").font(.headline)
+                Text("아직 점검하지 않았습니다. 오른쪽 위 '점검'을 누르세요.").font(AppFont.headline)
             } else if state.openFindings.isEmpty && state.gapCount > 0 {
-                Text("발견 사항 0건 / 점검 공백 있음 → 점검 필요").font(.headline).foregroundStyle(.orange)
+                Text("발견 사항 0건 / 점검 공백 있음 → 점검 필요").font(AppFont.headline).foregroundStyle(.orange)
             } else if state.openFindings.isEmpty {
-                Text("열린 발견 사항이 없습니다.").font(.headline)
+                Text("열린 발견 사항이 없습니다.").font(AppFont.headline)
             }
         }
     }
 
     func tile(_ title: String, _ value: String, _ color: Color) -> some View {
         VStack(alignment: .leading, spacing: 4) {
-            Text(title).font(.caption).foregroundStyle(.secondary)
-            Text(value).font(.title.bold()).foregroundStyle(color)
+            Text(title).font(AppFont.caption).foregroundStyle(.secondary)
+            Text(value).font(AppFont.font(22, .bold, relativeTo: .title)).foregroundStyle(color)
         }
         .padding(12).frame(maxWidth: .infinity, alignment: .leading)
         .background(Color.secondary.opacity(0.08)).clipShape(RoundedRectangle(cornerRadius: 8))
@@ -69,11 +69,11 @@ struct OverviewView: View {
                         Text("· 룰 \(s.rulesVersion) · 종류 \(s.kind)").foregroundStyle(.secondary)
                     }
                     Text("확인한 값 \(s.counts["observations"] ?? 0)건 · coverage \(s.counts["coverage"] ?? 0)건 · 공백 \(s.counts["gaps"] ?? 0)건 · 판단 보류 \(s.counts["verdicts_unknown"] ?? 0)건")
-                        .font(.footnote).foregroundStyle(.secondary)
-                    ForEach(s.notes, id: \.self) { Text($0).font(.footnote).foregroundStyle(.orange) }
-                    if s.status == .partial { Text("일부 항목을 확인하지 못했습니다. 부분 결과이며 전체 완료가 아닙니다.").font(.footnote).foregroundStyle(.orange) }
+                        .font(AppFont.footnote).foregroundStyle(.secondary)
+                    ForEach(s.notes, id: \.self) { Text($0).font(AppFont.footnote).foregroundStyle(.orange) }
+                    if s.status == .partial { Text("일부 항목을 확인하지 못했습니다. 부분 결과이며 전체 완료가 아닙니다.").font(AppFont.footnote).foregroundStyle(.orange) }
                     if s.status == .failed || s.status == .cancelled {
-                        Text("최신 실행이 \(s.status.label)입니다. 이전 성공 결과를 아래 목록에 유지합니다.").font(.footnote).foregroundStyle(.orange)
+                        Text("최신 실행이 \(s.status.label)입니다. 이전 성공 결과를 아래 목록에 유지합니다.").font(AppFont.footnote).foregroundStyle(.orange)
                     }
                 }.frame(maxWidth: .infinity, alignment: .leading)
             } else {
@@ -95,23 +95,23 @@ struct OverviewView: View {
                         }
                     }
                     Text("폴더 감시 \(m.watchedDirs.count)개 폴더 (\(m.watchedDirs.joined(separator: ", "))) · 60초 폴링 \(m.polledFiles.count)개 파일 · 30분 주기 대조\(m.health.lastReconcileAt.map { " · 마지막 대조 " + Fmt.elapsed(Clock.utc($0)) } ?? "")")
-                        .font(.footnote).foregroundStyle(.secondary)
-                    if let d = state.lastSkippedReconcileAt { Text("변화 없음 확인 \(Fmt.elapsed(d)) (저장 생략)").font(.footnote).foregroundStyle(.secondary) }
-                    if !m.health.detail.isEmpty { Text(m.health.detail).font(.footnote).foregroundStyle(.secondary) }
+                        .font(AppFont.footnote).foregroundStyle(.secondary)
+                    if let d = state.lastSkippedReconcileAt { Text("변화 없음 확인 \(Fmt.elapsed(d)) (저장 생략)").font(AppFont.footnote).foregroundStyle(.secondary) }
+                    if !m.health.detail.isEmpty { Text(m.health.detail).font(AppFont.footnote).foregroundStyle(.secondary) }
                     if m.openGaps.isEmpty {
-                        Text("지금은 감시가 끊긴 곳이 없습니다").font(.callout)
+                        Text("지금은 감시가 끊긴 곳이 없습니다").font(AppFont.callout)
                     } else {
                         ForEach(m.openGaps) { g in
                             Text("공백 진행 중: \(g.label) · 시작 \(Fmt.local(g.startedAt)) · 범위 \(g.surface == "config_watch" ? "설정 감시" : g.surface)").foregroundStyle(.orange)
                         }
-                        Text("복구: 일시중지면 재개, 절전이면 복귀 후 자동 대조, 장애면 앱 재시작 → 시험 이벤트 확인").font(.footnote).foregroundStyle(.secondary)
+                        Text("복구: 일시중지면 재개, 절전이면 복귀 후 자동 대조, 장애면 앱 재시작 → 시험 이벤트 확인").font(AppFont.footnote).foregroundStyle(.secondary)
                     }
                     DisclosureGroup("최근 공백 기록 (\(m.recentGaps.count))") {
                         ForEach(m.recentGaps) { g in
-                            Text("\(Fmt.local(g.startedAt)) ~ \(g.endedAt.map { Fmt.local($0) } ?? "진행 중") · \(g.label)\(g.recoveryEvidence.isEmpty ? "" : " · 복구: " + g.recoveryEvidence)").font(.footnote)
+                            Text("\(Fmt.local(g.startedAt)) ~ \(g.endedAt.map { Fmt.local($0) } ?? "진행 중") · \(g.label)\(g.recoveryEvidence.isEmpty ? "" : " · 복구: " + g.recoveryEvidence)").font(AppFont.footnote)
                         }
-                    }.font(.footnote)
-                    Text("감시가 멈춘 동안의 변경은 알 수 없고, 복귀하면 현재 상태만 다시 확인합니다. 파일 변경 알림은 누가 바꿨는지나 실행 여부를 말해 주지 않습니다.").font(.footnote).foregroundStyle(.secondary)
+                    }.font(AppFont.footnote)
+                    Text("감시가 멈춘 동안의 변경은 알 수 없고, 복귀하면 현재 상태만 다시 확인합니다. 파일 변경 알림은 누가 바꿨는지나 실행 여부를 말해 주지 않습니다.").font(AppFont.footnote).foregroundStyle(.secondary)
                 } else { Text("백그라운드 감시 준비 중").foregroundStyle(.secondary) }
             }.frame(maxWidth: .infinity, alignment: .leading)
         }
@@ -127,7 +127,7 @@ struct OverviewView: View {
                         Text(label(s?.status ?? "-")).frame(width: 90, alignment: .leading)
                         Text("버전 \(s?.version ?? "-")").frame(width: 150, alignment: .leading)
                         Text(support(s?.support ?? "-")).foregroundStyle(.secondary)
-                    }.font(.callout)
+                    }.font(AppFont.callout)
                 }
                 if state.installStatus.values.allSatisfy({ $0.status == "not_installed" }) {
                     Text("점검할 지원 대상이 없습니다. 지원 범위: Claude Code, Codex CLI, Cursor MCP. 프로젝트를 추가하거나 도구를 설치하세요.").foregroundStyle(.orange)
@@ -145,10 +145,10 @@ struct OverviewView: View {
                     HStack {
                         Image(systemName: s.kind == .userRoot ? "house" : "folder")
                         Text(s.kind == .userRoot ? "사용자 설정 위치 (~/.claude, ~/.codex, ~/.cursor)" : s.alias)
-                        if s.excluded { Text("제외됨").font(.caption).foregroundStyle(.secondary) }
+                        if s.excluded { Text("제외됨").font(AppFont.caption).foregroundStyle(.secondary) }
                         Spacer()
                         if s.kind == .project {
-                            Text(s.realPath).font(.caption).foregroundStyle(.secondary).lineLimit(1).truncationMode(.middle).help(s.realPath)
+                            Text(s.realPath).font(AppFont.caption).foregroundStyle(.secondary).lineLimit(1).truncationMode(.middle).help(s.realPath)
                             Button(s.excluded ? "포함" : "제외") { state.toggleExcluded(s) }.controlSize(.small)
                             Button("삭제") { state.removeScope(s) }.controlSize(.small)
                         }
@@ -156,7 +156,7 @@ struct OverviewView: View {
                 }
                 HStack {
                     Button { state.addProjectFolder() } label: { Label("프로젝트 추가", systemImage: "plus") }
-                    Text("홈 전체, 다른 사용자, 클라우드 병합은 자동 탐색하지 않습니다.").font(.footnote).foregroundStyle(.secondary)
+                    Text("홈 전체, 다른 사용자, 클라우드 병합은 자동 탐색하지 않습니다.").font(AppFont.footnote).foregroundStyle(.secondary)
                 }
             }.frame(maxWidth: .infinity, alignment: .leading)
         }

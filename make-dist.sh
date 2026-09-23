@@ -19,6 +19,7 @@ for b in LARM larm-hook larm-verify; do
 done
 cp -R "$ARM_BIN/LARM_LARMCore.bundle" "$APP/Contents/Resources/LARM_LARMCore.bundle"
 cp Info.plist "$APP/Contents/Info.plist"
+mkdir -p "$APP/Contents/Resources/Fonts" && cp assets/fonts/*.otf assets/fonts/LICENSE-Pretendard.txt "$APP/Contents/Resources/Fonts/"
 if [[ -f assets/icon.png ]]; then
   ICONSET="$(mktemp -d)/AppIcon.iconset"; mkdir -p "$ICONSET"
   for s in 16 32 128 256 512; do sips -z "$s" "$s" assets/icon.png --out "$ICONSET/icon_${s}x${s}.png" >/dev/null; d=$((s*2)); sips -z "$d" "$d" assets/icon.png --out "$ICONSET/icon_${s}x${s}@2x.png" >/dev/null; done

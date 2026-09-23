@@ -28,7 +28,7 @@ struct FindingsView: View {
                     VStack(spacing: 6) {
                         Text(state.findings.isEmpty ? "아직 발견 사항이 없습니다." : "조건에 맞는 발견 사항이 없습니다.").foregroundStyle(.secondary)
                         if !state.findings.isEmpty && fstate != nil { Button("전체 상태 보기") { fstate = nil } }
-                        if state.lastScan == nil { Text("오른쪽 위 '점검'을 누르세요.").font(.footnote).foregroundStyle(.secondary) }
+                        if state.lastScan == nil { Text("오른쪽 위 '점검'을 누르세요.").font(AppFont.footnote).foregroundStyle(.secondary) }
                     }.frame(maxWidth: .infinity, maxHeight: .infinity)
                 }
                 List(selection: $state.selectedFindingID) {
@@ -37,19 +37,19 @@ struct FindingsView: View {
                             SeverityBadge(severity: f.severity)
                             VStack(alignment: .leading, spacing: 2) {
                                 Text("\(f.ruleID) \(f.title)").bold()
-                                Text(f.summary).font(.callout).lineLimit(2)
+                                Text(f.summary).font(AppFont.callout).lineLimit(2)
                                 HStack {
-                                    Text(f.locationAlias).font(.caption).foregroundStyle(.secondary).lineLimit(1).truncationMode(.middle)
+                                    Text(f.locationAlias).font(AppFont.caption).foregroundStyle(.secondary).lineLimit(1).truncationMode(.middle)
                                     StateBadge(state: f.state)
-                                    if f.verifyStatus == "unverifiable" { Text("검증 불가").font(.caption).foregroundStyle(.orange) }
-                                    if f.verifyStatus == "scope_removed" { Text("범위 제거됨").font(.caption).foregroundStyle(.orange) }
-                                    if f.seenCount > 1 { Text("\(f.seenCount)회").font(.caption).foregroundStyle(.secondary) }
+                                    if f.verifyStatus == "unverifiable" { Text("검증 불가").font(AppFont.caption).foregroundStyle(.orange) }
+                                    if f.verifyStatus == "scope_removed" { Text("범위 제거됨").font(AppFont.caption).foregroundStyle(.orange) }
+                                    if f.seenCount > 1 { Text("\(f.seenCount)회").font(AppFont.caption).foregroundStyle(.secondary) }
                                 }
                             }
                         }.tag(f.findingID)
                     }
                 }
-                Text("전체 \(state.findings.count)건 · 필터 후 \(filtered.count)건").font(.footnote).foregroundStyle(.secondary).padding(6)
+                Text("전체 \(state.findings.count)건 · 필터 후 \(filtered.count)건").font(AppFont.footnote).foregroundStyle(.secondary).padding(6)
             }.frame(minWidth: 300)
             Group {
                 if let id = state.selectedFindingID, let f = state.findings.first(where: { $0.findingID == id }) {
@@ -101,7 +101,7 @@ struct FindingDetailView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 14) {
-                HStack { SeverityBadge(severity: finding.severity); Text("\(finding.ruleID) \(finding.title)").font(.title3.bold()); StateBadge(state: finding.state) }
+                HStack { SeverityBadge(severity: finding.severity); Text("\(finding.ruleID) \(finding.title)").font(AppFont.title3); StateBadge(state: finding.state) }
                 Text(finding.summary).textSelection(.enabled)
                 LabeledContent("신뢰도", value: finding.confidence.label)
                 LabeledContent("위치", value: finding.locationAlias)
@@ -126,30 +126,30 @@ struct FindingDetailView: View {
                         ForEach(shown) { o in
                             HStack(alignment: .top) {
                                 Text(o.field).font(.system(.callout, design: .monospaced)).frame(width: 190, alignment: .leading)
-                                Text(o.safeValue).font(.callout).textSelection(.enabled)
-                                if o.valueKind == .unknown { Text("확인 안 됨").font(.caption).foregroundStyle(.orange) }
-                                if o.valueKind == .redacted { Text("유효성 미확인").font(.caption).foregroundStyle(.secondary) }
+                                Text(o.safeValue).font(AppFont.callout).textSelection(.enabled)
+                                if o.valueKind == .unknown { Text("확인 안 됨").font(AppFont.caption).foregroundStyle(.orange) }
+                                if o.valueKind == .redacted { Text("유효성 미확인").font(AppFont.caption).foregroundStyle(.secondary) }
                             }
                         }
                         if let p = obs.first?.provenance {
                             Text("출처: \(p.locationAlias) · 우선순위 \(p.precedence) · \(p.interpretation) · 어댑터 \(p.adapter) \(p.adapterVersion)")
-                                .font(.footnote).foregroundStyle(.secondary)
+                                .font(AppFont.footnote).foregroundStyle(.secondary)
                         }
-                        Toggle("이 항목의 모든 값 보기", isOn: $showAllObs).font(.footnote)
+                        Toggle("이 항목의 모든 값 보기", isOn: $showAllObs).font(AppFont.footnote)
                     }.frame(maxWidth: .infinity, alignment: .leading)
                 }
                 GroupBox("한계") { Text(finding.limits).frame(maxWidth: .infinity, alignment: .leading) }
                 GroupBox("다음 단계") { Text(finding.nextAction).bold().frame(maxWidth: .infinity, alignment: .leading) }
                 GroupBox("수동 조치 안내") {
-                    Text(state.guidance(for: finding.ruleID)).font(.callout).textSelection(.enabled).frame(maxWidth: .infinity, alignment: .leading)
+                    Text(state.guidance(for: finding.ruleID)).font(AppFont.callout).textSelection(.enabled).frame(maxWidth: .infinity, alignment: .leading)
                 }
                 actions
                 decisionsBox
-                if let m = actionMessage { Text(m).font(.footnote).foregroundStyle(.orange) }
+                if let m = actionMessage { Text(m).font(AppFont.footnote).foregroundStyle(.orange) }
                 GroupBox("이력") {
                     VStack(alignment: .leading, spacing: 2) {
                         ForEach(Array(state.events(for: finding).enumerated()), id: \.offset) { _, e in
-                            Text("\(Fmt.local(e.at)) · \(e.actor) · \(e.kind) \(e.from ?? "")→\(e.to ?? "") · \(e.note)").font(.footnote)
+                            Text("\(Fmt.local(e.at)) · \(e.actor) · \(e.kind) \(e.from ?? "")→\(e.to ?? "") · \(e.note)").font(AppFont.footnote)
                         }
                     }.frame(maxWidth: .infinity, alignment: .leading)
                 }
@@ -168,14 +168,14 @@ struct FindingDetailView: View {
                             actionMessage = state.addException(finding, days: exceptionDays, reason: exceptionReason); exceptionReason = ""
                         }
                     }
-                    Text("예외는 위험을 알고 받아들이는 것이며 해결된 것이 아닙니다. 기본 7일, 최대 30일이고, 기한이 지나거나 설정이 바뀌면 다시 열립니다.").font(.footnote).foregroundStyle(.secondary)
+                    Text("예외는 위험을 알고 받아들이는 것이며 해결된 것이 아닙니다. 기본 7일, 최대 30일이고, 기한이 지나거나 설정이 바뀌면 다시 열립니다.").font(AppFont.footnote).foregroundStyle(.secondary)
                 }
                 if finding.ruleID == "R06", finding.state != .resolvedByRescan {
                     HStack {
                         TextField("검토 기록 (예: 사내 프록시, 소유자 확인)", text: $reviewReason).textFieldStyle(.roundedBorder)
                         Button("엔드포인트 검토 완료") { actionMessage = state.markEndpointReviewed(finding, reason: reviewReason); reviewReason = "" }
                     }
-                    Text("같은 주소(scheme, host, port)에만 적용되며 평문 HTTP는 검토로 해결되지 않습니다. 다음 재점검부터 반영됩니다.").font(.footnote).foregroundStyle(.secondary)
+                    Text("같은 주소(scheme, host, port)에만 적용되며 평문 HTTP는 검토로 해결되지 않습니다. 다음 재점검부터 반영됩니다.").font(AppFont.footnote).foregroundStyle(.secondary)
                 }
             }.frame(maxWidth: .infinity, alignment: .leading)
         }

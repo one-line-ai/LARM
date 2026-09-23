@@ -11,11 +11,11 @@ struct CoverageView: View {
     var body: some View {
         VStack(alignment: .leading) {
             HStack {
-                Text("점검 범위").font(.title2.bold())
+                Text("점검 범위").font(AppFont.title2)
                 Spacer()
                 Toggle("성공, 부재 항목도 표시", isOn: $showSuccess)
             }.padding([.horizontal, .top])
-            Text("읽지 못한 항목은 없는 것으로 치지 않습니다.").font(.footnote).foregroundStyle(.secondary).padding(.horizontal)
+            Text("읽지 못한 항목은 없는 것으로 치지 않습니다.").font(AppFont.footnote).foregroundStyle(.secondary).padding(.horizontal)
             if state.lastScan == nil {
                 Text("아직 점검하지 않았습니다.").foregroundStyle(.secondary).padding()
             } else if items.isEmpty {
@@ -30,7 +30,7 @@ struct CoverageView: View {
                 TableColumn("사유") { (c: Coverage) in Text(c.reason) }
             }
             } else { Spacer() }
-            Text("복구: 접근 거절은 권한, 개인정보 보호 설정 확인 후 재시도, 상한 초과는 범위 축소, 미지원은 지원표 확인 → 재점검").font(.footnote).foregroundStyle(.secondary).padding()
+            Text("복구: 접근 거절은 권한, 개인정보 보호 설정 확인 후 재시도, 상한 초과는 범위 축소, 미지원은 지원표 확인 → 재점검").font(AppFont.footnote).foregroundStyle(.secondary).padding()
         }
     }
     func label(_ s: CoverageStatus) -> String {

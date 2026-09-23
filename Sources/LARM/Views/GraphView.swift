@@ -59,7 +59,7 @@ struct GraphView: View {
                 Picker("심각도", selection: $vm.severityFilter) { Text("전체").tag("all"); Text("높음").tag("high"); Text("중간").tag("medium") }.fixedSize()
                 Picker("상태", selection: $vm.stateFilter) { Text("전체").tag("all"); Text("열림").tag("open"); Text("조치 중").tag("in_progress"); Text("예외").tag("excepted") }.fixedSize()
                 Text("표시 \(vm.visibleNodes.count)개 / 전체 \(vm.graph?.nodes.count ?? 0)개\(vm.hiddenByCap > 0 ? " · 상한 초과로 \(vm.hiddenByCap)개 숨김 (표로 보기 권장)" : "")")
-                    .font(.footnote).foregroundStyle(vm.hiddenByCap > 0 ? .orange : .secondary).lineLimit(1).frame(minWidth: 0)
+                    .font(AppFont.footnote).foregroundStyle(vm.hiddenByCap > 0 ? .orange : .secondary).lineLimit(1).frame(minWidth: 0)
                 Spacer()
             }
         }.padding(8)
@@ -74,7 +74,7 @@ struct GraphView: View {
         }.fixedSize()
         .sheet(isPresented: $vm.showSaveSheet) {
             VStack(spacing: 12) {
-                Text("보기 이름").font(.headline)
+                Text("보기 이름").font(AppFont.headline)
                 TextField("예: 매일 확인 (AIops)", text: $vm.saveName).textFieldStyle(.roundedBorder).frame(width: 300)
                 HStack { Button("취소") { vm.showSaveSheet = false }; Button("저장") { vm.saveCurrent(); vm.showSaveSheet = false }.keyboardShortcut(.defaultAction) }
             }.padding(20)
@@ -83,7 +83,7 @@ struct GraphView: View {
 
     var footer: some View {
         Text("스크롤·핀치: 확대  ·  빈 곳 드래그 또는 Shift+스크롤: 이동  ·  노드 드래그: 위치 고정 (더블클릭으로 해제)  ·  실선은 파일에서 확인한 관계, 점선은 추론한 관계")
-            .font(.footnote).foregroundStyle(.secondary).padding(6)
+            .font(AppFont.footnote).foregroundStyle(.secondary).padding(6)
     }
 
     var legend: some View {
@@ -91,10 +91,10 @@ struct GraphView: View {
             ForEach([Ontology.NodeType.agent, .project, .configuration, .mcpServer, .endpoint, .secretCandidate, .permissionRule, .hook, .instructionFile, .finding], id: \.self) { t in
                 HStack(spacing: 6) {
                     Circle().fill(Color(nsColor: GraphNSView.color(t))).frame(width: 9, height: 9)
-                    Text(Self.typeName(t)).font(.caption)
+                    Text(Self.typeName(t)).font(AppFont.caption)
                 }
             }
-            Text("빨간 테두리: 높은 위험 · 크기: 연결 수").font(.caption2).foregroundStyle(.secondary)
+            Text("빨간 테두리: 높은 위험 · 크기: 연결 수").font(AppFont.caption2).foregroundStyle(.secondary)
         }
         .padding(8).background(.regularMaterial).clipShape(RoundedRectangle(cornerRadius: 6))
     }
@@ -122,10 +122,10 @@ struct GraphView: View {
         ScrollView {
             if let id = vm.selected, let n = vm.node(id) {
                 VStack(alignment: .leading, spacing: 8) {
-                    Text(n.label).font(.headline)
+                    Text(n.label).font(AppFont.headline)
                     LabeledContent("타입", value: n.type.rawValue)
                     LabeledContent("범위", value: state.scopeAlias(n.scopeID))
-                    LabeledContent("ID", value: n.id).font(.footnote)
+                    LabeledContent("ID", value: n.id).font(AppFont.footnote)
                     if let c = vm.change(for: n.id) { LabeledContent("기준점 대비", value: c) }
                     if let sev = n.severity { LabeledContent("심각도 / 상태", value: "\(sev) / \(n.state ?? "")") }
                     LabeledContent("확인 시각", value: state.lastScan.map { Fmt.local($0.endedAt) } ?? "-")
@@ -144,7 +144,7 @@ struct GraphView: View {
                         GroupBox("확인한 값") {
                             VStack(alignment: .leading, spacing: 2) {
                                 ForEach(n.attrs.keys.sorted(), id: \.self) { k in
-                                    HStack(alignment: .top) { Text(k).font(.system(.caption, design: .monospaced)).frame(width: 150, alignment: .leading); Text(n.attrs[k] ?? "").font(.caption).textSelection(.enabled) }
+                                    HStack(alignment: .top) { Text(k).font(.system(.caption, design: .monospaced)).frame(width: 150, alignment: .leading); Text(n.attrs[k] ?? "").font(AppFont.caption).textSelection(.enabled) }
                                 }
                             }.frame(maxWidth: .infinity, alignment: .leading)
                         }
@@ -159,8 +159,8 @@ struct GraphView: View {
                                     HStack(alignment: .top) {
                                         Text(e.from == n.id ? "→" : "←").frame(width: 14)
                                         VStack(alignment: .leading) {
-                                            Text("\(e.type.rawValue) \(vm.node(other)?.label ?? other)").font(.caption)
-                                            Text("\(e.epistemic == .observed ? "직접 확인" : e.epistemic == .derived ? "추론" : "사용자 확인") · 근거 \(e.evidenceRef.count)건 · \(Self.edgeMeaning(e.type))").font(.caption2).foregroundStyle(.secondary)
+                                            Text("\(e.type.rawValue) \(vm.node(other)?.label ?? other)").font(AppFont.caption)
+                                            Text("\(e.epistemic == .observed ? "직접 확인" : e.epistemic == .derived ? "추론" : "사용자 확인") · 근거 \(e.evidenceRef.count)건 · \(Self.edgeMeaning(e.type))").font(AppFont.caption2).foregroundStyle(.secondary)
                                         }
                                     }
                                 }.buttonStyle(.plain)
@@ -171,7 +171,7 @@ struct GraphView: View {
             } else {
                 VStack(alignment: .leading, spacing: 6) {
                     Text("노드를 클릭하면 상세가 열립니다.").foregroundStyle(.secondary)
-                    Text("마우스를 올리면 연결된 노드만 밝게 보입니다. 확대할수록 라벨이 더 많이 보입니다.").font(.footnote).foregroundStyle(.secondary)
+                    Text("마우스를 올리면 연결된 노드만 밝게 보입니다. 확대할수록 라벨이 더 많이 보입니다.").font(AppFont.footnote).foregroundStyle(.secondary)
                 }.padding()
             }
         }
@@ -520,7 +520,7 @@ final class GraphNSView: NSView {
         ctx.setLineDash(phase: 0, lengths: [])
 
         let showAllLabels = scale > 1.6 || vm.visibleNodes.count <= 30
-        let font = NSFont.systemFont(ofSize: max(9, min(13, 11 * scale)))
+        let font = AppFont.nsFont(max(9, min(13, 11 * scale)))
         for n in vm.visibleNodes {
             guard let p = vm.positions[n.id] else { continue }
             let c = toView(p), r = radius(n)
@@ -544,7 +544,7 @@ final class GraphNSView: NSView {
                 str.draw(at: origin)
             }
             if let ch = vm.change(for: n.id), !faded {
-                let a: [NSAttributedString.Key: Any] = [.font: NSFont.systemFont(ofSize: 9), .foregroundColor: ch == "추가" ? NSColor.systemGreen : ch == "삭제" ? NSColor.systemRed : NSColor.systemOrange]
+                let a: [NSAttributedString.Key: Any] = [.font: AppFont.nsFont(9, .medium), .foregroundColor: ch == "추가" ? NSColor.systemGreen : ch == "삭제" ? NSColor.systemRed : NSColor.systemOrange]
                 let str = NSAttributedString(string: ch, attributes: a)
                 str.draw(at: CGPoint(x: c.x - str.size().width / 2, y: c.y - r - 13))
             }

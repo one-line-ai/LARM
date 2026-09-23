@@ -43,6 +43,7 @@ cp "$BIN_DIR/larm-hook" "$APP/Contents/MacOS/larm-hook"
 cp "$BIN_DIR/larm-verify" "$APP/Contents/MacOS/larm-verify"
 cp -R "$RES_BUNDLE" "$APP/Contents/Resources/LARM_LARMCore.bundle"
 cp Info.plist "$APP/Contents/Info.plist"
+mkdir -p "$APP/Contents/Resources/Fonts" && cp assets/fonts/*.otf assets/fonts/LICENSE-Pretendard.txt "$APP/Contents/Resources/Fonts/"
 
 if [[ -f assets/icon.png ]] && command -v sips >/dev/null 2>&1 && command -v iconutil >/dev/null 2>&1; then
   echo "==> 앱 아이콘 생성"
