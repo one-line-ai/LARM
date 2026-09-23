@@ -19,7 +19,7 @@
 
 ## 빌드 없이 설치 (DMG)
 
-1. https://github.com/bbootta/AIops/raw/main/products/larm/dist/LARM-0.6.1.dmg 를 내려받는다 (해시: `dist/SHA256SUMS`).
+1. https://github.com/one-line-ai/AIops/raw/main/products/larm/dist/LARM-0.6.1.dmg 를 내려받는다 (해시: `dist/SHA256SUMS`).
 2. DMG를 열고 LARM.app을 Applications 폴더로 끌어 넣는다.
 3. ad-hoc 서명이라 처음 열 때 경고가 나오면 터미널에서 `xattr -dr com.apple.quarantine /Applications/LARM.app` 을 실행한 뒤 다시 연다.
 4. 첫 실행 때 Keychain 접근 허용을 묻는다. 허용해야 점검과 감시가 시작된다.
