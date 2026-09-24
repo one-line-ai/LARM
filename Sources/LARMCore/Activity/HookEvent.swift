@@ -9,7 +9,7 @@ public struct HookEvent: Codable, Sendable, Equatable {
     public var eventID: String
     public var sourceEventID: String
     public var phase: String              // request | result | session_start | session_end | test | other
-    public var hookEventName: String      // PreToolUse 등 원문 이벤트명
+    public var hookEventName: String      // PreToolUse 등 원문 활동 기록명
     public var toolName: String
     public var targetKind: String         // file | command | url | mcp | none
     public var targetPath: String?        // file/url 대상 (앱이 별칭 처리 후 폐기)

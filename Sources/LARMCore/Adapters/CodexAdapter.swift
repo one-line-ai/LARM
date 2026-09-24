@@ -12,7 +12,7 @@ public struct CodexAdapter: Adapter {
         let current = home + "/.codex/packages/standalone/current"
         if let target = AdapterUtil.readlink(current), let v = AdapterUtil.semver(in: target) {
             let mm = v.split(separator: ".").prefix(2).joined(separator: ".")
-            return AgentInstall(status: .installed, version: v, versionSource: "~/.codex/packages/standalone/current 심볼릭 링크 대상",
+            return AgentInstall(status: .installed, version: v, versionSource: "~/.codex/packages/standalone/current 바로가기 링크 대상",
                                 supportLevel: Self.testedMajorMinor.contains(mm) ? "supported" : "limited")
         }
         if AdapterUtil.exists(bin) { return AgentInstall(status: .installed, version: nil, versionSource: "실행 파일 존재, 버전 불명", supportLevel: "limited") }

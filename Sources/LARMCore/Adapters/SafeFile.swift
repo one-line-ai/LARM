@@ -91,7 +91,7 @@ public enum SafeFile {
         case .absent: return (.absent, "파일 없음")
         case .denied: return (.denied, "접근 거절")
         case .oversize(let n): return (.oversize, "크기 초과 \(n) bytes")
-        case .symlinkEscape: return (.denied, "범위 밖 심볼릭 링크")
+        case .symlinkEscape: return (.denied, "범위 밖 바로가기 링크")
         case .tocTou: return (.error, "읽는 중 파일 변경")
         case .notRegular: return (.unsupported, "일반 파일 아님")
         case .budget: return (.oversize, "점검 상한 초과")

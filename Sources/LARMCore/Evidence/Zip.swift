@@ -17,7 +17,7 @@ public enum CRC32 {
 public enum ZipError: Error, CustomStringConvertible {
     case invalid(String), unsupported(String), tooLarge
     public var description: String {
-        switch self { case .invalid(let s): return "ZIP 형식 오류: \(s)"; case .unsupported(let s): return "미지원 ZIP 기능: \(s)"; case .tooLarge: return "ZIP이 너무 큽니다" }
+        switch self { case .invalid(let s): return "ZIP 형식 오류: \(s)"; case .unsupported(let s): return "미지원 ZIP 기능: \(s)"; case .tooLarge: return "ZIP이 너무 큼" }
     }
 }
 
@@ -138,7 +138,7 @@ public enum StableJSON {
         switch v {
         case is String, is Int, is Int64, is Bool, is NSNull: return
         case let n as NSNumber:
-            if CFNumberIsFloatType(n) { throw ZipError.invalid("실수 값은 증빙에 넣지 않습니다") }
+            if CFNumberIsFloatType(n) { throw ZipError.invalid("실수 값은 보고서에 넣지 않음") }
         case let a as [Any]: for x in a { try validate(x) }
         case let d as [String: Any]: for (_, x) in d { try validate(x) }
         default: throw ZipError.invalid("직렬화 불가 타입 \(type(of: v))")

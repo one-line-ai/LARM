@@ -12,9 +12,9 @@ public struct CoverageGap: Identifiable, Sendable, Equatable {
     public let recoveryEvidence: String
     public var label: String {
         switch reason {
-        case "paused": return "사용자 일시중지"; case "sleep": return "절전"; case "not_running": return "앱 미실행"
-        case "fs_overflow": return "파일 이벤트 유실"; case "watch_failed": return "감시 장애"; case "denied": return "권한 거절"
-        case "socket_down": return "활동 연동 끊김"; case "spool_loss": return "이벤트 유실"; default: return reason
+        case "paused": return "사용자 잠시 멈춤"; case "sleep": return "절전"; case "not_running": return "앱 미실행"
+        case "fs_overflow": return "파일 활동 기록 유실"; case "watch_failed": return "감시 장애"; case "denied": return "권한 거절"
+        case "socket_down": return "활동 연동 끊김"; case "spool_loss": return "활동 기록 유실"; default: return reason
         }
     }
 }

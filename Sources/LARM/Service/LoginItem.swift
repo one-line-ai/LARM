@@ -17,7 +17,7 @@ enum LoginItem {
         case "enabled": return "자동 시작 켜짐"
         case "requires_approval": return "시스템 설정에서 승인 필요 (로그인 항목)"
         case "not_registered": return "자동 시작 꺼짐"
-        case "not_found": return "앱 위치, 서명 확인 필요 (재설치 후 다시 켜세요)"
+        case "not_found": return "앱 위치, 서명 확인 필요 (재설치 후 다시 켜기)"
         default: return "알 수 없음"
         }
     }

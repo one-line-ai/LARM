@@ -79,7 +79,7 @@ public enum ScanRepo {
         return ScanResult(scanID: result.scanID, status: result.status, startedAt: result.startedAt, endedAt: result.endedAt,
                           scopes: result.scopes + missing, coverage: result.coverage + cov, observations: result.observations + obs,
                           verdicts: result.verdicts, adapterVersions: result.adapterVersions, rulesVersion: result.rulesVersion,
-                          notes: result.notes + ["\(missing.map { $0.alias }.joined(separator: ", ")) 범위는 이전 점검 결과를 유지했습니다."])
+                          notes: result.notes + ["\(missing.map { $0.alias }.joined(separator: ", ")) 범위는 이전 점검 결과를 유지했음."])
     }
 
     public static func store(_ db: SQLiteDB, result partial: ScanResult, kind: String, keyID: String = "") throws -> ScanSummary {

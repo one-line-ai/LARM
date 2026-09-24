@@ -35,7 +35,7 @@ public enum Differ {
                     out.append(DiffEntry(objectID: o.objectID, objectType: o.objectType, field: o.field, change: .modified,
                                          before: o.valueKind == .redacted ? "[제거됨]" : o.safeValue, after: n.valueKind == .redacted ? "[제거됨]" : n.safeValue,
                                          locationAlias: n.provenance.locationAlias, secretChanged: secretChanged,
-                                         reason: secretChanged ? "비밀값 지문 변경 (원문 미표시)" : "값 변경"))
+                                         reason: secretChanged ? "비밀값 요약값 변경 (원문 미표시)" : "값 변경"))
                 }
             } else {
                 let base = String(o.provenance.locationAlias.split(separator: " ").first ?? Substring(o.provenance.locationAlias))
@@ -53,7 +53,7 @@ public enum Differ {
         }
         for (scope, n) in removedScopes {
             out.append(DiffEntry(objectID: "scope:\(scope)", objectType: .project, field: "scope", change: .incomparable, before: "\(n)개 항목", after: nil,
-                                 locationAlias: scope, secretChanged: false, reason: "범위가 제거되어 \(n)개 항목을 비교할 수 없습니다"))
+                                 locationAlias: scope, secretChanged: false, reason: "범위가 제거되어 \(n)개 항목을 비교할 수 없음"))
         }
         return out.sorted { ($0.objectID, $0.field) < ($1.objectID, $1.field) }
     }

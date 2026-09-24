@@ -10,20 +10,21 @@ struct OverviewView: View {
             VStack(alignment: .leading, spacing: 16) {
                 headline
                 HStack(alignment: .top, spacing: 12) {
-                    tile("열린 위험 (높음)", "\(state.openHighCount)", .red)
-                    tile("열린 위험 (중간)", "\(state.openFindings.filter { $0.severity == .medium }.count)", .orange)
-                    tile("조치 중", "\(state.findings.filter { $0.state == .inProgress }.count)", .blue)
-                    tile("예외", "\(state.findings.filter { $0.state == .excepted }.count)", .purple)
-                    tile("점검 공백", "\(state.gapCount)", .gray)
-                    tile("변경 사항", state.baseline == nil ? "-" : "\(state.diff.count)", .teal)
+                    tile("높은 위험", "\(state.openHighCount)", state.openHighCount > 0 ? Theme.indigo : Theme.mute, strong: true)
+                    tile("중간 위험", "\(state.openFindings.filter { $0.severity == .medium }.count)", Theme.indigoSoft)
+                    tile("조치 중", "\(state.findings.filter { $0.state == .inProgress }.count)", Theme.indigoSoft)
+                    tile("예외로 둔 항목", "\(state.findings.filter { $0.state == .excepted }.count)", Theme.indigoSoft)
+                    tile("확인 못 한 항목", "\(state.gapCount)", Theme.mute)
+                    tile("바뀐 설정", state.baseline == nil ? "-" : "\(state.diff.count)", Theme.indigoSoft)
                 }
-                if let e = state.scanError { Text(e).foregroundStyle(.orange).textSelection(.enabled) }
-                if let e = state.rulesError { Text(e).foregroundStyle(.red) }
+                if let e = state.scanError { Text(e).foregroundStyle(Theme.indigoSoft).textSelection(.enabled) }
+                if let e = state.rulesError { Text(e).foregroundStyle(Theme.indigo) }
                 scanBox
                 monitorBox
                 supportBox
                 scopeBox
                 todayBox
+                glossaryBox
             }
             .padding(24)
             .frame(maxWidth: 900, alignment: .leading)
@@ -34,28 +35,30 @@ struct OverviewView: View {
         VStack(alignment: .leading, spacing: 4) {
             Text("LARM 개요").font(AppFont.largeTitle)
             HStack {
-                Text("감시 상태: ").foregroundStyle(.secondary)
-                Text(state.healthLabel).bold().foregroundStyle(state.monitor?.health.overall == .watching ? Color.green : Color.orange)
-                if let m = state.monitor, m.pause.isPaused { Text("· \(m.pause.description)").foregroundStyle(.orange) }
-                if let ok = state.monitor?.health.lastOKAt { Text("· 마지막 건강 확인 \(Fmt.elapsed(Clock.utc(ok)))").foregroundStyle(.secondary) }
+                Text("감시 상태: ").foregroundStyle(Theme.inkSoft)
+                Text(state.healthLabel).bold().foregroundStyle(state.monitor?.health.overall == .watching ? Theme.indigo : Theme.indigoSoft)
+                if let m = state.monitor, m.pause.isPaused { Text("· \(m.pause.description)").foregroundStyle(Theme.indigoSoft) }
+                if let ok = state.monitor?.health.lastOKAt { Text("· 마지막 건강 확인 \(Fmt.elapsed(Clock.utc(ok)))").foregroundStyle(Theme.inkSoft) }
             }
             if state.lastScan == nil {
-                Text("아직 점검하지 않았습니다. 오른쪽 위 '점검'을 누르세요.").font(AppFont.headline)
+                Text("아직 점검하지 않았음. 오른쪽 위 '점검' 버튼으로 시작").font(AppFont.headline)
             } else if state.openFindings.isEmpty && state.gapCount > 0 {
-                Text("발견 사항 0건 / 점검 공백 있음 → 점검 필요").font(AppFont.headline).foregroundStyle(.orange)
+                Text("발견 사항 0건 / 확인 못 한 항목 있음 → 점검 필요").font(AppFont.headline).foregroundStyle(Theme.indigoSoft)
             } else if state.openFindings.isEmpty {
-                Text("열린 발견 사항이 없습니다.").font(AppFont.headline)
+                Text("열린 발견 사항이 없음").font(AppFont.headline)
             }
         }
     }
 
-    func tile(_ title: String, _ value: String, _ color: Color) -> some View {
+    func tile(_ title: String, _ value: String, _ color: Color, strong: Bool = false) -> some View {
         VStack(alignment: .leading, spacing: 4) {
-            Text(title).font(AppFont.caption).foregroundStyle(.secondary)
-            Text(value).font(AppFont.font(22, .bold, relativeTo: .title)).foregroundStyle(color)
+            Text(title).font(AppFont.caption).foregroundStyle(Theme.inkSoft)
+            Text(value).font(AppFont.font(24, strong ? .bold : .semibold)).foregroundStyle(color)
         }
         .padding(12).frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color.secondary.opacity(0.08)).clipShape(RoundedRectangle(cornerRadius: 8))
+        .background(Theme.surface)
+        .overlay(alignment: .bottom) { Rectangle().fill(strong ? Theme.indigo : Theme.indigoFaint).frame(height: 3) }
+        .clipShape(RoundedRectangle(cornerRadius: 4))
         .accessibilityElement(children: .combine)
     }
 
@@ -64,56 +67,76 @@ struct OverviewView: View {
             if let s = state.lastScan {
                 VStack(alignment: .leading, spacing: 4) {
                     HStack {
-                        Text("상태: \(s.status.label)").bold().foregroundStyle(s.status == .complete ? Color.primary : Color.orange)
+                        Text("상태: \(s.status.label)").bold().foregroundStyle(s.status == .complete ? Theme.ink : Theme.indigoSoft)
                         Text("· \(Fmt.local(s.endedAt)) (\(Fmt.elapsed(s.endedAt)))")
-                        Text("· 룰 \(s.rulesVersion) · 종류 \(s.kind)").foregroundStyle(.secondary)
+                        Text("· 점검 규칙 \(s.rulesVersion) · 종류 \(s.kind)").foregroundStyle(Theme.inkSoft)
                     }
-                    Text("확인한 값 \(s.counts["observations"] ?? 0)건 · coverage \(s.counts["coverage"] ?? 0)건 · 공백 \(s.counts["gaps"] ?? 0)건 · 판단 보류 \(s.counts["verdicts_unknown"] ?? 0)건")
-                        .font(AppFont.footnote).foregroundStyle(.secondary)
-                    ForEach(s.notes, id: \.self) { Text($0).font(AppFont.footnote).foregroundStyle(.orange) }
-                    if s.status == .partial { Text("일부 항목을 확인하지 못했습니다. 부분 결과이며 전체 완료가 아닙니다.").font(AppFont.footnote).foregroundStyle(.orange) }
+                    Text("확인한 값 \(s.counts["observations"] ?? 0)건 · 확인 항목 \(s.counts["coverage"] ?? 0)건 · 확인 못 한 구간 \(s.counts["gaps"] ?? 0)건 · 판단 보류 \(s.counts["verdicts_unknown"] ?? 0)건")
+                        .font(AppFont.footnote).foregroundStyle(Theme.inkSoft)
+                    ForEach(s.notes, id: \.self) { Text($0).font(AppFont.footnote).foregroundStyle(Theme.indigoSoft) }
+                    if s.status == .partial { Text("일부 항목을 확인하지 못했음. 부분 결과이며 전체 완료가 아님.").font(AppFont.footnote).foregroundStyle(Theme.indigoSoft) }
                     if s.status == .failed || s.status == .cancelled {
-                        Text("최신 실행이 \(s.status.label)입니다. 이전 성공 결과를 아래 목록에 유지합니다.").font(AppFont.footnote).foregroundStyle(.orange)
+                        Text("최신 실행이 \(s.status.label)임. 이전 성공 결과를 아래 목록에 유지함").font(AppFont.footnote).foregroundStyle(Theme.indigoSoft)
                     }
                 }.frame(maxWidth: .infinity, alignment: .leading)
             } else {
-                Text("기록 없음").foregroundStyle(.secondary).frame(maxWidth: .infinity, alignment: .leading)
+                Text("기록 없음").foregroundStyle(Theme.inkSoft).frame(maxWidth: .infinity, alignment: .leading)
             }
         }
     }
 
     var monitorBox: some View {
-        GroupBox("백그라운드 감시 (창을 닫아도 유지)") {
+        GroupBox("자동 감시 (창을 닫아도 유지)") {
             VStack(alignment: .leading, spacing: 6) {
                 if let m = state.monitor {
                     HStack {
                         Text("설정 감시:").bold(); Text(m.health.configWatch.label)
-                        Text("· AI 활동:").bold(); Text(m.health.activity.label + (m.hookInstalled ? "" : " (hook 미등록)"))
+                        Text("· AI 도구 활동:").bold(); Text(m.health.activity.label + (m.hookInstalled ? "" : " (연결 안 됨)"))
                         Spacer()
-                        if m.pause.isPaused { Button("감시 재개") { m.resume() } } else {
-                            Menu("일시중지") { Button("15분") { m.pauseWatching(minutes: 15) }; Button("1시간") { m.pauseWatching(minutes: 60) }; Button("수동 재개까지") { m.pauseWatching(minutes: nil) } }.frame(width: 110)
+                        if m.pause.isPaused { Button("감시 다시 시작") { m.resume() } } else {
+                            Menu("잠시 멈춤") { Button("15분") { m.pauseWatching(minutes: 15) }; Button("1시간") { m.pauseWatching(minutes: 60) }; Button("수동 다시 시작까지") { m.pauseWatching(minutes: nil) } }.frame(width: 110)
                         }
                     }
                     Text("폴더 감시 \(m.watchedDirs.count)개 폴더 (\(m.watchedDirs.joined(separator: ", "))) · 60초 폴링 \(m.polledFiles.count)개 파일 · 30분 주기 대조\(m.health.lastReconcileAt.map { " · 마지막 대조 " + Fmt.elapsed(Clock.utc($0)) } ?? "")")
-                        .font(AppFont.footnote).foregroundStyle(.secondary)
-                    if let d = state.lastSkippedReconcileAt { Text("변화 없음 확인 \(Fmt.elapsed(d)) (저장 생략)").font(AppFont.footnote).foregroundStyle(.secondary) }
-                    if !m.health.detail.isEmpty { Text(m.health.detail).font(AppFont.footnote).foregroundStyle(.secondary) }
+                        .font(AppFont.footnote).foregroundStyle(Theme.inkSoft)
+                    if let d = state.lastSkippedReconcileAt { Text("변화 없음 확인 \(Fmt.elapsed(d)) (저장 생략)").font(AppFont.footnote).foregroundStyle(Theme.inkSoft) }
+                    if !m.health.detail.isEmpty { Text(m.health.detail).font(AppFont.footnote).foregroundStyle(Theme.inkSoft) }
                     if m.openGaps.isEmpty {
-                        Text("지금은 감시가 끊긴 곳이 없습니다").font(AppFont.callout)
+                        Text("지금은 감시가 끊긴 곳이 없음").font(AppFont.callout)
                     } else {
                         ForEach(m.openGaps) { g in
-                            Text("공백 진행 중: \(g.label) · 시작 \(Fmt.local(g.startedAt)) · 범위 \(g.surface == "config_watch" ? "설정 감시" : g.surface)").foregroundStyle(.orange)
+                            Text("확인 못 한 구간 진행 중: \(g.label) · 시작 \(Fmt.local(g.startedAt)) · 범위 \(g.surface == "config_watch" ? "설정 감시" : g.surface)").foregroundStyle(Theme.indigoSoft)
                         }
-                        Text("복구: 일시중지면 재개, 절전이면 복귀 후 자동 대조, 장애면 앱 재시작 → 시험 이벤트 확인").font(AppFont.footnote).foregroundStyle(.secondary)
+                        Text("복구: 잠시 멈춤이면 다시 시작, 절전이면 복귀 후 자동 대조, 장애면 앱 재시작 → 연결 확인 신호 확인").font(AppFont.footnote).foregroundStyle(Theme.inkSoft)
                     }
-                    DisclosureGroup("최근 공백 기록 (\(m.recentGaps.count))") {
+                    DisclosureGroup("최근 확인 못 한 구간 기록 (\(m.recentGaps.count))") {
                         ForEach(m.recentGaps) { g in
                             Text("\(Fmt.local(g.startedAt)) ~ \(g.endedAt.map { Fmt.local($0) } ?? "진행 중") · \(g.label)\(g.recoveryEvidence.isEmpty ? "" : " · 복구: " + g.recoveryEvidence)").font(AppFont.footnote)
                         }
                     }.font(AppFont.footnote)
-                    Text("감시가 멈춘 동안의 변경은 알 수 없고, 복귀하면 현재 상태만 다시 확인합니다. 파일 변경 알림은 누가 바꿨는지나 실행 여부를 말해 주지 않습니다.").font(AppFont.footnote).foregroundStyle(.secondary)
-                } else { Text("백그라운드 감시 준비 중").foregroundStyle(.secondary) }
+                    Text("감시가 멈춘 동안의 변경은 알 수 없고, 복귀하면 현재 상태만 다시 확인함. 파일 변경 알림은 누가 바꿨는지나 실행 여부를 말해 주지 않음").font(AppFont.footnote).foregroundStyle(Theme.inkSoft)
+                } else { Text("자동 감시 준비 중").foregroundStyle(Theme.inkSoft) }
             }.frame(maxWidth: .infinity, alignment: .leading)
+        }
+    }
+
+    var glossaryBox: some View {
+        GroupBox("용어 안내") {
+            VStack(alignment: .leading, spacing: 5) {
+                glossary("점검", "AI 도구(Claude Code, Codex, Cursor)의 설정 파일을 읽어 위험한 설정이 있는지 확인하는 일. 설정을 바꾸지는 않음")
+                glossary("발견 사항", "점검에서 찾은 위험한 설정 한 건. 높음·중간 위험도와 함께 이유와 고치는 방법을 보여 줌")
+                glossary("기준 상태", "\"이 설정은 내가 확인했다\"고 저장해 둔 상태. 이후 무엇이 바뀌었는지 비교하는 기준")
+                glossary("예외", "위험을 알지만 당분간 두기로 한 항목. 기한(최대 30일)이 지나면 다시 열림")
+                glossary("자동 감시", "앱이 켜져 있는 동안 설정 파일이 바뀌는지 지켜보다가 바뀌면 다시 점검하는 기능")
+                glossary("AI 도구 활동", "Claude Code가 파일을 읽거나 명령을 실행하려 할 때 그 사실만 기록한 것. 내용은 저장하지 않고 막지도 않음")
+                glossary("점검 보고서", "점검 결과를 다른 사람에게 전달할 수 있게 묶은 파일. 비밀값과 실제 경로는 들어가지 않음")
+            }.frame(maxWidth: .infinity, alignment: .leading)
+        }
+    }
+    func glossary(_ term: String, _ meaning: String) -> some View {
+        HStack(alignment: .top, spacing: 10) {
+            Text(term).font(AppFont.font(12.5, .semibold)).foregroundStyle(Theme.indigo).frame(width: 90, alignment: .leading)
+            Text(meaning).font(AppFont.callout).foregroundStyle(Theme.inkSoft)
         }
     }
 
@@ -126,11 +149,11 @@ struct OverviewView: View {
                         Text(id).frame(width: 110, alignment: .leading).bold()
                         Text(label(s?.status ?? "-")).frame(width: 90, alignment: .leading)
                         Text("버전 \(s?.version ?? "-")").frame(width: 150, alignment: .leading)
-                        Text(support(s?.support ?? "-")).foregroundStyle(.secondary)
+                        Text(support(s?.support ?? "-")).foregroundStyle(Theme.inkSoft)
                     }.font(AppFont.callout)
                 }
                 if state.installStatus.values.allSatisfy({ $0.status == "not_installed" }) {
-                    Text("점검할 지원 대상이 없습니다. 지원 범위: Claude Code, Codex CLI, Cursor MCP. 프로젝트를 추가하거나 도구를 설치하세요.").foregroundStyle(.orange)
+                    Text("점검할 지원 대상이 없음 지원 범위: Claude Code, Codex CLI, Cursor MCP. 프로젝트를 추가하거나 도구를 설치하기").foregroundStyle(Theme.indigoSoft)
                 }
             }.frame(maxWidth: .infinity, alignment: .leading)
         }
@@ -139,16 +162,16 @@ struct OverviewView: View {
     func support(_ s: String) -> String { s == "supported" ? "정적 점검 지원 (시험 버전)" : s == "limited" ? "제한 지원 (버전 미확인)" : "미지원" }
 
     var scopeBox: some View {
-        GroupBox("점검 범위") {
+        GroupBox("확인 범위") {
             VStack(alignment: .leading, spacing: 6) {
                 ForEach(state.scopes) { s in
                     HStack {
                         Image(systemName: s.kind == .userRoot ? "house" : "folder")
                         Text(s.kind == .userRoot ? "사용자 설정 위치 (~/.claude, ~/.codex, ~/.cursor)" : s.alias)
-                        if s.excluded { Text("제외됨").font(AppFont.caption).foregroundStyle(.secondary) }
+                        if s.excluded { Text("제외됨").font(AppFont.caption).foregroundStyle(Theme.inkSoft) }
                         Spacer()
                         if s.kind == .project {
-                            Text(s.realPath).font(AppFont.caption).foregroundStyle(.secondary).lineLimit(1).truncationMode(.middle).help(s.realPath)
+                            Text(s.realPath).font(AppFont.caption).foregroundStyle(Theme.inkSoft).lineLimit(1).truncationMode(.middle).help(s.realPath)
                             Button(s.excluded ? "포함" : "제외") { state.toggleExcluded(s) }.controlSize(.small)
                             Button("삭제") { state.removeScope(s) }.controlSize(.small)
                         }
@@ -156,7 +179,7 @@ struct OverviewView: View {
                 }
                 HStack {
                     Button { state.addProjectFolder() } label: { Label("프로젝트 추가", systemImage: "plus") }
-                    Text("홈 전체, 다른 사용자, 클라우드 병합은 자동 탐색하지 않습니다.").font(AppFont.footnote).foregroundStyle(.secondary)
+                    Text("홈 전체, 다른 사용자, 클라우드 병합은 자동 탐색하지 않음").font(AppFont.footnote).foregroundStyle(Theme.inkSoft)
                 }
             }.frame(maxWidth: .infinity, alignment: .leading)
         }
@@ -166,12 +189,12 @@ struct OverviewView: View {
         GroupBox("오늘 확인할 항목 (높은 위험 → 오래된 결과 순)") {
             let top = Array(state.openFindings.sorted { $0.severity > $1.severity }.prefix(3))
             VStack(alignment: .leading, spacing: 6) {
-                if top.isEmpty { Text("없음").foregroundStyle(.secondary) }
+                if top.isEmpty { Text("없음").foregroundStyle(Theme.inkSoft) }
                 ForEach(top) { f in
                     Button {
                         state.selectedFindingID = f.findingID; state.section = .findings
                     } label: {
-                        HStack { SeverityBadge(severity: f.severity); Text("\(f.ruleID) \(f.title)").bold(); Text(f.locationAlias).foregroundStyle(.secondary).lineLimit(1) }
+                        HStack { SeverityBadge(severity: f.severity); Text("\(f.ruleID) \(f.title)").bold(); Text(f.locationAlias).foregroundStyle(Theme.inkSoft).lineLimit(1) }
                     }.buttonStyle(.plain)
                 }
             }.frame(maxWidth: .infinity, alignment: .leading)

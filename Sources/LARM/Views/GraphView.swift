@@ -12,7 +12,7 @@ struct GraphView: View {
         VStack(spacing: 0) {
             toolbar
             if vm.graph == nil {
-                Text("점검 결과가 없습니다. 먼저 점검하세요.").foregroundStyle(.secondary).frame(maxWidth: .infinity, maxHeight: .infinity)
+                Text("점검 결과가 없음 먼저 점검하기").foregroundStyle(Theme.inkSoft).frame(maxWidth: .infinity, maxHeight: .infinity)
             } else if vm.tableMode {
                 tableView
             } else {
@@ -83,7 +83,7 @@ struct GraphView: View {
 
     var footer: some View {
         Text("스크롤·핀치: 확대  ·  빈 곳 드래그 또는 Shift+스크롤: 이동  ·  노드 드래그: 위치 고정 (더블클릭으로 해제)  ·  실선은 파일에서 확인한 관계, 점선은 추론한 관계")
-            .font(AppFont.footnote).foregroundStyle(.secondary).padding(6)
+            .font(AppFont.footnote).foregroundStyle(Theme.inkSoft).padding(6)
     }
 
     var legend: some View {
@@ -94,15 +94,15 @@ struct GraphView: View {
                     Text(Self.typeName(t)).font(AppFont.caption)
                 }
             }
-            Text("빨간 테두리: 높은 위험 · 크기: 연결 수").font(AppFont.caption2).foregroundStyle(.secondary)
+            Text("굵은 테두리: 높은 위험 · 크기: 연결 수").font(AppFont.caption2).foregroundStyle(Theme.inkSoft)
         }
         .padding(8).background(.regularMaterial).clipShape(RoundedRectangle(cornerRadius: 6))
     }
 
     static func typeName(_ t: Ontology.NodeType) -> String {
         switch t {
-        case .agent: return "AI 도구"; case .project: return "프로젝트"; case .configuration: return "설정 파일"; case .mcpServer: return "MCP 서버"
-        case .endpoint: return "주소"; case .secretCandidate: return "비밀정보 후보"; case .permissionRule: return "허용 규칙"; case .hook: return "훅"
+        case .agent: return "AI 도구"; case .project: return "프로젝트"; case .configuration: return "설정 파일"; case .mcpServer: return "외부 도구 연결(MCP)"
+        case .endpoint: return "주소"; case .secretCandidate: return "비밀정보 후보"; case .permissionRule: return "허용 규칙"; case .hook: return "작업 연결(hook)"
         case .instructionFile: return "지시 파일"; case .finding: return "발견 사항"; case .rule: return "룰"; case .file: return "파일"; default: return t.rawValue
         }
     }
@@ -126,7 +126,7 @@ struct GraphView: View {
                     LabeledContent("타입", value: n.type.rawValue)
                     LabeledContent("범위", value: state.scopeAlias(n.scopeID))
                     LabeledContent("ID", value: n.id).font(AppFont.footnote)
-                    if let c = vm.change(for: n.id) { LabeledContent("기준점 대비", value: c) }
+                    if let c = vm.change(for: n.id) { LabeledContent("기준 상태 대비", value: c) }
                     if let sev = n.severity { LabeledContent("심각도 / 상태", value: "\(sev) / \(n.state ?? "")") }
                     LabeledContent("확인 시각", value: state.lastScan.map { Fmt.local($0.endedAt) } ?? "-")
                     HStack {
@@ -160,7 +160,7 @@ struct GraphView: View {
                                         Text(e.from == n.id ? "→" : "←").frame(width: 14)
                                         VStack(alignment: .leading) {
                                             Text("\(e.type.rawValue) \(vm.node(other)?.label ?? other)").font(AppFont.caption)
-                                            Text("\(e.epistemic == .observed ? "직접 확인" : e.epistemic == .derived ? "추론" : "사용자 확인") · 근거 \(e.evidenceRef.count)건 · \(Self.edgeMeaning(e.type))").font(AppFont.caption2).foregroundStyle(.secondary)
+                                            Text("\(e.epistemic == .observed ? "직접 확인" : e.epistemic == .derived ? "추론" : "사용자 확인") · 근거 \(e.evidenceRef.count)건 · \(Self.edgeMeaning(e.type))").font(AppFont.caption2).foregroundStyle(Theme.inkSoft)
                                         }
                                     }
                                 }.buttonStyle(.plain)
@@ -170,8 +170,8 @@ struct GraphView: View {
                 }.padding(10).frame(maxWidth: .infinity, alignment: .leading)
             } else {
                 VStack(alignment: .leading, spacing: 6) {
-                    Text("노드를 클릭하면 상세가 열립니다.").foregroundStyle(.secondary)
-                    Text("마우스를 올리면 연결된 노드만 밝게 보입니다. 확대할수록 라벨이 더 많이 보입니다.").font(AppFont.footnote).foregroundStyle(.secondary)
+                    Text("노드를 클릭하면 상세 표시").foregroundStyle(Theme.inkSoft)
+                    Text("마우스를 올리면 연결된 노드만 밝게 보임. 확대할수록 라벨이 더 많이 보임").font(AppFont.footnote).foregroundStyle(Theme.inkSoft)
                 }.padding()
             }
         }
@@ -180,12 +180,12 @@ struct GraphView: View {
     static func edgeMeaning(_ t: Ontology.EdgeType) -> String {
         switch t {
         case .hasConfiguration: return "에이전트용 설정 선언 (실행, 적용 아님)"
-        case .scopedTo: return "점검 범위"
+        case .scopedTo: return "확인 항목"
         case .declaresMCP: return "정적 정의 (실제 가동, 접속 아님)"
         case .pointsTo: return "설정이 가리키는 주소 (실제 통신은 확인 안 됨)"
         case .hasCandidate: return "비밀정보 후보 위치 (유효성, 유출 미확인)"
         case .hasFinding: return "대상을 평가한 발견 사항"
-        case .evaluatedBy: return "판단에 쓴 룰 버전"
+        case .evaluatedBy: return "판단에 쓴 점검 규칙 버전"
         case .declaresRule, .declaresHook: return "설정에 선언됨"
         case .hasInstruction: return "지시 파일 존재 (내용 미해석)"
         case .storedIn: return "저장 파일"
@@ -501,7 +501,7 @@ final class GraphNSView: NSView {
         guard let ctx = NSGraphicsContext.current?.cgContext else { return }
         if vm.fitRequest != lastFitRequest || !fitted { lastFitRequest = vm.fitRequest; fit() }
         if vm.zoomSeq != lastZoomSeq { lastZoomSeq = vm.zoomSeq; zoom(by: vm.zoomFactor, around: CGPoint(x: bounds.midX, y: bounds.midY)) }
-        NSColor.textBackgroundColor.setFill(); ctx.fill(bounds)
+        Theme.nsColor(Theme.sand).setFill(); ctx.fill(bounds)
         let focus = vm.hover ?? vm.selected
         let related: Set<String> = focus.map { f in Set(vm.visibleEdges.filter { $0.from == f || $0.to == f }.flatMap { [$0.from, $0.to] }).union([f]) } ?? []
         let dim = focus != nil
@@ -510,7 +510,7 @@ final class GraphNSView: NSView {
             guard let a = vm.positions[e.from], let b = vm.positions[e.to] else { continue }
             let hot = related.contains(e.from) && related.contains(e.to) && (e.from == focus || e.to == focus)
             let change = vm.change(for: e.to) ?? vm.change(for: e.from)
-            var color: NSColor = change == "추가" ? .systemGreen : change == "삭제" ? .systemRed : change == "비교 불가" ? .systemOrange : .tertiaryLabelColor
+            var color: NSColor = change != nil ? Theme.nsColor(Theme.indigoSoft) : Theme.nsColor(Theme.indigoFaint)
             color = color.withAlphaComponent(hot ? 0.95 : dim ? 0.12 : 0.45)
             ctx.setStrokeColor(color.cgColor)
             ctx.setLineWidth(hot ? 2 : 1)
@@ -528,23 +528,23 @@ final class GraphNSView: NSView {
             let fill = GraphNSView.color(n.type).withAlphaComponent(faded ? 0.25 : 1)
             ctx.setFillColor(fill.cgColor)
             ctx.fillEllipse(in: CGRect(x: c.x - r, y: c.y - r, width: r * 2, height: r * 2))
-            if n.severity == "high" { ctx.setStrokeColor(NSColor.systemRed.withAlphaComponent(faded ? 0.3 : 1).cgColor); ctx.setLineWidth(2); ctx.strokeEllipse(in: CGRect(x: c.x - r - 3, y: c.y - r - 3, width: r * 2 + 6, height: r * 2 + 6)) }
-            if vm.pinned[n.id] != nil { ctx.setStrokeColor(NSColor.labelColor.withAlphaComponent(faded ? 0.3 : 0.9).cgColor); ctx.setLineWidth(1.5); ctx.strokeEllipse(in: CGRect(x: c.x - r - 1.5, y: c.y - r - 1.5, width: r * 2 + 3, height: r * 2 + 3)) }
-            if vm.selected == n.id { ctx.setStrokeColor(NSColor.controlAccentColor.cgColor); ctx.setLineWidth(2.5); ctx.strokeEllipse(in: CGRect(x: c.x - r - 5, y: c.y - r - 5, width: r * 2 + 10, height: r * 2 + 10)) }
+            if n.severity == "high" { ctx.setStrokeColor(Theme.nsColor(Theme.indigo).withAlphaComponent(faded ? 0.3 : 1).cgColor); ctx.setLineWidth(2); ctx.strokeEllipse(in: CGRect(x: c.x - r - 3, y: c.y - r - 3, width: r * 2 + 6, height: r * 2 + 6)) }
+            if vm.pinned[n.id] != nil { ctx.setStrokeColor(Theme.nsColor(Theme.ink).withAlphaComponent(faded ? 0.3 : 0.9).cgColor); ctx.setLineWidth(1.5); ctx.strokeEllipse(in: CGRect(x: c.x - r - 1.5, y: c.y - r - 1.5, width: r * 2 + 3, height: r * 2 + 3)) }
+            if vm.selected == n.id { ctx.setStrokeColor(Theme.nsColor(Theme.indigoSoft).cgColor); ctx.setLineWidth(2.5); ctx.strokeEllipse(in: CGRect(x: c.x - r - 5, y: c.y - r - 5, width: r * 2 + 10, height: r * 2 + 10)) }
             let wantLabel = showAllLabels || related.contains(n.id) || vm.pinned[n.id] != nil || n.type == .agent || n.type == .project || n.severity == "high"
             if wantLabel && !faded {
                 let text = n.label.count > 32 ? String(n.label.prefix(31)) + "…" : n.label
-                let attrs: [NSAttributedString.Key: Any] = [.font: font, .foregroundColor: NSColor.labelColor.withAlphaComponent(related.contains(n.id) || !dim ? 0.9 : 0.5)]
+                let attrs: [NSAttributedString.Key: Any] = [.font: font, .foregroundColor: Theme.nsColor(Theme.ink).withAlphaComponent(related.contains(n.id) || !dim ? 0.9 : 0.5)]
                 let str = NSAttributedString(string: text, attributes: attrs)
                 let size = str.size()
                 let origin = CGPoint(x: c.x - size.width / 2, y: c.y + r + 3)
                 let bg = CGRect(x: origin.x - 3, y: origin.y - 1, width: size.width + 6, height: size.height + 2)
-                ctx.setFillColor(NSColor.textBackgroundColor.withAlphaComponent(0.7).cgColor)
+                ctx.setFillColor(Theme.nsColor(Theme.sand).withAlphaComponent(0.75).cgColor)
                 ctx.fill(bg)
                 str.draw(at: origin)
             }
             if let ch = vm.change(for: n.id), !faded {
-                let a: [NSAttributedString.Key: Any] = [.font: AppFont.nsFont(9, .medium), .foregroundColor: ch == "추가" ? NSColor.systemGreen : ch == "삭제" ? NSColor.systemRed : NSColor.systemOrange]
+                let a: [NSAttributedString.Key: Any] = [.font: AppFont.nsFont(9, .medium), .foregroundColor: Theme.nsColor(Theme.indigoSoft)]
                 let str = NSAttributedString(string: ch, attributes: a)
                 str.draw(at: CGPoint(x: c.x - str.size().width / 2, y: c.y - r - 13))
             }
@@ -552,11 +552,12 @@ final class GraphNSView: NSView {
     }
 
     static func color(_ t: Ontology.NodeType) -> NSColor {
+        func c(_ hex: UInt32) -> NSColor { NSColor(red: CGFloat((hex >> 16) & 0xFF) / 255, green: CGFloat((hex >> 8) & 0xFF) / 255, blue: CGFloat(hex & 0xFF) / 255, alpha: 1) }
         switch t {
-        case .agent: return .systemBlue; case .configuration: return .systemTeal; case .mcpServer: return .systemIndigo; case .endpoint: return .systemPurple
-        case .secretCandidate: return .systemRed; case .finding: return .systemOrange; case .rule: return .systemGray; case .permissionRule: return .systemCyan
-        case .hook: return .systemBrown; case .instructionFile: return .systemMint; case .file: return .systemGray; case .project: return .systemGreen; case .device: return .labelColor
-        default: return .secondaryLabelColor
+        case .agent: return c(0x2D2A5E); case .project: return c(0x5A57A8); case .configuration: return c(0x8683C4); case .mcpServer: return c(0x6C69B8)
+        case .endpoint: return c(0x4A478F); case .secretCandidate: return c(0x1E1B45); case .finding: return c(0x3B3877); case .rule: return c(0xB4B1D6); case .permissionRule: return c(0x9D9AD0)
+        case .hook: return c(0x7B78BF); case .instructionFile: return c(0xA7A4D8); case .file: return c(0xC3C1DE); case .device: return c(0x2D2A5E)
+        default: return c(0xB4B1D6)
         }
     }
 }

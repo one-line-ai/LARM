@@ -12,8 +12,8 @@ final class AppState: ObservableObject {
         case overview, findings, activity, changes, coverage, graph, evidence
         var id: String { rawValue }
         var title: String {
-            switch self { case .overview: return "개요"; case .findings: return "발견 사항"; case .activity: return "AI 활동"; case .changes: return "변경 사항"; case .coverage: return "점검 범위"
-            case .graph: return "그래프"; case .evidence: return "증빙과 설정" }
+            switch self { case .overview: return "개요"; case .findings: return "발견 사항"; case .activity: return "AI 도구 활동"; case .changes: return "바뀐 설정"; case .coverage: return "확인 범위"
+            case .graph: return "그래프"; case .evidence: return "보고서와 설정" }
         }
         var symbol: String {
             switch self { case .overview: return "gauge"; case .findings: return "exclamationmark.triangle"; case .activity: return "waveform.path.ecg"; case .changes: return "arrow.left.arrow.right"; case .coverage: return "checklist"
@@ -97,7 +97,7 @@ final class AppState: ObservableObject {
             self.db = db
             let material: KeychainKey.Material
             do { material = try KeychainKey.loadOrCreate() } catch {
-                boot = .failed("설치 키를 Keychain에서 준비하지 못했습니다. 약한 임시 키로 대체하지 않습니다. \(error)")
+                boot = .failed("설치 키를 Keychain에서 준비하지 못했음. 약한 임시 키로 대체하지 않음 \(error)")
                 return
             }
             redactor = Redactor(hmacKey: material.key)
@@ -110,9 +110,9 @@ final class AppState: ObservableObject {
                 let (installed, note) = RuleUpdate.loadCurrent(dir: Paths.supportDir.appendingPathComponent("rules", isDirectory: true))
                 if let installed, RuleUpdate.isNewer(installed.version, than: bundled.version) { rules = installed } else { rules = bundled }
                 rulesVersion = rules!.version
-                if installed == nil, note.contains("손상") { rulesError = "\(note). 마지막 검증 버전(번들 \(bundled.version))을 사용합니다." }
+                if installed == nil, note.contains("손상") { rulesError = "\(note). 마지막 검증 버전(번들 \(bundled.version))을 사용함" }
             } catch {
-                rulesError = "룰 로딩 실패: \(error). 점검 불가 상태입니다. 무탐지로 종료하지 않습니다."
+                rulesError = "점검 규칙 로딩 실패: \(error). 점검 불가 상태임. 무탐지로 종료하지 않음"
             }
             try ScopeRepo.ensureUserRoot(db)
             try reload()
@@ -176,7 +176,7 @@ final class AppState: ObservableObject {
 
     func runScan(kind: String = "full", onlyScopeIDs: Set<String>? = nil) {
         guard let db, let redactor, let rules else {
-            if rules == nil { scanError = rulesError ?? "룰이 없어 점검할 수 없습니다." }
+            if rules == nil { scanError = rulesError ?? "룰이 없어 점검할 수 없음" }
             return
         }
         if scanning {
@@ -211,8 +211,8 @@ final class AppState: ObservableObject {
                     if stored {
                         _ = try ScanRepo.store(db, result: result, kind: kind, keyID: keyID)
                         try self.reload()
-                        if result.status == .partial { self.scanError = "일부 항목을 확인하지 못했습니다. '점검 범위'에서 사유를 확인하세요." }
-                        if result.status == .cancelled { self.scanError = "점검을 취소했습니다. 이전 성공 결과를 유지합니다." }
+                        if result.status == .partial { self.scanError = "일부 항목을 확인하지 못했음. 'coverage'에서 사유를 확인하기" }
+                        if result.status == .cancelled { self.scanError = "점검을 취소했음. 이전 성공 결과를 유지함" }
                         let newHigh = self.findings.filter { $0.severity == .high && $0.state == .open && !beforeHigh.contains($0.findingID) }
                         for (rule, items) in Dictionary(grouping: newHigh, by: { $0.ruleID }) { self.notify(NotificationPolicy.forNewHigh(ruleID: rule, count: items.count)) }
                     }
@@ -232,7 +232,7 @@ final class AppState: ObservableObject {
         let panel = NSOpenPanel()
         panel.canChooseDirectories = true; panel.canChooseFiles = false; panel.allowsMultipleSelection = true
         panel.prompt = "프로젝트 추가"
-        panel.message = "점검할 프로젝트 폴더를 선택하세요. 폴더 선택은 코드 실행이나 전체 수집 동의가 아닙니다. 지원 설정 파일만 읽습니다."
+        panel.message = "점검할 프로젝트 폴더를 선택하기. 폴더 선택은 코드 실행이나 전체 수집 동의가 아님. 지원 설정 파일만 읽음."
         guard panel.runModal() == .OK, let db else { return }
         do {
             for u in panel.urls { _ = try ScopeRepo.addProject(db, path: u.path) }
@@ -267,14 +267,14 @@ final class AppState: ObservableObject {
     }
 
     func guidance(for ruleID: String) -> String {
-        (try? ResourceLocator.data("guidance/ko/\(ruleID).md")).map { String(decoding: $0, as: UTF8.self) } ?? "안내 문서를 찾을 수 없습니다."
+        (try? ResourceLocator.data("guidance/ko/\(ruleID).md")).map { String(decoding: $0, as: UTF8.self) } ?? "안내 문서를 찾을 수 없음"
     }
 
     func scopeAlias(_ id: String) -> String { scopes.first { $0.scopeID == id }?.alias ?? id }
 
 
     func setBaseline(reason: String) -> String? {
-        guard let db, let s = lastScan else { return "점검 기록이 없습니다." }
+        guard let db, let s = lastScan else { return "점검 기록이 없음" }
         do { try DecisionRepo.setBaseline(db, scanID: s.scanID, reason: reason); try reload(); return nil } catch { return "\(error)" }
     }
 
@@ -301,14 +301,14 @@ final class AppState: ObservableObject {
     func purgeNow() -> String {
         guard let db else { return "" }
         let n = (try? Retention.apply(db)) ?? 0; try? reload()
-        return "만료 점검 기록 \(n)건을 삭제했습니다. 기준점, 최신 점검, 내보낸 사본은 유지됩니다."
+        return "만료 점검 기록 \(n)건을 삭제했음. 기준 상태, 최신 점검, 내보낸 사본은 유지됨"
     }
 
     /// 전체 초기화: 기록·기준점·설치 키·임시 파일 삭제 후 종료.
     func fullReset() {
         let alert = NSAlert()
         alert.messageText = "전체 초기화"
-        alert.informativeText = "점검 기록, 기준점, 예외, 설치 키(Keychain), 보관 중인 이벤트를 삭제하고 앱을 종료합니다. 내보낸 증빙 파일은 그대로 남습니다. 디스크, 백업, 클라우드에 남은 사본까지 지워지지는 않습니다."
+        alert.informativeText = "점검 기록, 기준 상태, 예외, 설치 키(Keychain), 보관 중인 활동 기록를 삭제하고 앱을 종료함. 내보낸 보고서 파일은 그대로 남음. 디스크, 백업, 클라우드에 남은 사본까지 지워지지는 않음"
         alert.addButton(withTitle: "삭제하고 종료"); alert.addButton(withTitle: "취소")
         guard alert.runModal() == .alertFirstButtonReturn else { return }
         db = nil
@@ -367,8 +367,8 @@ final class AppState: ObservableObject {
             hookPlanIsRemoval = remove
             hookPlan = remove ? try HookInstaller.planRemove(settingsText: text)
                               : try HookInstaller.planInstall(settingsText: text, hookPath: "/Applications/LARM.app/Contents/MacOS/larm-hook")
-            if hookPlan?.changed == false { hookMessage = remove ? "제거할 LARM hook 항목이 없습니다." : "이미 등록되어 있습니다."; hookPlan = nil }
-        } catch { hookMessage = "설정 파일을 읽지 못했습니다: \(error)"; hookPlan = nil }
+            if hookPlan?.changed == false { hookMessage = remove ? "제거할 LARM hook 항목이 없음" : "이미 등록되어 있음."; hookPlan = nil }
+        } catch { hookMessage = "설정 파일을 읽지 못했슴: \(error)"; hookPlan = nil }
     }
 
     func applyHookPlan() {
@@ -377,7 +377,7 @@ final class AppState: ObservableObject {
             let before = Hashing.sha256Hex(plan.before)
             try HookInstaller.apply(plan, to: Monitor.claudeSettingsPath)
             try Audit.record(db, kind: hookPlanIsRemoval ? "hook_removed" : "hook_installed", detail: ["settings_sha256_before": before, "settings_sha256_after": Hashing.sha256Hex(plan.after)])
-            hookMessage = hookPlanIsRemoval ? "LARM hook 항목을 제거했습니다. 다른 hook과 설정은 그대로입니다." : "hook을 등록했습니다. 새 Claude Code 세션부터 기록됩니다. '시험 이벤트 보내기'로 연결을 확인하세요."
+            hookMessage = hookPlanIsRemoval ? "LARM hook 항목을 제거했음. 다른 hook과 설정은 그대로임" : "연결을 등록했음. 새 Claude Code 작업 세션부터 기록됨. '연결 확인 신호 보내기'로 연결을 확인하기"
             hookPlan = nil
             monitor?.refreshHookInstalled(); monitor?.healthCheck()
             runScan(kind: "rescan", onlyScopeIDs: [])
@@ -421,7 +421,7 @@ final class AppState: ObservableObject {
     func exportEvidence() {
         guard let db else { return }
         do {
-            guard let input = try exportInput() else { lastExportMessage = "내보낼 점검 결과가 없습니다. 먼저 점검하세요."; return }
+            guard let input = try exportInput() else { lastExportMessage = "내보낼 점검 결과가 없음 먼저 점검하기"; return }
             let (zip, exportID, msha) = try Exporter.build(input)
             let panel = NSSavePanel()
             panel.nameFieldStringValue = "LARM-evidence-\(String(input.scanSummary.endedAt.prefix(10))).zip"
@@ -431,7 +431,7 @@ final class AppState: ObservableObject {
             try db.run("INSERT INTO export VALUES(?,?,?,?,?,?,?,?)", [.text(exportID), .text(Clock.nowUTC()), .text("[\"\(input.scanID)\"]"), .text("{}"),
                                                                   .text(Exporter.schema), .text(msha), .int(Int64(Exporter.fileOrder.count + 1)), .text(url.lastPathComponent)])
             try Audit.record(db, kind: "export", detail: ["export_id": exportID, "manifest_sha256": msha])
-            lastExportMessage = "내보냈습니다: \(url.lastPathComponent)\nmanifest SHA-256: \(msha)\n이 해시를 별도 매체에 보관하면 manifest 재작성 위조를 검출할 수 있습니다."
+            lastExportMessage = "내보냈슴: \(url.lastPathComponent)\nmanifest SHA-256: \(msha)\n이 해시를 별도 매체에 보관하면 manifest 재작성 위조를 검출할 수 있음."
         } catch { lastExportMessage = "내보내기 실패: \(Redactor.scrub("\(error)"))" }
     }
 
@@ -460,8 +460,8 @@ final class AppState: ObservableObject {
             _ = try RuleUpdate.install(set, json: pkg.rulesJSON, into: dir)
             try Audit.record(db, kind: "rules_updated", detail: ["from": rulesVersion, "to": set.version])
             rules = set; rulesVersion = set.version
-            ruleUpdateMessage = "룰 \(set.version)으로 전환했습니다. 기존 발견 사항은 이전 룰 버전을 유지하며 다음 점검부터 새 룰로 평가합니다."
-        } catch { ruleUpdateMessage = "갱신 거부: \(error). 현재 룰 \(rulesVersion)을 유지합니다." }
+            ruleUpdateMessage = "점검 규칙 \(set.version)으로 전환했음. 기존 발견 사항은 이전 점검 규칙 버전을 유지하며 다음 점검부터 새 룰로 평가함"
+        } catch { ruleUpdateMessage = "갱신 거부: \(error). 현재 점검 규칙 \(rulesVersion)을 유지함" }
     }
     func rollbackRules() {
         guard let db else { return }
@@ -471,7 +471,7 @@ final class AppState: ObservableObject {
             let bundled = try RuleLoader.loadBundled()
             rules = bundled; rulesVersion = bundled.version
             try Audit.record(db, kind: "rules_rolled_back", detail: ["to": bundled.version])
-            ruleUpdateMessage = "번들 룰 \(bundled.version)으로 되돌렸습니다."
+            ruleUpdateMessage = "번들 점검 규칙 \(bundled.version)으로 되돌렸음."
         } catch { ruleUpdateMessage = "\(error)" }
     }
 

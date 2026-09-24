@@ -4,7 +4,7 @@ import Foundation
 public enum Diagnostics {
     public static func build(db: SQLiteDB, appVersion: String, osBuild: String, rulesVersion: String, extra: [String: String] = [:]) -> String {
         var lines = ["LARM 진단 (자동 전송 없음)", "generated_at=\(Clock.nowUTC()) tz=\(Clock.localTimeZoneID)",
-                     "app=\(appVersion) os=\(osBuild) rules=\(rulesVersion) schema_db=\(db.userVersion) evidence=\(Exporter.schema) ontology=\(Ontology.version)"]
+                     "app=\(appVersion) os=\(osBuild) rules=\(rulesVersion) 형식_db=\(db.userVersion) evidence=\(Exporter.schema) ontology=\(Ontology.version)"]
         for (k, v) in extra.sorted(by: { $0.key < $1.key }) { lines.append("\(k)=\(Redactor.scrub(v))") }
         if let scans = try? ScanRepo.list(db, limit: 5) {
             for s in scans { lines.append("scan seq=\(s.sequence) kind=\(s.kind) status=\(s.status.rawValue) ended=\(s.endedAt) rules=\(s.rulesVersion) gaps=\(s.counts["gaps"] ?? 0)") }

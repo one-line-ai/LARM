@@ -20,10 +20,10 @@ enum Headless {
                                                               : try HookInstaller.planInstall(settingsText: text, hookPath: "/Applications/LARM.app/Contents/MacOS/larm-hook")
                 guard plan.changed else { print("변경 없음 (\(args.contains("--uninstall-hook") ? "LARM hook 없음" : "이미 등록됨"))"); exit(0) }
                 print("--- ~/.claude/settings.json 변경 전후 ---\n\(plan.diff)")
-                guard args.contains("--yes") else { print("적용하려면 --yes 를 붙이세요 (사용자 확인 필요)."); exit(3) }
+                guard args.contains("--yes") else { print("적용하려면 --yes 를 붙이기 (사용자 확인 필요)."); exit(3) }
                 try HookInstaller.apply(plan, to: path)
                 try Audit.record(db, kind: args.contains("--uninstall-hook") ? "hook_removed" : "hook_installed", detail: ["via": "headless"])
-                print("적용했습니다."); exit(0)
+                print("적용했음."); exit(0)
             }
             let material = try KeychainKey.loadOrCreate()
             _ = try InstallationStore.loadOrCreate(db: db, keyID: material.keyID, appVersion: AppInfo.version, osBuild: AppInfo.osBuild)

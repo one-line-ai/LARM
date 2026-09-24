@@ -88,7 +88,7 @@ public final class PathPoller {
 public enum SurfaceStatus: String, Sendable, Codable {
     case watching, partial, paused, failed, unsupported, notConnected = "not_connected"
     public var label: String {
-        switch self { case .watching: return "감시 중"; case .partial: return "부분 감시"; case .paused: return "일시중지"; case .failed: return "장애"
+        switch self { case .watching: return "감시 중"; case .partial: return "부분 감시"; case .paused: return "잠시 멈춤"; case .failed: return "장애"
         case .unsupported: return "미지원"; case .notConnected: return "연결 안 됨" }
     }
 }

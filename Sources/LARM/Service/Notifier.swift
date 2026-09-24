@@ -7,7 +7,7 @@ import LARMCore
 final class Notifier {
     private(set) var available = AppInfo.isBundled
     private(set) var authorized = false
-    var reason: String { available ? (authorized ? "허용됨" : "알림 권한 미허용 (감시와 앱 이력은 유지)") : "앱 번들 밖에서는 알림을 보낼 수 없습니다" }
+    var reason: String { available ? (authorized ? "허용됨" : "알림 권한 미허용 (감시와 앱 이력은 유지)") : "앱 번들 밖에서는 알림을 보낼 수 없음" }
 
     func refreshAuthorization() async {
         guard available else { return }

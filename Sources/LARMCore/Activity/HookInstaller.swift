@@ -32,7 +32,7 @@ public enum HookInstaller {
         return false
     }
 
-    /// 설치 계획: 각 이벤트에 LARM 항목(마커 = 명령 경로)을 하나씩 추가.
+    /// 설치 계획: 각 활동 기록에 LARM 항목(마커 = 명령 경로)을 하나씩 추가.
     public static func planInstall(settingsText: String, hookPath: String) throws -> Plan {
         var o = try settingsObject(settingsText)
         var hooks = o["hooks"] as? [String: Any] ?? [:]

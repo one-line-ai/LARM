@@ -48,14 +48,14 @@ public enum NotificationPolicy {
     /// 알림 본문 규칙: 파일 원문·사용자명·토큰·프로젝트 이름을 넣지 않는다.
     public static func forNewHigh(ruleID: String, count: Int) -> NotificationRequest {
         NotificationRequest(kind: .newHigh, dedupeKey: "new_high|\(ruleID)", title: "LARM: 높은 위험 발견",
-                            body: "\(ruleID) 규칙에서 높은 위험 \(count)건이 새로 발견되었습니다. 앱에서 근거를 확인하세요.")
+                            body: "\(ruleID) 규칙에서 높은 위험 \(count)건이 새로 발견되었음. 앱에서 근거를 확인하기")
     }
     public static func forGap(reason: String, surface: String) -> NotificationRequest {
-        NotificationRequest(kind: .newGap, dedupeKey: "gap|\(surface)|\(reason)", title: "LARM: 감시 공백",
-                            body: "\(surface == "config_watch" ? "설정 감시" : surface) 범위에 공백이 생겼습니다 (\(reason)). 앱에서 복구 행동을 확인하세요.")
+        NotificationRequest(kind: .newGap, dedupeKey: "gap|\(surface)|\(reason)", title: "LARM: 감시가 끊긴 구간",
+                            body: "\(surface == "config_watch" ? "설정 감시" : surface) 범위에 확인 못 한 구간이 생겼음 (\(reason)). 앱에서 복구 행동을 확인하기")
     }
     public static func forRecovery(surface: String) -> NotificationRequest {
         NotificationRequest(kind: .recovered, dedupeKey: "recovered|\(surface)|\(Int(Date().timeIntervalSince1970 / 3600))", title: "LARM: 감시 복구",
-                            body: "\(surface == "config_watch" ? "설정 감시" : surface) 범위가 복구되었습니다. 공백 구간은 기록에 남습니다.")
+                            body: "\(surface == "config_watch" ? "설정 감시" : surface) 범위가 복구되었음. 확인 못 한 구간 구간은 기록에 남음.")
     }
 }

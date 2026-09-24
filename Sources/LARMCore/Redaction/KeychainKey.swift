@@ -17,7 +17,7 @@ public enum KeychainKey {
         public var description: String {
             switch self {
             case .keychain(let s): return "Keychain 오류 \(s): \(SecCopyErrorMessageString(s, nil) as String? ?? "")"
-            case .corrupt: return "Keychain 항목이 손상되었습니다"
+            case .corrupt: return "Keychain 항목이 손상되었음"
             }
         }
     }
@@ -33,7 +33,7 @@ public enum KeychainKey {
             kSecClass as String: kSecClassGenericPassword,
             kSecAttrService as String: service,
             kSecAttrAccount as String: account,
-            kSecAttrLabel as String: "LARM 설치 키 (비밀정보 지문용)",
+            kSecAttrLabel as String: "LARM 설치 키 (비밀정보 요약값용)",
             kSecAttrAccessible as String: kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly,
             kSecValueData as String: key,
         ]

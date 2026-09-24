@@ -52,14 +52,14 @@ public enum ActivityRules {
         return true
     }
 
-    /// 요청 이벤트 하나에 대한 판단 목록 (룰별 최대 1건).
+    /// 요청 활동 기록 하나에 대한 판단 목록 (룰별 최대 1건).
     public static func evaluate(_ set: ActivityRuleSet, targetKind: String, flags: [String], outsideScope: Bool) -> [ActivityVerdict] {
         let fl = Set(flags)
         var out: [ActivityVerdict] = []
         for r in set.rules {
             if let u = r.unknownWhen, matches(u, kind: targetKind, flags: fl, outside: outsideScope) {
                 out.append(ActivityVerdict(ruleID: r.id, ruleVersion: set.version, outcome: .unknown, severity: .gap, confidence: .low, title: r.title,
-                                           summary: "판단 보류: 인코딩·간접 실행·대상 불명은 문자열만으로 판단하지 않습니다.", limits: r.limits, nextAction: r.nextAction))
+                                           summary: "판단 보류: 인코딩·간접 실행·대상 불명은 문자열만으로 판단하지 않음", limits: r.limits, nextAction: r.nextAction))
                 continue
             }
             if let v = r.verdicts.first(where: { matches($0.when, kind: targetKind, flags: fl, outside: outsideScope) }) {

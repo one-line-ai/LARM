@@ -35,7 +35,7 @@ public final class Scanner {
         let active = scopes.filter { !$0.excluded }
         let projects = active.filter { $0.kind == .project }
         if projects.count > limits.maxProjects {
-            notes.append("프로젝트 \(projects.count)개 중 상한 \(limits.maxProjects)개만 점검했습니다.")
+            notes.append("프로젝트 \(projects.count)개 중 상한 \(limits.maxProjects)개만 점검했음.")
         }
         let planned = active.filter { $0.kind == .userRoot } + projects.prefix(limits.maxProjects)
 
@@ -57,7 +57,7 @@ public final class Scanner {
         if cancelled { status = .cancelled }
         else if coverage.contains(where: { [.denied, .oversize, .unsupported, .error].contains($0.status) }) { status = .partial }
         else { status = .complete }
-        if context.baselineObservations == nil { notes.append("기준점이 없어 MCP·훅 구성을 미검토로 표시합니다.") }
+        if context.baselineObservations == nil { notes.append("기준 상태이 없어 MCP·hook 구성을 미검토로 표시함") }
         return ScanResult(scanID: scanID, status: status, startedAt: started, endedAt: Clock.nowUTC(), scopes: planned,
                           coverage: coverage, observations: observations, verdicts: verdicts, adapterVersions: adapterVersions,
                           rulesVersion: rules.version, notes: notes)

@@ -15,7 +15,7 @@ import CryptoKit
         let r = Scanner(rules: Fx.rules, redactor: Fx.redactor).run(scopes: scopes)
         #expect(r.status == .partial)
         #expect(r.coverage.contains { $0.itemAlias == "~/.cursor/mcp.json" && $0.status == .oversize })
-        #expect(r.coverage.contains { $0.itemAlias == "<proj>/.mcp.json" && $0.status == .denied && $0.reason.contains("심볼릭") })
+        #expect(r.coverage.contains { $0.itemAlias == "<proj>/.mcp.json" && $0.status == .denied && $0.reason.contains("바로가기") })
         #expect(r.verdicts.contains { $0.ruleID == "R08" && $0.objectID.contains("mcp.json") })
         var many = [scopes[0]]
         for i in 0..<25 { many.append(Scope(scopeID: "p\(i)", alias: "proj\(i)", realPath: proj, kind: .project)) }

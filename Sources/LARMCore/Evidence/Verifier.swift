@@ -9,7 +9,7 @@ public struct VerifyReport: Sendable {
     public var schema: String = ""
     public var generatedAt: String = ""
     public var fileCount: Int = 0
-    public let limitation = "검증 성공은 묶음 내부의 파일 일관성 확인입니다. 생성자 신원, 확인 사실의 진실성, 생성 시점의 공증, 악성 여부, 법규 준수를 증명하지 않습니다. manifest까지 재작성한 위조는 독립 매체에 보관한 기준 해시 없이는 검출할 수 없습니다."
+    public let limitation = "검증 성공은 묶음 내부의 파일 일관성 확인임. 생성자 신원, 확인 사실의 진실성, 생성 시점의 공증, 악성 여부, 법규 준수를 증명하지 않음 manifest까지 재작성한 위조는 독립 매체에 보관한 기준 해시 없이는 검출할 수 없음"
 }
 
 public enum Verifier {
@@ -32,7 +32,7 @@ public enum Verifier {
         }
         check("중복 ZIP 경로 없음", dup.isEmpty, dup.joined(separator: ", "))
         check("절대경로·상위 이동·디렉터리 없음", bad.isEmpty, bad.joined(separator: ", "))
-        check("심볼릭 링크 없음", links.isEmpty, links.joined(separator: ", "))
+        check("바로가기 링크 없음", links.isEmpty, links.joined(separator: ", "))
         check("저장 방식만 사용", methods.isEmpty, methods.joined(separator: ", "))
         guard dup.isEmpty, bad.isEmpty, links.isEmpty, methods.isEmpty else { return r }
         guard let mh = headers.first(where: { $0.path == "manifest.json" }) else { check("manifest.json 존재", false); return r }
@@ -52,7 +52,7 @@ public enum Verifier {
         check("manifest 구문 (중복 키 금지)", true)
         let schema = manifest["schema_version"] as? String ?? ""
         r.schema = schema; r.exportID = manifest["export_id"] as? String ?? ""; r.generatedAt = manifest["generated_at"] as? String ?? ""
-        check("schema 지원", supportedSchemas.contains(schema), schema)
+        check("형식 지원", supportedSchemas.contains(schema), schema)
         guard supportedSchemas.contains(schema) else { return r }
         guard let files = manifest["files"] as? [[String: Any]] else { check("files 목록", false); return r }
         let listed = Dictionary(files.compactMap { f -> (String, (Int, String))? in
@@ -79,8 +79,8 @@ public enum Verifier {
     }
 
     public static func render(_ r: VerifyReport) -> String {
-        var s = ["LARM 증빙 검증 결과: \(r.ok ? "성공 (묶음 내부의 파일 일관성을 확인했습니다)" : "실패")",
-                 "export_id=\(r.exportID) schema=\(r.schema) generated_at=\(r.generatedAt) files=\(r.fileCount)"]
+        var s = ["LARM 보고서 검증 결과: \(r.ok ? "성공 (묶음 내부의 파일 일관성을 확인했습니다)" : "실패")",
+                 "export_id=\(r.exportID) 형식=\(r.schema) generated_at=\(r.generatedAt) files=\(r.fileCount)"]
         for c in r.checks { s.append("  [\(c.pass ? "PASS" : "FAIL")] \(c.name)\(c.detail.isEmpty ? "" : ": \(c.detail)")") }
         s.append("한계: \(r.limitation)")
         return s.joined(separator: "\n")

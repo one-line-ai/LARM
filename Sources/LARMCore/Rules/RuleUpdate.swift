@@ -18,11 +18,11 @@ public enum RuleUpdate {
         case badSignature, unsupportedSchema(String), notNewer(String, String), invalidRules(String), containsExecutable
         public var description: String {
             switch self {
-            case .badSignature: return "서명이 유효하지 않아 갱신을 거부했습니다 (변조 또는 다른 키)."
-            case .unsupportedSchema(let s): return "미지원 룰 schema \(s)."
-            case .notNewer(let a, let b): return "오래된 버전입니다 (현재 \(a), 패키지 \(b))."
-            case .invalidRules(let s): return "룰 파일 오류: \(s)"
-            case .containsExecutable: return "룰 데이터에 실행 구문이 포함되어 거부했습니다."
+            case .badSignature: return "서명이 유효하지 않아 갱신을 거부했음 (변조 또는 다른 키)."
+            case .unsupportedSchema(let s): return "미지원 점검 규칙 형식 \(s)."
+            case .notNewer(let a, let b): return "오래된 버전임 (현재 \(a), 패키지 \(b))."
+            case .invalidRules(let s): return "점검 규칙 파일 오류: \(s)"
+            case .containsExecutable: return "점검 규칙 데이터에 실행 구문이 포함되어 거부했음."
             }
         }
     }
@@ -49,7 +49,7 @@ public enum RuleUpdate {
         return key.isValidSignature(sig, for: message)
     }
 
-    /// 호환성 검사: schema 지원, 버전 증가, 룰 디코딩 성공, 실행 구문 없음.
+    /// 호환성 검사: schema 지원, 버전 증가, 룰 디코딩 성공, 실행 구문 없음
     public static func validate(_ p: Package, currentVersion: String) throws -> RuleSet {
         guard p.schema == RuleLoader.supportedSchema else { throw UpdateError.unsupportedSchema(p.schema) }
         guard isNewer(p.version, than: currentVersion) else { throw UpdateError.notNewer(currentVersion, p.version) }
@@ -95,7 +95,7 @@ public enum RuleUpdate {
     public static func loadCurrent(dir: URL) -> (RuleSet?, String) {
         let cur = dir.appendingPathComponent("current.json")
         guard let d = try? Data(contentsOf: cur) else { return (nil, "설치된 갱신 없음") }
-        do { let s = try RuleLoader.load(d); return (s, "갱신 룰 \(s.version)") } catch { return (nil, "설치된 갱신 룰 손상: \(error)") }
+        do { let s = try RuleLoader.load(d); return (s, "갱신 점검 규칙 \(s.version)") } catch { return (nil, "설치된 갱신 점검 규칙 손상: \(error)") }
     }
 }
 

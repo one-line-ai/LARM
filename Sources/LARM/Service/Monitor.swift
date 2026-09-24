@@ -55,7 +55,7 @@ final class Monitor: ObservableObject {
     private func startSocket() {
         socket?.stop()
         let srv = HookSocketServer(path: Paths.socketURL.path) { [weak self] data in Task { @MainActor in self?.receivedHook(data) } }
-        if srv.start() { socket = srv; try? CoverageGapRepo.close(db, surface: "activity", reason: "socket_down", evidence: "소켓 재시작") }
+        if srv.start() { socket = srv; try? CoverageGapRepo.close(db, surface: "activity", reason: "socket_down", evidence: "연결 통로 재시작") }
         else { socket = nil; _ = try? CoverageGapRepo.open(db, surface: "activity", reason: "socket_down") }
     }
 
@@ -69,17 +69,17 @@ final class Monitor: ObservableObject {
         onHookData(data)
     }
 
-    /// 시험 이벤트: 번들 안의 larm-hook을 --test로 실행한다 (제품이 서명한 어댑터만 실행, N01).
+    /// 시험 활동 기록: 번들 안의 larm-hook을 --test로 실행한다 (제품이 서명한 어댑터만 실행, N01).
     func sendTestEvent() -> String {
         guard let url = Bundle.main.executableURL?.deletingLastPathComponent().appendingPathComponent("larm-hook"), FileManager.default.fileExists(atPath: url.path) else {
-            return "번들 안에 larm-hook이 없습니다 (swift run 환경). 설치된 앱에서 시험하세요."
+            return "번들 안에 larm-hook이 없음 (swift run 환경). 설치된 앱에서 시험하기"
         }
         expectingTestEvent = true
         let p = Process(); p.executableURL = url; p.arguments = ["--test"]
         let pipe = Pipe(); p.standardOutput = pipe; p.standardError = pipe
-        do { try p.run(); p.waitUntilExit() } catch { expectingTestEvent = false; return "시험 이벤트 실행 실패: \(error.localizedDescription)" }
+        do { try p.run(); p.waitUntilExit() } catch { expectingTestEvent = false; return "연결 확인 신호 실행 실패: \(error.localizedDescription)" }
         let out = String(decoding: pipe.fileHandleForReading.readDataToEndOfFile(), as: UTF8.self).trimmingCharacters(in: .whitespacesAndNewlines)
-        return out.isEmpty ? "시험 이벤트를 보냈습니다. 수신 확인을 기다립니다." : out
+        return out.isEmpty ? "연결 확인 신호를 보냈음. 수신 확인을 기다림" : out
     }
 
 
@@ -162,8 +162,8 @@ final class Monitor: ObservableObject {
         switch sig {
         case .overflow(let reason):
             _ = try? CoverageGapRepo.open(db, surface: "config_watch", reason: "fs_overflow")
-            health.detail = "파일 이벤트 유실(\(reason)) → 현재 상태 대조로 복구"
-            reconcile(reason: "이벤트 유실 복구")
+            health.detail = "파일 활동 기록 유실(\(reason)) → 현재 상태 대조로 복구"
+            reconcile(reason: "활동 기록 유실 복구")
         case .changed(let paths):
             let interesting = paths.filter { p in
                 let n = (p as NSString).lastPathComponent
@@ -211,7 +211,7 @@ final class Monitor: ObservableObject {
 
     private func recover(from reason: String) {
         guard !pause.isPaused else { return }
-        try? CoverageGapRepo.close(db, surface: "config_watch", reason: reason, evidence: "복귀 후 현재 상태 대조 (공백 중 변경은 확인 안 됨)")
+        try? CoverageGapRepo.close(db, surface: "config_watch", reason: reason, evidence: "복귀 후 현재 상태 대조 (확인 못 한 구간 중 변경은 확인 안 됨)")
         refreshGaps()
         reconcile(reason: "\(reason) 복귀 대조")
         healthCheck()
@@ -252,7 +252,7 @@ final class Monitor: ObservableObject {
         if cw == .failed {
             _ = try? CoverageGapRepo.open(db, surface: "config_watch", reason: "watch_failed")
         } else if cw == .watching {
-            try? CoverageGapRepo.close(db, surface: "config_watch", reason: "watch_failed", evidence: "감시 재개 확인")
+            try? CoverageGapRepo.close(db, surface: "config_watch", reason: "watch_failed", evidence: "감시 다시 시작 확인")
         }
         refreshGaps()
     }
@@ -273,11 +273,11 @@ final class Monitor: ObservableObject {
         var failed = false
         for w in watchers.values where !w.isRunning { if !w.start() { failed = true } }
         if failed { failedDirs = ["(재시작 실패)"] } else { failedDirs = [] }
-        try? CoverageGapRepo.close(db, surface: "config_watch", reason: "paused", evidence: auto ? "기한 만료 → 건강 확인, 대조" : "사용자 재개 → 건강 확인, 대조")
+        try? CoverageGapRepo.close(db, surface: "config_watch", reason: "paused", evidence: auto ? "기한 만료 → 건강 확인, 대조" : "사용자 다시 시작 → 건강 확인, 대조")
         try? Audit.record(db, kind: "watch_resumed", detail: ["auto": auto ? "true" : "false"])
         refreshGaps()
         healthCheck()
-        if health.configWatch != .failed { reconcile(reason: auto ? "일시중지 만료 대조" : "재개 대조") }
-        else { health.detail = "재개 실패: 감시 장애 상태를 유지합니다 (공백 유지)" }
+        if health.configWatch != .failed { reconcile(reason: auto ? "잠시 멈춤 만료 대조" : "다시 시작 대조") }
+        else { health.detail = "다시 시작 실패: 감시 장애 상태를 유지함 (확인 못 한 구간 유지)" }
     }
 }

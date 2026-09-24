@@ -35,7 +35,7 @@ public struct RuleEngine {
         for c in coverage where c.status != .success && c.status != .absent {
             let oid = "cov:\(c.adapter):\(c.itemAlias)"
             out.append(Verdict(ruleID: "R08", ruleVersion: rules.version, objectID: oid, objectType: .coverageItem, outcome: .positive,
-                               severity: .gap, confidence: .high, title: "점검 범위·가시성 공백",
+                               severity: .gap, confidence: .high, title: "coverage·가시성 확인 못 한 구간",
                                summary: "\(c.itemAlias): \(statusLabel(c.status)) (\(c.reason))", evidence: [],
                                limits: "찾지 못한 것을 존재하지 않는 것으로 바꾸지 않는다. 위험 점수에 합산하지 않는다.",
                                nextAction: "오류 해결·범위 재선택·지원 업데이트 후 재점검", scopeID: c.scopeID, locationAlias: c.itemAlias))
@@ -56,7 +56,7 @@ public struct RuleEngine {
         }
         if let uw = rule.unknownWhen, uw.contains(where: { test($0, object) }) {
             let ev = uw.compactMap { object.fields[$0.field]?.obsID }
-            return base(.unknown, .gap, .low, "판단 보류: 필요한 값을 확인하지 못했습니다 (\(uw.map { $0.field }.joined(separator: ", ")))", ev)
+            return base(.unknown, .gap, .low, "판단 보류: 필요한 값을 확인하지 못했음 (\(uw.map { $0.field }.joined(separator: ", ")))", ev)
         }
         for v in rule.verdicts {
             if v.when.allSatisfy({ test($0, object) }) {

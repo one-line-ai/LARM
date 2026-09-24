@@ -168,7 +168,7 @@ public enum Schema {
         }
         if db.userVersion > current {
             throw NSError(domain: "LARM", code: 1, userInfo: [NSLocalizedDescriptionKey:
-                "데이터베이스 schema(v\(db.userVersion))가 이 앱(v\(current))보다 최신입니다. 최신 앱으로 여세요."])
+                "데이터베이스 형식(v\(db.userVersion))가 이 앱(v\(current))보다 최신임. 최신 앱으로 여기"])
         }
     }
 }

@@ -22,11 +22,11 @@ public enum DecisionError: Error, CustomStringConvertible {
     case scanNotComplete(String), expiryRequired, expiryOutOfRange, notFound, reasonRequired
     public var description: String {
         switch self {
-        case .scanNotComplete(let s): return "부분 점검(\(s))은 전체 기준점으로 지정할 수 없습니다. 범위를 좁혀 명시적으로 재점검하세요."
-        case .expiryRequired: return "기한 없는 예외는 저장할 수 없습니다."
-        case .expiryOutOfRange: return "예외 기한은 1일 이상 30일 이하여야 합니다."
-        case .notFound: return "대상을 찾을 수 없습니다."
-        case .reasonRequired: return "사유를 입력하세요."
+        case .scanNotComplete(let s): return "부분 점검(\(s))은 전체 기준 상태으로 지정할 수 없음 범위를 좁혀 명시적으로 재점검하기"
+        case .expiryRequired: return "기한 없는 예외는 저장할 수 없음"
+        case .expiryOutOfRange: return "예외 기한은 1일 이상 30일 이하여야 함"
+        case .notFound: return "대상을 찾을 수 없음"
+        case .reasonRequired: return "사유를 입력하기"
         }
     }
 }
@@ -66,7 +66,7 @@ public enum DecisionRepo {
                        [.text(Ids.new("dec")), .text("exception"), .text(finding.findingID), .text(finding.targetFingerprint), .null, .text(finding.objectID),
                         .text(actor), .text(reason), .text(Clock.nowUTC()), .text(exp), .text(finding.ruleVersion), .text(evidenceDigest)])
             try db.run("UPDATE finding SET state='excepted', updated_at=? WHERE finding_id=?", [.text(Clock.nowUTC()), .text(finding.findingID)])
-            try FindingRepo.event(db, finding.findingID, kind: "exception", from: finding.state, to: .excepted, scanID: nil, actor: actor, note: "위험 수용 · 만료 \(String(exp.prefix(10))) · \(reason)")
+            try FindingRepo.event(db, finding.findingID, kind: "exception", from: finding.state, to: .excepted, scanID: nil, actor: actor, note: "위험을 알고 예외로 둠 · 만료 \(String(exp.prefix(10))) · \(reason)")
             try Audit.record(db, kind: "exception_added", detail: ["finding_id": finding.findingID, "expires_at": exp])
         }
     }
@@ -84,7 +84,7 @@ public enum DecisionRepo {
             guard let fid = d.findingID, let f = try FindingRepo.get(db, findingID: fid), f.state == .excepted else { continue }
             var why: String? = nil
             if let e = d.expiresAt, let ed = Clock.parse(e), ed <= now { why = "예외 만료" }
-            else if f.ruleVersion != d.ruleVersion { why = "룰 버전 변경 (\(d.ruleVersion) → \(f.ruleVersion))" }
+            else if f.ruleVersion != d.ruleVersion { why = "점검 규칙 버전 변경 (\(d.ruleVersion) → \(f.ruleVersion))" }
             else if let cur = evidenceDigests[fid], !d.evidenceDigest.isEmpty, cur != d.evidenceDigest { why = "대상 구성 변경" }
             if let why {
                 try db.transaction {
