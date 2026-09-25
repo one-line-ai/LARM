@@ -9,14 +9,14 @@ import LARMCore
 final class AppState: ObservableObject {
     enum Boot: Equatable { case starting, ready, failed(String) }
     enum Section: String, CaseIterable, Identifiable {
-        case overview, findings, activity, changes, coverage, graph, evidence
+        case overview, findings, activity, games, changes, coverage, graph, evidence
         var id: String { rawValue }
         var title: String {
-            switch self { case .overview: return "개요"; case .findings: return "발견 사항"; case .activity: return "AI 도구 활동"; case .changes: return "바뀐 설정"; case .coverage: return "확인 범위"
+            switch self { case .overview: return "개요"; case .findings: return "발견 사항"; case .activity: return "AI 도구 활동"; case .games: return "사용자와 AI 도구"; case .changes: return "바뀐 설정"; case .coverage: return "확인 범위"
             case .graph: return "그래프"; case .evidence: return "보고서와 설정" }
         }
         var symbol: String {
-            switch self { case .overview: return "gauge"; case .findings: return "exclamationmark.triangle"; case .activity: return "waveform.path.ecg"; case .changes: return "arrow.left.arrow.right"; case .coverage: return "checklist"
+            switch self { case .overview: return "gauge"; case .findings: return "exclamationmark.triangle"; case .activity: return "waveform.path.ecg"; case .games: return "person.2"; case .changes: return "arrow.left.arrow.right"; case .coverage: return "checklist"
             case .graph: return "point.3.connected.trianglepath.dotted"; case .evidence: return "doc.badge.gearshape" }
         }
     }
@@ -50,6 +50,10 @@ final class AppState: ObservableObject {
     private(set) var monitor: Monitor?
     let notifier = Notifier()
     private var pendingRescan: (String, Set<String>?)?
+    @Published var alertResponseRate: Double? = nil
+    @Published var alertSamples = 0
+    @Published var lastGateNote = ""
+    let decision: DecisionLayer = HeuristicDecisionLayer()
     @Published var events: [RuntimeEvent] = []
     @Published var hookPlan: HookInstaller.Plan?
     @Published var hookPlanIsRemoval = false
@@ -132,7 +136,12 @@ final class AppState: ObservableObject {
             let m = Monitor(db: db, trigger: { [weak self] kind, ids in self?.runScan(kind: kind, onlyScopeIDs: ids) },
                             onGapChange: { [weak self] req in self?.notify(req) },
                             onHookData: { [weak self] data in self?.ingestHook(data) })
+            m.decisionInput = { [weak self] in self?.decisionInput() ?? DecisionInput() }
             monitor = m
+            loadAlertStats()
+            NSWorkspace.shared.notificationCenter.addObserver(forName: NSWorkspace.didActivateApplicationNotification, object: nil, queue: .main) { [weak self] n in
+                if (n.userInfo?[NSWorkspace.applicationUserInfoKey] as? NSRunningApplication)?.bundleIdentifier == AppInfo.bundleID { Task { @MainActor in self?.markAlertResponses() } }
+            }
             m.objectWillChange.sink { [weak self] _ in self?.objectWillChange.send() }.store(in: &cancellables)
             boot = .ready
             m.start(scopes: scopes)
@@ -154,6 +163,16 @@ final class AppState: ObservableObject {
         decisions = try DecisionRepo.all(db)
         retentionDays = Settings.retentionDays(db)
         diff = try computeDiff()
+        rebuildGalaxy()
+        rebuildGames()
+    }
+
+    /// 갤럭시 지도용 그래프 JSON (마지막 점검 기준). 점검이 바뀔 때만 다시 만든다.
+    @Published var galaxyJSON: String?
+    func rebuildGalaxy() {
+        guard let db, let s = try? ScanRepo.latestCompletedOrPartial(db), let obs = try? ScanRepo.observations(db, scanID: s.scanID) else { galaxyJSON = nil; return }
+        let g = GraphBuilder().build(observations: obs, findings: findings, scopes: scopes, scanID: s.scanID)
+        galaxyJSON = try? GraphExport.json(g, scopes: scopes, findings: findings)
     }
 
     func computeDiff() throws -> [DiffEntry] {
@@ -318,9 +337,114 @@ final class AppState: ObservableObject {
     }
 
 
+    /// G2 늑대소년 게임: 높은 위험·감시 장애는 항상 보내고, 나머지는 조치 필요 확률 × 반응 확률로 게이트한다.
     func notify(_ req: NotificationRequest) {
         guard let db else { return }
-        _ = notifier.send(req, db: db, quiet: quietHours, enabled: notificationsEnabled)
+        if req.kind == .newGap || req.kind == .recovered {
+            let a = decision.estimate(.actionNeeded, subject: req.dedupeKey, input: decisionInput(), context: ["severity": "medium", "seen": "1"])
+            let b = decision.estimate(.willRespond, subject: req.dedupeKey, input: decisionInput(), context: [:])
+            try? EstimateRepo.record(db, b)
+            let g = AlertGate.shouldSend(actionNeeded: a.p, willRespond: b.p, weight: 1.0)
+            lastGateNote = "\(req.kind == .newGap ? "감시 공백" : "복구") 알림: 가치 \(String(format: "%.2f", g.value)) → \(g.send ? "전송" : "배지만") · 반응 확률 \(Int(b.p * 100))% (\(b.basis))"
+            if !g.send { return }
+        }
+        let d = notifier.send(req, db: db, quiet: quietHours, enabled: notificationsEnabled)
+        if d == .send { try? Settings.set(db, "alert_last_sent", Clock.nowUTC()); try? Settings.set(db, "alert_pending", "1"); recordAlertSent() }
+    }
+
+    // MARK: 알림 반응 기록 (G2)
+    func recordAlertSent() {
+        guard let db else { return }
+        var log = alertLog(); log.append([Clock.nowUTC(), "0"]); if log.count > 30 { log.removeFirst(log.count - 30) }
+        saveAlertLog(log)
+        _ = db
+    }
+    func markAlertResponses() {
+        guard let db else { return }
+        var log = alertLog(); var changed = false
+        for i in log.indices where log[i][1] == "0" {
+            if let t = Clock.parse(log[i][0]), Date().timeIntervalSince(t) < 86400 { log[i][1] = "1"; changed = true; try? EstimateRepo.outcome(db, question: .willRespond, subject: "*", value: 1) }
+        }
+        if changed { saveAlertLog(log) }
+    }
+    func alertLog() -> [[String]] {
+        guard let db, let s = Settings.get(db, "alert_log"), let d = try? JSONDecoder().decode([[String]].self, from: Data(s.utf8)) else { return [] }
+        return d
+    }
+    func saveAlertLog(_ log: [[String]]) {
+        guard let db, let d = try? JSONEncoder().encode(log) else { return }
+        try? Settings.set(db, "alert_log", String(decoding: d, as: UTF8.self)); loadAlertStats()
+    }
+    func loadAlertStats() {
+        let log = alertLog().filter { Clock.parse($0[0]).map { Date().timeIntervalSince($0) < 30 * 86400 } ?? false }
+        alertSamples = log.count
+        alertResponseRate = log.isEmpty ? nil : Double(log.filter { $0[1] == "1" }.count) / Double(log.count)
+    }
+    func decisionInput() -> DecisionInput {
+        var i = DecisionInput()
+        i.openHigh = openHighCount
+        i.recentEventCount15m = events.filter { Clock.parse($0.receivedAt).map { Date().timeIntervalSince($0) < 900 } ?? false }.count
+        if let s = lastScan, s.kind == "event", let d = Clock.parse(s.endedAt) { i.lastChangeMinutesAgo = Date().timeIntervalSince(d) / 60 }
+        i.responseRate30d = alertResponseRate; i.responseSamples = alertSamples
+        i.quietHours = quietHours.contains(Date())
+        return i
+    }
+
+    // MARK: 예외 연장 (G5)
+    func exceptionRenewals(_ f: Finding) -> Int {
+        guard let db, let n = try? db.scalar("SELECT COUNT(*) FROM decision WHERE kind='exception' AND finding_id=?", [.text(f.findingID)]).int else { return 0 }
+        return Int(n)
+    }
+
+    // MARK: 게임 계산 (설계 10장)
+    @Published var trustRecords: [PlayerGames.TrustRecord] = []
+    @Published var sessionSignals: [PlayerGames.SessionSignal] = []
+    var baselineSuggestion: String? {
+        PlayerGames.baselineSuggestion(hasBaseline: baseline != nil, baselineAt: baseline?.createdAt, diffCount: diff.count, openHigh: openHighCount, lastScanAt: lastScan?.endedAt)
+    }
+    func rebuildGames() {
+        sessionSignals = PlayerGames.sessionSignals(events: events)
+        if let db { trustRecords = (try? PlayerGames.trust(db, findings: findings)) ?? [] }
+    }
+    func delegation(for f: Finding) -> PlayerGames.Delegation? {
+        guard f.ruleID == "R02", let b = observations(for: f).first(where: { $0.field == "breadth" })?.safeValue else { return nil }
+        return PlayerGames.delegation(breadth: b, scopeID: f.scopeID, events: events)
+    }
+    /// 게임 2: 세션을 살펴본 결과를 기록해 추정을 검증한다.
+    func reviewSession(_ s: PlayerGames.SessionSignal, problem: Bool) {
+        guard let db else { return }
+        for e in events where e.sessionRef == s.sessionRef && e.riskRule != nil && e.ackState == "observed" {
+            try? EventIngest.acknowledge(db, eventID: e.eventID, state: problem ? "acknowledged" : "false_positive_review")
+        }
+        try? EstimateRepo.record(db, Estimate(question: .evasion, subject: s.sessionRef, p: s.p, basis: s.basis, model: decision.model))
+        try? EstimateRepo.outcome(db, question: .evasion, subject: s.sessionRef, value: problem ? 1 : 0)
+        events = (try? EventIngest.list(db)) ?? []
+        rebuildGames()
+    }
+    var calibration: [(String, String)] {
+        guard let db else { return [] }
+        return DecisionQuestion.allCases.map { q in
+            let name = q == .actionNeeded ? "조치 필요" : q == .willRespond ? "알림 반응" : q == .changeSoon ? "60분 내 변경" : "세션 살펴볼 필요"
+            if let b = try? EstimateRepo.brier(db, question: q) { return (q.rawValue, "\(name): 브라이어 \(String(format: "%.2f", b.score)) (표본 \(b.n)건)") }
+            return (q.rawValue, "\(name): 표본 5건 미만, 검증 전")
+        }
+    }
+    var mood: Mascot.Mood {
+        if let m = monitor, m.pause.isPaused { return .paused }
+        if openHighCount > 0 { return .risk }
+        if lastScan == nil { return .empty }
+        if openFindings.isEmpty { return .clear }
+        return .watching
+    }
+
+    // MARK: 오늘 확인할 항목 (G6)
+    var todayItems: [Finding] {
+        openFindings.sorted { a, b in
+            if a.severity != b.severity { return a.severity > b.severity }
+            if (a.verifyStatus == "verified") != (b.verifyStatus == "verified") { return a.verifyStatus == "verified" }
+            if a.seenCount != b.seenCount { return a.seenCount > b.seenCount }
+            return a.openedAt < b.openedAt
+        }
     }
 
     func setNotifications(_ on: Bool) {

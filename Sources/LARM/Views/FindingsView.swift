@@ -26,7 +26,7 @@ struct FindingsView: View {
                 filters
                 if filtered.isEmpty {
                     VStack(spacing: 6) {
-                        Text(state.findings.isEmpty ? "아직 발견 사항이 없음" : "조건에 맞는 발견 사항이 없음").foregroundStyle(Theme.inkSoft)
+                        FriendlyEmpty(mood: state.findings.isEmpty ? .empty : .clear, title: state.findings.isEmpty ? "아직 발견 사항이 없음" : "조건에 맞는 발견 사항이 없음", note: state.findings.isEmpty ? "오른쪽 위 '점검' 버튼을 누르면 AI 도구 설정을 읽어 위험한 항목을 찾음" : nil)
                         if !state.findings.isEmpty && fstate != nil { Button("전체 상태 보기") { fstate = nil } }
                         if state.lastScan == nil { Text("오른쪽 위 '점검' 버튼으로 시작").font(AppFont.footnote).foregroundStyle(Theme.inkSoft) }
                     }.frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -140,6 +140,15 @@ struct FindingDetailView: View {
                         Toggle("이 항목의 모든 값 보기", isOn: $showAllObs).font(AppFont.footnote)
                     }.frame(maxWidth: .infinity, alignment: .leading)
                 }
+                if let d = state.delegation(for: finding) {
+                    GroupBox("좁히면 어떻게 되나 (권한 위임)") {
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text("이 규칙이 덮었을 최근 30일 요청 \(d.matched30d)건, 세션 \(d.sessions30d)개 → 좁히면 세션당 약 \(String(format: "%.1f", d.perSession))회 확인 요청이 늘어남").bold()
+                            Text(d.recommendNarrow ? "세션당 2회 이내라 좁혀도 작업 흐름에 큰 부담이 없음. 실제 쓰는 명령만 허용하는 규칙으로 바꾸기" : (d.sessions30d == 0 ? d.basis : "확인이 잦아질 수 있음. 자주 쓰는 명령 몇 개만 따로 허용하고 나머지는 좁히기")).font(AppFont.callout)
+                            Text("근거: \(d.basis). 규칙을 실제로 바꾸는 것은 사용자 몫이며 LARM은 설정을 고치지 않음").font(AppFont.footnote).foregroundStyle(Theme.inkSoft)
+                        }.frame(maxWidth: .infinity, alignment: .leading)
+                    }
+                }
                 GroupBox("한계") { Text(finding.limits).frame(maxWidth: .infinity, alignment: .leading) }
                 GroupBox("다음 단계") { Text(finding.nextAction).bold().frame(maxWidth: .infinity, alignment: .leading) }
                 GroupBox("수동 조치 안내") {
@@ -169,6 +178,10 @@ struct FindingDetailView: View {
                         Button("기한을 정해 예외 처리") {
                             actionMessage = state.addException(finding, days: exceptionDays, reason: exceptionReason); exceptionReason = ""
                         }
+                    }
+                    let renewals = state.exceptionRenewals(finding)
+                    if renewals >= 2 {
+                        Text("이 항목은 예외를 \(renewals)번 두었음. 되풀이되는 예외는 사실상 허용과 같으므로 기한을 7일로 두고, 사유에 '언제 고칠지'를 적기").font(AppFont.footnote).foregroundStyle(Theme.indigoSoft)
                     }
                     Text("예외는 위험을 알고 받아들이는 것이며 해결된 것이 아님. 기본 7일, 최대 30일이고, 기한이 지나거나 설정이 바뀌면 다시 열림").font(AppFont.footnote).foregroundStyle(Theme.inkSoft)
                 }

@@ -27,9 +27,9 @@ struct ActivityView: View {
                 }.frame(maxWidth: 160)
             }
             Text("원문 프롬프트, 명령 내용, 파일 내용은 수집하지 않음 명령은 종류, 명령 내용 개수, 요약값, 표시만, 경로는 별칭만 남김. 보존 기간을 늘리면 저장량과 개인정보 영향이 커짐").font(AppFont.footnote).foregroundStyle(Theme.inkSoft)
+            if !state.sessionSignals.isEmpty { sessionBox }
             if items.isEmpty {
-                Text(state.events.isEmpty ? "기록된 활동 기록이 없음 연결을 등록하면 새 Claude Code 작업 세션부터 기록됨" : "조건에 맞는 활동 기록이 없음")
-                    .foregroundStyle(Theme.inkSoft).frame(maxWidth: .infinity).padding(.top, 20)
+                FriendlyEmpty(mood: .empty, title: state.events.isEmpty ? "기록된 활동이 없음" : "조건에 맞는 활동 기록이 없음", note: state.events.isEmpty ? "위 '연결 등록' 버튼으로 Claude Code와 연결하면 새 작업 세션부터 기록됨" : nil)
             }
             HSplitView {
                 Table(items, selection: $selected) {
@@ -45,6 +45,15 @@ struct ActivityView: View {
                 detail.frame(minWidth: 280)
             }
         }.padding()
+    }
+
+    var sessionBox: some View {
+        GroupBox("먼저 살펴볼 세션 (참고 추정)") {
+            VStack(alignment: .leading, spacing: 6) {
+                ForEach(Array(state.sessionSignals.prefix(3))) { SessionRow(sig: $0) }
+                Button("전체 순서와 근거 보기") { state.section = .games }.controlSize(.small)
+            }.frame(maxWidth: .infinity, alignment: .leading)
+        }
     }
 
     func ack(_ s: String) -> String { s == "observed" ? "안 함" : s == "acknowledged" ? "확인함" : s == "false_positive_review" ? "잘못된 탐지 검토" : s }

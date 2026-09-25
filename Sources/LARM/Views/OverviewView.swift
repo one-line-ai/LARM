@@ -32,6 +32,8 @@ struct OverviewView: View {
     }
 
     var headline: some View {
+        HStack(alignment: .top, spacing: 14) {
+        Mascot(mood: state.mood, size: 56)
         VStack(alignment: .leading, spacing: 4) {
             Text("LARM 개요").font(AppFont.largeTitle)
             HStack {
@@ -45,8 +47,14 @@ struct OverviewView: View {
             } else if state.openFindings.isEmpty && state.gapCount > 0 {
                 Text("발견 사항 0건 / 확인 못 한 항목 있음 → 점검 필요").font(AppFont.headline).foregroundStyle(Theme.indigoSoft)
             } else if state.openFindings.isEmpty {
-                Text("열린 발견 사항이 없음").font(AppFont.headline)
+                Text("열린 발견 사항이 없음. 지금 상태가 좋음").font(AppFont.headline)
+            } else if state.openHighCount > 0 {
+                Text("높은 위험 \(state.openHighCount)건이 열려 있음. 아래 '오늘 확인할 항목'부터 보기").font(AppFont.headline)
             }
+            if let m = state.monitor, let n = m.nextReconcileAt {
+                Text("다음 전체 대조 \(Fmt.local(Clock.utc(n))) (\(m.reconcileBasis))").font(AppFont.footnote).foregroundStyle(Theme.inkSoft)
+            }
+        }
         }
     }
 
@@ -186,17 +194,26 @@ struct OverviewView: View {
     }
 
     var todayBox: some View {
-        GroupBox("오늘 확인할 항목 (높은 위험 → 오래된 결과 순)") {
-            let top = Array(state.openFindings.sorted { $0.severity > $1.severity }.prefix(3))
-            VStack(alignment: .leading, spacing: 6) {
-                if top.isEmpty { Text("없음").foregroundStyle(Theme.inkSoft) }
+        GroupBox("오늘 확인할 항목 (조치 필요 추정 순)") {
+            let top = Array(state.todayItems.prefix(3))
+            VStack(alignment: .leading, spacing: 8) {
+                if top.isEmpty {
+                    HStack(spacing: 10) { Mascot(mood: .clear, size: 32); Text("오늘은 확인할 항목이 없음").foregroundStyle(Theme.inkSoft) }
+                }
                 ForEach(top) { f in
                     Button {
                         state.selectedFindingID = f.findingID; state.section = .findings
                     } label: {
-                        HStack { SeverityBadge(severity: f.severity); Text("\(f.ruleID) \(f.title)").bold(); Text(f.locationAlias).foregroundStyle(Theme.inkSoft).lineLimit(1) }
+                        HStack(alignment: .top) {
+                            SeverityBadge(severity: f.severity)
+                            VStack(alignment: .leading, spacing: 2) {
+                                HStack { Text("\(f.ruleID) \(f.title)").bold(); Text(f.locationAlias).foregroundStyle(Theme.inkSoft).lineLimit(1) }
+                                Text("확인하면 알 수 있는 것: \(PlayerGames.whatYouLearn(f))").font(AppFont.footnote).foregroundStyle(Theme.inkSoft)
+                            }
+                        }
                     }.buttonStyle(.plain)
                 }
+                Text("순서: 위험도 → 재점검으로 확인된 것 → 여러 번 발견된 것 → 오래된 것. 자세한 근거는 '사용자와 AI 도구' 화면").font(AppFont.caption).foregroundStyle(Theme.mute)
             }.frame(maxWidth: .infinity, alignment: .leading)
         }
     }

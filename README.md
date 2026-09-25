@@ -13,13 +13,14 @@
 | M3 상주 감시 | 완료 | 로그인 항목·FSEvents(설정 폴더)+60초 폴링(루트 파일)·30분 대조·10초 건강 확인·공백 기록·일시중지·알림(24시간 묶음·조용한 시간) |
 | M4 활동 수집 | 완료 | Claude Code hook 연동(관측 전용, 사용자 확인 후 등록)·Unix 소켓+spool·RR01/RR02·활동 화면·증빙 events.json |
 | M5 그래프·편의 | 완료 | Canvas 근거 그래프(전체/주변/변경, 200노드 상한, pin, 표 전환)·저장 보기 5개·검색·오늘 할 일·조용한 시간 |
+| M7 갤럭시·게임 관점 (0.7.0) | 1차 완료 | 온톨로지 갤럭시 지도(WKWebView, 오프라인, 갤럭시/2D 전환)·설계 10장 적용: 무작위 대조 간격(작업 중 10~15분, 유휴 30~60분)·알림 가치 게이트(높음은 게이트 없음)·세션 신호 순서·범위별 신뢰 이력·기준 상태 권장·예외 반복 안내·추정 결과 기록(브라이어)·'사용자와 AI 도구' 화면·캐릭터 '라미'·쉬운 빈 상태. 추정은 규칙 기반이며 Jev 미연결 |
 | M6 강화 | 1차 완료 | 상한 fixture·전 저장면 canary·진단 파일·서명 룰 갱신(Ed25519)·SBOM·make-dist·수용 시험 추적표. 성능 실측(N05)·72시간(N13)·공증(N06)·독립 검증(N10)은 미실행 |
 
 조건부 요건 F42/F43/N15(실행 전 확인·정책 집행)는 구현하지 않으며 관측 모드로 제한한다 (요건 11.1).
 
 ## 빌드 없이 설치 (DMG)
 
-1. https://github.com/one-line-ai/LARM/raw/main/dist/LARM-0.6.1.dmg 를 내려받는다 (해시: `dist/SHA256SUMS`).
+1. https://github.com/one-line-ai/LARM/raw/main/dist/LARM-0.7.0.dmg 를 내려받는다 (해시: `dist/SHA256SUMS`).
 2. DMG를 열고 LARM.app을 Applications 폴더로 끌어 넣는다.
 3. ad-hoc 서명이라 처음 열 때 경고가 나오면 터미널에서 `xattr -dr com.apple.quarantine /Applications/LARM.app` 을 실행한 뒤 다시 연다.
 4. 첫 실행 때 Keychain 접근 허용을 묻는다. 허용해야 점검과 감시가 시작된다.

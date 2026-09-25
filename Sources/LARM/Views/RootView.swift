@@ -50,6 +50,7 @@ struct RootView: View {
                 case .overview: OverviewView()
                 case .findings: FindingsView()
                 case .activity: ActivityView()
+                case .games: GamesView()
                 case .changes: ChangesView()
                 case .coverage: CoverageView()
                 case .graph: GraphView()

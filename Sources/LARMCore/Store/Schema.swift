@@ -2,7 +2,7 @@ import Foundation
 
 /// 스키마 마이그레이션.
 public enum Schema {
-    public static let current = 5
+    public static let current = 6
 
     static let v1: [String] = [
         """
@@ -134,6 +134,17 @@ public enum Schema {
         "CREATE INDEX IF NOT EXISTS idx_event_source ON runtime_event(source_event_id)",
     ]
 
+
+    static let v6: [String] = [
+        """
+        CREATE TABLE IF NOT EXISTS jev_estimate(
+          estimate_id TEXT PRIMARY KEY, model_version TEXT NOT NULL, question_id TEXT NOT NULL, subject_id TEXT NOT NULL,
+          p REAL NOT NULL, basis TEXT NOT NULL, created_at TEXT NOT NULL, outcome REAL, outcome_at TEXT
+        )
+        """,
+        "CREATE INDEX IF NOT EXISTS idx_est_q ON jev_estimate(question_id, subject_id)",
+    ]
+
     public static func migrate(_ db: SQLiteDB) throws {
         let v = db.userVersion
         if v < 1 {
@@ -164,6 +175,12 @@ public enum Schema {
             try db.transaction {
                 for s in v5 { try db.exec(s) }
                 try db.setUserVersion(5)
+            }
+        }
+        if db.userVersion < 6 {
+            try db.transaction {
+                for s in v6 { try db.exec(s) }
+                try db.setUserVersion(6)
             }
         }
         if db.userVersion > current {

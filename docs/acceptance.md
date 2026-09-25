@@ -68,3 +68,15 @@ PASS(자체)는 개발자의 fixture 시험이며 N10의 독립 검증(LG2)이 �
 | T59 | N15 | 조건부 통제의 무결성 | N/A | 조건부 기능 미제공. 사유 동일 |
 
 집계: N/A 3, NOT_RUN 4, PARTIAL 31, PASS(자체) 21
+
+## 0.7.0 추가 항목 (요건정의서 밖, 설계 문서 docs/game-jev-design.html 10장)
+
+| 항목 | 상태 | 근거 |
+|---|---|---|
+| G1 무작위 대조 간격 (InspectionPolicy) | PASS(자체) | DecisionTests.inspectionIntervalBoundsAndRandomness: 10~60분 경계, 변경 확률↑ → 간격↓, 0.7~1.3 무작위 곱 |
+| G2 알림 가치 게이트 (AlertGate) | PASS(자체) | DecisionTests.alertGateSendsOnlyWhenValuable. 높은 위험·감시 장애 알림은 게이트를 거치지 않음 (AppState.notify) |
+| 규칙 기반 추정과 결과 기록 (jev_estimate, 브라이어) | PASS(자체) | DecisionTests.estimatesRecordOutcomesAndBrier: 표본 5건 미만이면 nil, 6건 브라이어 0.04 |
+| 게임 2 세션 신호 순서 | PASS(자체) | DecisionTests.sessionSignalsRankSuspiciousFirst |
+| 게임 1 권한 위임 예상 확인 횟수 | PASS(자체) | DecisionTests.delegationCountsMatchingRequests (R02 breadth별 최근 30일 요청 수, 세션당 2회 이내 권장) |
+| 게임 3 기준 상태 권장 | PASS(자체) | DecisionTests.baselineSuggestionOnlyWhenSafe |
+| 갤럭시 지도·'사용자와 AI 도구' 화면·캐릭터 | PARTIAL | 빌드·설치 완료. 재설치 후 Keychain 허용 전에는 창 확인 불가하여 실기 화면 확인은 사용자 몫 |

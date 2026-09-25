@@ -7,9 +7,22 @@ import LARMCore
 struct GraphView: View {
     @EnvironmentObject var state: AppState
     @StateObject private var vm = GraphViewModel()
+    @AppStorage("graph.mode") private var mode = "galaxy"
 
     var body: some View {
         VStack(spacing: 0) {
+            HStack {
+                Picker("보기 방식", selection: $mode) { Text("갤럭시").tag("galaxy"); Text("2D 지도").tag("flat") }.pickerStyle(.segmented).frame(width: 200)
+                Spacer()
+                Text(mode == "galaxy" ? "별을 누르면 그 별로 이동, 이웃이 밝아짐. 발견 사항 별에서 '발견 사항 열기'로 상세 이동" : "").font(AppFont.footnote).foregroundStyle(Theme.inkSoft)
+            }.padding(8)
+            if mode == "galaxy" {
+                if let json = state.galaxyJSON {
+                    GalaxyView(json: json) { fid in state.selectedFindingID = fid; state.section = .findings }
+                } else {
+                    Text("점검 결과가 없음. 먼저 점검 필요").foregroundStyle(Theme.inkSoft).frame(maxWidth: .infinity, maxHeight: .infinity)
+                }
+            } else {
             toolbar
             if vm.graph == nil {
                 Text("점검 결과가 없음 먼저 점검하기").foregroundStyle(Theme.inkSoft).frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -31,6 +44,7 @@ struct GraphView: View {
                 }
             }
             footer
+            }
         }
         .onAppear { vm.load(state: state) }
         .onChange(of: state.lastScan?.scanID) { _ in vm.load(state: state) }

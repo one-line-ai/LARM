@@ -11,6 +11,10 @@ final class Monitor: ObservableObject {
     @Published private(set) var recentGaps: [CoverageGap] = []
     @Published private(set) var watchedDirs: [String] = []
     @Published private(set) var polledFiles: [String] = []
+    @Published private(set) var nextReconcileAt: Date?
+    @Published private(set) var reconcileBasis = ""
+    var decision: DecisionLayer = HeuristicDecisionLayer()
+    var decisionInput: () -> DecisionInput = { DecisionInput() }
 
     private let db: SQLiteDB
     private let trigger: (String, Set<String>?) -> Void     // (kind, scopeIDs)
@@ -99,7 +103,7 @@ final class Monitor: ObservableObject {
         observers.append(nc.addObserver(forName: NSWorkspace.sessionDidBecomeActiveNotification, object: nil, queue: .main) { [weak self] _ in Task { @MainActor in self?.recover(from: "session_inactive") } })
         healthTimer = timer(Self.healthInterval) { [weak self] in self?.healthCheck() }
         pollTimer = timer(Self.pollInterval) { [weak self] in self?.pollFiles() }
-        reconcileTimer = timer(Self.reconcileInterval) { [weak self] in self?.reconcile(reason: "주기 대조") }
+        scheduleReconcile()
         if pause.isPaused { enterGap("paused") } else { reconcile(reason: "시작 대조") }
         healthCheck()
     }
@@ -112,6 +116,21 @@ final class Monitor: ObservableObject {
         for o in observers { NSWorkspace.shared.notificationCenter.removeObserver(o) }
         observers = []
         running = false
+    }
+
+    /// G1 검사 게임: 변경 확률 추정으로 다음 대조 간격을 정하고 무작위 곱을 섞는다.
+    func scheduleReconcile() {
+        reconcileTimer?.cancel()
+        let est = decision.estimate(.changeSoon, subject: "reconcile", input: decisionInput(), context: [:])
+        let interval = InspectionPolicy.nextInterval(changeSoon: est.p)
+        nextReconcileAt = Date().addingTimeInterval(interval)
+        reconcileBasis = "변경 확률 \(Int(est.p * 100))% (\(est.basis)) → \(Int(interval / 60))분 뒤"
+        try? EstimateRepo.record(db, est)
+        let t = DispatchSource.makeTimerSource(queue: .main)
+        t.schedule(deadline: .now() + interval, leeway: .seconds(5))
+        t.setEventHandler { [weak self] in self?.reconcile(reason: "주기 대조"); self?.scheduleReconcile() }
+        t.resume()
+        reconcileTimer = t
     }
 
     private func timer(_ interval: TimeInterval, _ body: @escaping @MainActor () -> Void) -> DispatchSourceTimer {
