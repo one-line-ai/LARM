@@ -148,10 +148,10 @@ public enum Exporter {
         <p>범위: \(i.scopes.map { esc($0.alias) }.joined(separator: ", ")) (선택 범위이며 전체 시스템이 아님)</p>
         \(i.scanSummary.status != .complete ? "<p class=\"warn\">부분 결과임. 전체 완료로 해석하지 마기.</p>" : "")
         <h2>집계</h2>
-        <table><tr><th>열린 위험</th><th>조치 중</th><th>다시 점검해 해결됨</th><th>예외</th><th>잘못된 탐지 검토</th><th>확인 못 한 항목</th><th>변경 항목</th></tr>
+        <table><tr><th>미조치 위험</th><th>조치 중</th><th>다시 점검해 해결됨</th><th>예외</th><th>잘못된 탐지 검토</th><th>확인 못 한 항목</th><th>변경 항목</th></tr>
         <tr><td>\(open.filter { $0.state == .open }.count)</td><td>\(open.filter { $0.state == .inProgress }.count)</td><td>\(i.findings.filter { $0.state == .resolvedByRescan }.count)</td><td>\(i.findings.filter { $0.state == .excepted }.count)</td><td>\(i.findings.filter { $0.state == .falsePositiveReview }.count)</td><td>\(gaps.count)</td><td>\(i.diff.count)</td></tr></table>
         <p>위험과 공백을 가중 합산한 단일 점수는 만들지 않음.</p>
-        <h2>열린 위험</h2><table><tr><th>심각도</th><th>룰</th><th>위치</th><th>요약</th><th>상태</th></tr>
+        <h2>미조치 위험</h2><table><tr><th>심각도</th><th>룰</th><th>위치</th><th>요약</th><th>상태</th></tr>
         """
         for f in open.sorted(by: { $0.severity > $1.severity }) {
             h += "<tr><td>\(esc(f.severity.label))</td><td>\(esc(f.ruleID)) \(esc(f.title))</td><td>\(esc(f.locationAlias))</td><td>\(esc(f.summary))</td><td>\(esc(f.state.label))\(f.verifyStatus == "unverifiable" ? " (검증 불가)" : "")</td></tr>"

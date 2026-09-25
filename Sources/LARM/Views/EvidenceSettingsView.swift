@@ -80,7 +80,7 @@ struct EvidenceSettingsView: View {
         GroupBox("보고서 내보내기") {
             VStack(alignment: .leading, spacing: 6) {
                 if let p = state.exportPreview() {
-                    Text("미리보기: 점검 \(String(p.scanID.suffix(8))) (\(p.scanStatus)) · 범위 \(p.scopeAliases.joined(separator: ", ")) · 열린 위험 \(p.openFindings) · 예외 \(p.exceptions) · 확인 못 한 구간 \(p.gaps) · 변경 \(p.diffEntries)\(p.hasBaseline ? "" : " (기준점 없음)")")
+                    Text("미리보기: 점검 \(String(p.scanID.suffix(8))) (\(p.scanStatus)) · 범위 \(p.scopeAliases.joined(separator: ", ")) · 미조치 위험 \(p.openFindings) · 예외 \(p.exceptions) · 확인 못 한 구간 \(p.gaps) · 변경 \(p.diffEntries)\(p.hasBaseline ? "" : " (기준점 없음)")")
                     Text("포함 파일: \(p.files.joined(separator: ", "))").font(AppFont.footnote).foregroundStyle(Theme.inkSoft)
                     Text("비밀값, 요약값, 실제 경로, 사용자 이름은 들어가지 않음").font(AppFont.footnote).foregroundStyle(Theme.inkSoft)
                     Button { state.exportEvidence() } label: { Label("ZIP으로 내보내기", systemImage: "square.and.arrow.up") }

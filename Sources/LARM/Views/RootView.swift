@@ -11,9 +11,13 @@ struct RootView: View {
                 Text("LARM").font(AppFont.font(15, .bold)).foregroundStyle(Theme.sidebarText)
                     .padding(.horizontal, 16).padding(.top, 8).padding(.bottom, 14)
                 ForEach(AppState.Section.allCases) { s in
+                    if s == .findings || s == .activity || s == .evidence {
+                        Rectangle().fill(Theme.indigoFaint).frame(height: 1).padding(.horizontal, 16).padding(.vertical, 6)
+                    }
                     Button { state.section = s } label: {
-                        HStack {
-                            Label(s.title, systemImage: s.symbol).font(AppFont.font(13, state.section == s ? .semibold : .regular))
+                        HStack(spacing: 0) {
+                            Image(systemName: s.symbol).font(.system(size: 13)).frame(width: 24, alignment: .center)
+                            Text(s.title).font(AppFont.font(13, state.section == s ? .semibold : .regular))
                             Spacer()
                             let n = badge(s)
                             if n > 0 { Text("\(n)").font(AppFont.caption).foregroundStyle(state.section == s ? Theme.sidebarSelectedText.opacity(0.8) : Theme.accent) }

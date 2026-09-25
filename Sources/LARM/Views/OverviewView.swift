@@ -40,16 +40,16 @@ struct OverviewView: View {
                 Text("감시 상태: ").foregroundStyle(Theme.inkSoft)
                 Text(state.healthLabel).bold().foregroundStyle(state.monitor?.health.overall == .watching ? Theme.indigo : Theme.indigoSoft)
                 if let m = state.monitor, m.pause.isPaused { Text("· \(m.pause.description)").foregroundStyle(Theme.indigoSoft) }
-                if let ok = state.monitor?.health.lastOKAt { Text("· 마지막 건강 확인 \(Fmt.elapsed(Clock.utc(ok)))").foregroundStyle(Theme.inkSoft) }
+                if let ok = state.monitor?.health.lastOKAt { Text("· 감시 동작 확인 \(Fmt.elapsed(Clock.utc(ok)))").foregroundStyle(Theme.inkSoft) }
             }
             if state.lastScan == nil {
                 Text("아직 점검하지 않았음. 오른쪽 위 '점검' 버튼으로 시작").font(AppFont.headline)
             } else if state.openFindings.isEmpty && state.gapCount > 0 {
                 Text("발견 사항 0건 / 확인 못 한 항목 있음 → 점검 필요").font(AppFont.headline).foregroundStyle(Theme.indigoSoft)
             } else if state.openFindings.isEmpty {
-                Text("열린 발견 사항이 없음. 지금 상태가 좋음").font(AppFont.headline)
+                Text("발견된 위험 없음. 안전한 상태").font(AppFont.headline)
             } else if state.openHighCount > 0 {
-                Text("높은 위험 \(state.openHighCount)건이 열려 있음. 아래 '오늘 확인할 항목'부터 보기").font(AppFont.headline)
+                Text("높은 위험 \(state.openHighCount)건 미조치. 아래 '오늘 확인할 항목'부터 보기").font(AppFont.headline)
             }
             if let m = state.monitor, let n = m.nextReconcileAt {
                 Text("다음 전체 대조 \(Fmt.local(Clock.utc(n))) (\(m.reconcileBasis))").font(AppFont.footnote).foregroundStyle(Theme.inkSoft)
@@ -135,7 +135,7 @@ struct OverviewView: View {
                 glossary("점검", "AI 도구(Claude Code, Codex, Cursor)의 설정 파일을 읽어 위험한 설정이 있는지 확인하는 일. 설정을 바꾸지는 않음")
                 glossary("발견 사항", "점검에서 찾은 위험한 설정 한 건. 높음·중간 위험도와 함께 이유와 고치는 방법을 보여 줌")
                 glossary("기준 상태", "\"이 설정은 내가 확인했다\"고 저장해 둔 상태. 이후 무엇이 바뀌었는지 비교하는 기준")
-                glossary("예외", "위험을 알지만 당분간 두기로 한 항목. 기한(최대 30일)이 지나면 다시 열림")
+                glossary("예외", "위험을 알지만 당분간 두기로 한 항목. 기한(최대 30일)이 지나면 다시 미조치로 돌아감")
                 glossary("자동 감시", "앱이 켜져 있는 동안 설정 파일이 바뀌는지 지켜보다가 바뀌면 다시 점검하는 기능")
                 glossary("AI 도구 활동", "Claude Code가 파일을 읽거나 명령을 실행하려 할 때 그 사실만 기록한 것. 내용은 저장하지 않고 막지도 않음")
                 glossary("점검 보고서", "점검 결과를 다른 사람에게 전달할 수 있게 묶은 파일. 비밀값과 실제 경로는 들어가지 않음")

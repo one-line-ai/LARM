@@ -9,7 +9,7 @@ import LARMCore
 final class AppState: ObservableObject {
     enum Boot: Equatable { case starting, ready, failed(String) }
     enum Section: String, CaseIterable, Identifiable {
-        case graph, overview, findings, activity, games, changes, coverage, evidence
+        case graph, overview, findings, changes, coverage, activity, games, evidence
         var id: String { rawValue }
         var title: String {
             switch self { case .overview: return "개요"; case .findings: return "발견 사항"; case .activity: return "AI 도구 활동"; case .games: return "사용자와 AI 도구"; case .changes: return "바뀐 설정"; case .coverage: return "점검한 파일"
@@ -192,9 +192,9 @@ final class AppState: ObservableObject {
     var moodMessage: String {
         switch mood {
         case .paused: return "쉬는 중: 감시를 잠시 멈춘 상태. 메뉴바에서 다시 시작 가능"
-        case .risk: return "확인 필요: 높은 위험 \(openHighCount)건이 열려 있음. '발견 사항'에서 확인"
+        case .risk: return "확인 필요: 높은 위험 \(openHighCount)건이 아직 조치되지 않음. '발견 사항'에서 확인"
         case .empty: return "기록 없음: 아직 점검하지 않았음. 오른쪽 위 '점검'으로 시작"
-        case .clear: return "이상 없음: 열린 발견 사항이 없고 감시가 켜져 있음"
+        case .clear: return "이상 없음: 발견된 위험이 없고 감시가 켜져 있음"
         case .watching: return "지켜보는 중: 중간 위험 \(openFindings.count)건을 두고 설정 변화를 감시함"
         }
     }

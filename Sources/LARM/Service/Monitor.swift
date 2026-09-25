@@ -292,7 +292,7 @@ final class Monitor: ObservableObject {
         var failed = false
         for w in watchers.values where !w.isRunning { if !w.start() { failed = true } }
         if failed { failedDirs = ["(재시작 실패)"] } else { failedDirs = [] }
-        try? CoverageGapRepo.close(db, surface: "config_watch", reason: "paused", evidence: auto ? "기한 만료 → 건강 확인, 대조" : "사용자 다시 시작 → 건강 확인, 대조")
+        try? CoverageGapRepo.close(db, surface: "config_watch", reason: "paused", evidence: auto ? "기한 만료 → 동작 확인, 대조" : "사용자 다시 시작 → 동작 확인, 대조")
         try? Audit.record(db, kind: "watch_resumed", detail: ["auto": auto ? "true" : "false"])
         refreshGaps()
         healthCheck()

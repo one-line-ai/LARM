@@ -42,7 +42,7 @@ struct GamesView: View {
                 header(1, "권한 위임", "사용자: 허용 범위를 정함", "AI 도구: 주어진 범위를 끝까지 씀")
                 let broad = state.openFindings.filter { $0.ruleID == "R01" || $0.ruleID == "R02" }
                 if broad.isEmpty {
-                    Text("열린 넓은 허용 규칙 없음").foregroundStyle(Theme.inkSoft)
+                    Text("미조치 상태의 넓은 허용 규칙 없음").foregroundStyle(Theme.inkSoft)
                 } else {
                     ForEach(broad) { f in
                         let d = state.delegation(for: f)
@@ -89,7 +89,7 @@ struct GamesView: View {
                         Text(state.scopeAlias(t.scopeID)).bold().frame(width: 220, alignment: .leading).lineLimit(1)
                         Text(t.level).font(AppFont.caption).padding(.horizontal, 6).padding(.vertical, 2)
                             .background(t.level == "안정" ? Theme.sandDeep : Theme.indigoFaint).clipShape(RoundedRectangle(cornerRadius: 3))
-                        Text("30일 새 발견 \(t.riskyChanges30d)건 · 반복 \(t.repeated)건 · 열린 높음 \(t.openHigh)건").font(AppFont.footnote).foregroundStyle(Theme.inkSoft)
+                        Text("30일 새 발견 \(t.riskyChanges30d)건 · 반복 \(t.repeated)건 · 미조치 높음 \(t.openHigh)건").font(AppFont.footnote).foregroundStyle(Theme.inkSoft)
                     }
                 }
                 if let s = state.baselineSuggestion {

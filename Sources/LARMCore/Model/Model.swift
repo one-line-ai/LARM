@@ -123,7 +123,7 @@ public enum FindingState: String, Codable, Sendable, CaseIterable {
     case open, inProgress = "in_progress", resolvedByRescan = "resolved_by_rescan", excepted, falsePositiveReview = "false_positive_review"
     public var label: String {
         switch self {
-        case .open: return "열림"; case .inProgress: return "조치 중"; case .resolvedByRescan: return "다시 점검해 해결됨"
+        case .open: return "미조치"; case .inProgress: return "조치 중"; case .resolvedByRescan: return "다시 점검해 해결됨"
         case .excepted: return "예외"; case .falsePositiveReview: return "잘못된 탐지 검토"
         }
     }

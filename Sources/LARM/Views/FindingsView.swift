@@ -71,7 +71,7 @@ struct FindingsView: View {
                     ForEach([Severity.high, .medium, .low, .gap], id: \.self) { Text($0.label).tag(Severity?.some($0)) }
                 }
                 Picker("상태", selection: $fstate) {
-                    Text("열림+조치 중").tag(FindingState?.some(.open))
+                    Text("미조치+조치 중").tag(FindingState?.some(.open))
                     Text("전체").tag(FindingState?.none)
                     ForEach([FindingState.inProgress, .resolvedByRescan, .excepted, .falsePositiveReview], id: \.self) { Text($0.label).tag(FindingState?.some($0)) }
                 }
@@ -112,7 +112,7 @@ struct FindingDetailView: View {
                 LabeledContent("점검 규칙 버전", value: finding.ruleVersion)
                 LabeledContent("최초 / 최근", value: "\(Fmt.local(finding.openedAt)) / \(Fmt.local(finding.updatedAt)) · \(finding.seenCount)회")
                 if finding.verifyStatus == "unverifiable" {
-                    Text("재점검으로 확인하지 못했음 (대상을 읽지 못함). 해소로 표시하지 않음").foregroundStyle(Theme.indigoSoft)
+                    Text("다시 점검했지만 대상을 읽지 못해 확인 못 함. 해결로 처리하지 않음").foregroundStyle(Theme.indigoSoft)
                 }
                 if finding.verifyStatus == "scope_removed" {
                     Text("재점검으로 확인하지 못했음 (범위가 제거됨). 동일 범위를 다시 등록한 뒤 재점검하기").foregroundStyle(Theme.indigoSoft)
@@ -183,7 +183,7 @@ struct FindingDetailView: View {
                     if renewals >= 2 {
                         Text("이 항목은 예외를 \(renewals)번 두었음. 되풀이되는 예외는 사실상 허용과 같으므로 기한을 7일로 두고, 사유에 '언제 고칠지'를 적기").font(AppFont.footnote).foregroundStyle(Theme.indigoSoft)
                     }
-                    Text("예외는 위험을 알고 받아들이는 것이며 해결된 것이 아님. 기본 7일, 최대 30일이고, 기한이 지나거나 설정이 바뀌면 다시 열림").font(AppFont.footnote).foregroundStyle(Theme.inkSoft)
+                    Text("예외는 위험을 알고도 당분간 두는 것이며 해결이 아님. 기본 7일, 최대 30일이고, 기한이 지나거나 설정이 바뀌면 다시 미조치로 돌아감").font(AppFont.footnote).foregroundStyle(Theme.inkSoft)
                 }
                 if finding.ruleID == "R06", finding.state != .resolvedByRescan {
                     HStack {
@@ -202,7 +202,7 @@ struct FindingDetailView: View {
                 Button("조치 중으로 표시") { state.transition(finding, to: .inProgress, note: "사용자가 조치 시작") }
             }
             if finding.state == .inProgress {
-                Button("열림으로 되돌리기") { state.transition(finding, to: .open, note: "사용자가 되돌림") }
+                Button("미조치로 되돌리기") { state.transition(finding, to: .open, note: "사용자가 되돌림") }
             }
             if finding.state != .falsePositiveReview && finding.state != .resolvedByRescan {
                 Button("잘못된 탐지 검토 요청") { state.transition(finding, to: .falsePositiveReview, note: "사용자가 잘못된 탐지로 판단") }

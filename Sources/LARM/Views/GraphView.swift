@@ -61,7 +61,7 @@ struct GraphView: View {
                 VStack(alignment: .leading, spacing: 2) {
                     Text(headline).font(AppFont.title3)
                     HStack(spacing: 6) {
-                        Text("감시 \(state.healthLabel)")
+                        Text(state.healthLabel)
                         if let m = state.monitor, let n = m.nextReconcileAt { Text("· 다음 대조 \(Fmt.local(Clock.utc(n)))") }
                         if let s = state.lastScan { Text("· 마지막 점검 \(Fmt.elapsed(s.endedAt))") }
                     }.font(AppFont.footnote).foregroundStyle(Theme.inkSoft)
@@ -84,8 +84,8 @@ struct GraphView: View {
     }
     var headline: String {
         if state.lastScan == nil { return "아직 점검하지 않았음. 오른쪽 위 '점검'으로 시작" }
-        if state.openHighCount > 0 { return "높은 위험 \(state.openHighCount)건이 열려 있음" }
-        if state.openFindings.isEmpty { return state.gapCount > 0 ? "발견 사항 없음, 확인 못 한 항목 있음" : "열린 발견 사항 없음. 지금 상태가 좋음" }
+        if state.openHighCount > 0 { return "높은 위험 \(state.openHighCount)건 미조치" }
+        if state.openFindings.isEmpty { return state.gapCount > 0 ? "발견 사항 없음, 확인 못 한 항목 있음" : "발견된 위험 없음. 안전한 상태" }
         return "중간 위험 \(state.openFindings.count)건을 지켜보는 중"
     }
     func stat(_ title: String, _ value: Int?, strong: Bool = false, action: @escaping () -> Void) -> some View {
@@ -136,7 +136,7 @@ struct GraphView: View {
                     }
                 }.fixedSize()
                 Picker("심각도", selection: $vm.severityFilter) { Text("전체").tag("all"); Text("높음").tag("high"); Text("중간").tag("medium") }.fixedSize()
-                Picker("상태", selection: $vm.stateFilter) { Text("전체").tag("all"); Text("열림").tag("open"); Text("조치 중").tag("in_progress"); Text("예외").tag("excepted") }.fixedSize()
+                Picker("상태", selection: $vm.stateFilter) { Text("전체").tag("all"); Text("미조치").tag("open"); Text("조치 중").tag("in_progress"); Text("예외").tag("excepted") }.fixedSize()
                 Text("표시 \(vm.visibleNodes.count)개 / 전체 \(vm.graph?.nodes.count ?? 0)개\(vm.hiddenByCap > 0 ? " · 상한 초과로 \(vm.hiddenByCap)개 숨김 (표로 보기 권장)" : "")")
                     .font(AppFont.footnote).foregroundStyle(vm.hiddenByCap > 0 ? .orange : .secondary).lineLimit(1).frame(minWidth: 0)
                 Spacer()
