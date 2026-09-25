@@ -1,0 +1,195 @@
+<title>LARM 게임이론·Jev 결정 설계</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@600;700&family=IBM+Plex+Sans+KR:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{--bg:#F4F6F8;--surface:#FFFFFF;--ink:#1B2430;--ink-2:#4A5563;--ink-3:#7A8594;--line:#D9DEE5;--accent:#2D2A5E;--accent-2:#5A57A8;--accent-soft:#E8E7F3;--mono:'IBM Plex Mono',ui-monospace,Menlo,monospace;--sans:'IBM Plex Sans KR','Apple SD Gothic Neo',system-ui,sans-serif;--serif:'Noto Serif KR','Apple Myungjo',Georgia,serif}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#14131F;--surface:#1E1D2E;--ink:#E9E8F4;--ink-2:#B8B6CF;--ink-3:#8A88A6;--line:#2F2D45;--accent:#C9C6F2;--accent-2:#9C99E0;--accent-soft:#2A2850}}
+:root[data-theme="dark"]{--bg:#14131F;--surface:#1E1D2E;--ink:#E9E8F4;--ink-2:#B8B6CF;--ink-3:#8A88A6;--line:#2F2D45;--accent:#C9C6F2;--accent-2:#9C99E0;--accent-soft:#2A2850}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.7;margin:0}
+a{color:var(--accent);text-decoration:none} a:hover{text-decoration:underline}
+.wrap{max-width:1040px;margin:0 auto;padding:40px 28px 80px}
+.eyebrow{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);font-weight:600}
+h1{font-family:var(--serif);font-size:32px;margin:6px 0 10px;text-wrap:balance} h2{font-family:var(--serif);font-size:22px;margin:52px 0 12px;padding-top:16px;border-top:1px solid var(--line)} h3{font-size:16px;margin:28px 0 8px;color:var(--accent)}
+p{margin:0 0 10px;max-width:74ch} .lead{color:var(--ink-2);font-size:16px}
+.thesis{background:var(--accent-soft);border-left:4px solid var(--accent);padding:14px 18px;margin:18px 0 6px;font-size:16px}
+.thesis b{color:var(--accent)}
+ul,ol{max-width:74ch} li{margin-bottom:6px}
+.tbl{overflow-x:auto;background:var(--surface);border:1px solid var(--line);margin:10px 0 16px} table{border-collapse:collapse;width:100%;font-size:13.5px} th,td{padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top;text-align:left} th{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);background:var(--bg)} tr:last-child td{border-bottom:0}
+.game{background:var(--surface);border:1px solid var(--line);padding:16px 18px;margin:0 0 14px}
+.game h3{margin:0 0 8px} .game dl{display:grid;grid-template-columns:118px 1fr;gap:5px 14px;margin:0;font-size:14px} .game dt{color:var(--ink-3);font-weight:500} .game dd{margin:0;color:var(--ink-2)}
+.game dd.formula{font-family:var(--mono);font-size:13px;color:var(--ink);background:var(--bg);padding:6px 10px;border-radius:3px}
+code{font-family:var(--mono);font-size:12.5px;background:var(--bg);padding:1px 5px;border-radius:3px}
+pre{font-family:var(--mono);font-size:12.5px;background:var(--surface);border:1px solid var(--line);padding:12px 14px;overflow-x:auto;line-height:1.5}
+.phase{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px} .phase div{background:var(--surface);border:1px solid var(--line);padding:12px 14px} .phase h4{margin:0 0 4px;font-size:13.5px;color:var(--accent)} .phase p{font-size:13px;color:var(--ink-2);margin:0}
+.diagram{background:var(--surface);border:1px solid var(--line);padding:12px;overflow-x:auto}
+</style>
+<div class="wrap">
+<p class="eyebrow">LARM · 설계안 · 2026-09-25</p>
+<h1>LARM 게임이론·Jev 결정 설계</h1>
+<p class="lead">LARM의 결정론 규칙 위에 Jev의 보정된 확률을 얹고, 그 확률을 게임이론 전략의 입력으로 써서 "언제 검사하고, 무엇을 알리고, 무엇을 먼저 보고, 얼마나 두고 볼지"를 근거 있게 정하는 설계다. 판정은 규칙이, 확률은 Jev가, 전략은 게임이, 결정은 사람이 맡는다.</p>
+<div class="thesis"><b>원칙.</b> Jev는 위험 판정을 바꾸지 않고 순서·타이밍·기본값만 바꾼다. 게임 전략은 Jev 확률의 함수이며, Jev가 없거나 보정이 나빠지면 전략은 규칙만으로 후퇴한다. 모든 확률은 "참고 확률 · Jev v버전"으로 표시하고 나중의 실제 결과와 대조해 보정을 검증한다.</div>
+
+<h2 id="arch">1. 구조</h2>
+<div class="diagram"><pre class="mermaid">
+flowchart LR
+  S[구조화 상태<br/>발견 사항·확인 못 한 항목·활동 기록·바뀐 설정·사용자 이력] --> R[규칙 층<br/>R01~R08, RR01~RR02<br/>결정론 판정]
+  S --> J[Jev 층<br/>질문 Q1~Q7 병렬<br/>보정 확률·구조화 값]
+  R --> G[게임 층<br/>검사·알림·신뢰·회피·약속·정보가치]
+  J --> G
+  G --> A[동작<br/>대조 간격·알림 여부·정렬·기본값·권장 표시]
+  A --> O[결과 기록<br/>조치·해결·반응]
+  O --> C[보정 검증<br/>브라이어 점수·신뢰도 곡선]
+  C -->|나쁘면 Jev 층 자동 끔| G
+  C --> V[독립 검증 N10<br/>모델 카드]
+</pre></div>
+<div class="tbl"><table><thead><tr><th>층</th><th>입력</th><th>출력</th><th>바뀌는 것</th><th>바뀌지 않는 것</th></tr></thead><tbody>
+<tr><td>규칙</td><td>설정 파일·활동 기록</td><td>판정(높음·중간·판단 보류)</td><td>없음. 지금 그대로</td><td>같은 입력이면 같은 판정</td></tr>
+<tr><td>Jev</td><td>비밀값·실제 경로가 제거된 구조화 상태 + 질문 목록</td><td>질문별 확률 또는 값, 모델 버전</td><td>순서, 알림 여부, 기본값, 권장 표시</td><td>위험도, 판정, 허용·차단(F42·F43 제외 유지)</td></tr>
+<tr><td>게임</td><td>Jev 확률 + 사용자 설정(비용·문턱)</td><td>전략 값(간격, 보낼지, 기한)</td><td>대조 간격, 알림 게이트, 정렬, 기본 기한</td><td>규칙 판정</td></tr>
+</tbody></table></div>
+
+<h2 id="questions">2. Jev 질문 계약</h2>
+<p>한 번의 호출에 질문 7개를 병렬로 넣고 확률과 값을 함께 받는다. 호출 시점은 점검 저장 직후, 알림 결정 직전, 앱을 열 때 세 곳이며 입력 요약값이 같으면 캐시를 쓴다. 응답 예산은 200ms이고 넘기면 규칙만으로 진행한다.</p>
+<div class="tbl"><table><thead><tr><th>ID</th><th>질문</th><th>대상 단위</th><th>입력 필드(모두 마스킹된 값)</th><th>반환</th><th>쓰이는 게임</th></tr></thead><tbody>
+<tr><td>Q1</td><td>이 발견 사항이 실제로 조치가 필요할 확률</td><td>발견 사항</td><td>규칙 ID, 위험도, 나이(일), 재탐지 횟수, 같은 대상의 과거 처리, 확인 못 한 항목 여부</td><td>확률 a</td><td>G2 알림, G6 정렬</td></tr>
+<tr><td>Q2</td><td>지금 알리면 24시간 안에 사용자가 열어 볼 확률</td><td>알림 후보</td><td>최근 30일 반응률, 시간대, 조용한 시간 여부, 미처리 건수, 마지막 열람 후 경과</td><td>확률 b</td><td>G2 알림</td></tr>
+<tr><td>Q3</td><td>이 변경이 사용자 자신의 변경일 확률</td><td>바뀐 설정 묶음</td><td>변경 항목 수, 변경 시각, 직전 작업 세션 존재, 파일 종류, 변경 종류 분포</td><td>확률 s</td><td>G3 신뢰</td></tr>
+<tr><td>Q4</td><td>판단 보류된 활동이 회피 시도일 확률</td><td>활동 기록</td><td>표시(인코딩·간접 실행·셸 래퍼), 명령 종류, 명령 내용 개수, 같은 세션의 앞뒤 기록 수</td><td>확률 e</td><td>G4 회피</td></tr>
+<tr><td>Q5</td><td>다음 설정 변경까지 남은 시간</td><td>전체</td><td>최근 변경 간격 분포, 작업 세션 진행 여부, 요일·시간대</td><td>값 τ(분)와 q = P(60분 내 변경)</td><td>G1 검사</td></tr>
+<tr><td>Q6</td><td>이 예외에 적절한 기한과 연장될 확률</td><td>예외 후보</td><td>규칙 ID, 위험도, 사유 길이, 과거 연장 횟수, 같은 대상 예외 이력</td><td>값 d ∈ {7,14,30}, 확률 p_renew</td><td>G5 약속</td></tr>
+<tr><td>Q7</td><td>확인 못 한 항목을 확인하면 판단이 바뀔 확률</td><td>확인 못 한 항목</td><td>항목 종류(거절·초과·미지원), 관련 규칙, 과거 같은 종류의 결과</td><td>확률 v</td><td>G6 정보 가치</td></tr>
+</tbody></table></div>
+<pre>// 호출 (개념). 상태는 보고서의 findings.json·coverage.json·events.json·decisions.json 스키마를 그대로 쓴다.
+POST decide
+{ "model": "jev", "state": { "findings": [...], "coverage": [...], "events": [...], "decisions": [...], "user": { "response_rate_30d": 0.62, "open_count": 4 } },
+  "questions": [ {"id":"Q1","subject":"f_…"}, {"id":"Q2","subject":"alert_…"}, {"id":"Q5"}, … ] }
+→
+{ "model_version": "jev-…", "answers": [ {"id":"Q1","subject":"f_…","p":0.31}, {"id":"Q2","subject":"alert_…","p":0.74}, {"id":"Q5","tau_min":95,"p_60":0.22}, … ] }</pre>
+
+<h2 id="games">3. 게임별 설계</h2>
+
+<div class="game"><h3>G1 검사 게임: 언제 다시 확인할까</h3><dl>
+<dt>참가자</dt><dd>LARM(검사 시점 선택) 대 변경자(설정을 바꾸는 쪽. 사용자 자신일 수도, 악성 프로젝트나 주입된 지시일 수도 있음)</dd>
+<dt>보수</dt><dd>검사 비용 c(CPU·배터리), 미감지 지연에 따른 손실 L·(지연 시간). 변경자는 검사 사이 틈이 길수록 유리</dd>
+<dt>Jev 입력</dt><dd>Q5의 q(60분 내 변경 확률), Q3의 s(사용자 변경 확률). 위험 가중 r = 1 − s</dd>
+<dt>결정 규칙</dt><dd class="formula">T = clamp(T_min=10분, T_max=60분, T_base=30분 / (1 + k·q·r)), 실제 간격 = T × U(0.7, 1.3)</dd>
+<dt>LARM 동작</dt><dd>30분 고정 대조를 이 간격으로 바꾼다. 무작위 곱은 검사 시점 예측을 막는 혼합 전략이다. 파일 폴링 순서도 매번 섞는다</dd>
+<dt>후퇴 규칙</dt><dd>Jev 없음 또는 응답 지연: T = 30분 × U(0.7, 1.3)</dd>
+<dt>검증 지표</dt><dd>변경 시각에서 재점검까지의 지연 p95, 하루 대조 횟수, 유휴 CPU 1% 이하 유지(N05)</dd>
+</dl></div>
+
+<div class="game"><h3>G2 늑대소년 게임: 알릴까 말까</h3><dl>
+<dt>참가자</dt><dd>LARM(알림 보냄·안 보냄) 대 사용자(열어 봄·무시). 반복 게임이며 무시가 쌓이면 진짜 위험도 묻힌다</dd>
+<dt>보수</dt><dd>알림 가치 = 조치 필요 확률 × 반응 확률 × 위험 크기 − 방해 비용</dd>
+<dt>Jev 입력</dt><dd>Q1의 a, Q2의 b</dd>
+<dt>결정 규칙</dt><dd class="formula">V = a·b·L(위험도) − C_interrupt ;  보냄 ⇔ V > θ ;  θ는 사용자 선택(보수·보통·적극), L(높음)=3, L(중간)=1</dd>
+<dt>LARM 동작</dt><dd>V가 문턱 아래면 알림 대신 앱 배지만 유지하고, 문턱을 넘으면 기존 24시간 묶음 규칙 안에서 보낸다. 새 높은 위험과 감시가 끊긴 구간은 V와 무관하게 항상 보낸다(요건 F24)</dd>
+<dt>후퇴 규칙</dt><dd>Jev 없음: 높음은 보내고 중간은 묶음. 지금 동작과 같음</dd>
+<dt>검증 지표</dt><dd>알림 반응률, 놓친 높은 위험 0건, 하루 알림 수</dd>
+</dl></div>
+
+<div class="game"><h3>G3 신뢰 반복 게임: 기준 상태를 권할까</h3><dl>
+<dt>참가자</dt><dd>사용자 대 각 외부 도구 연결(MCP)·프로젝트. 기준 상태 지정은 협력, 기준 이후 변경은 이탈로 본다(팃포탯)</dd>
+<dt>보수</dt><dd>검토 없이 지정하면 위험을 숨기고, 지정하지 않으면 미검토 항목이 쌓여 주의가 분산된다</dd>
+<dt>Jev 입력</dt><dd>Q3의 s</dd>
+<dt>결정 규칙</dt><dd class="formula">권장 ⇔ s ≥ 0.8 ∧ 열린 높은 위험 = 0 ∧ 변경이 모두 사용자 작업 세션 안에서 발생</dd>
+<dt>LARM 동작</dt><dd>바뀐 설정 화면에 "기준 상태로 지정 권장 (참고 확률 s)"를 표시한다. 지정은 사용자만 한다. 노드 상세에 검토 이력(검토 횟수, 마지막 변경 후 경과, 변경 빈도)을 표시하되 단일 점수는 만들지 않는다</dd>
+<dt>후퇴 규칙</dt><dd>권장 표시 없음</dd>
+<dt>검증 지표</dt><dd>권장 수용률, 기준 지정까지 걸린 시간, 권장 뒤 30일 내 같은 대상에서 높은 위험 발생 0건</dd>
+</dl></div>
+
+<div class="game"><h3>G4 회피 진화 게임: 판단 보류를 어떤 순서로 볼까</h3><dl>
+<dt>참가자</dt><dd>규칙 작성자 대 회피자(인코딩·간접 실행·셸 래퍼). 서로의 수에 맞춰 진화한다</dd>
+<dt>보수</dt><dd>규칙 쪽은 최악의 회피 집합에서 탐지율을 최대화(최소최대), 회피 쪽은 판단 보류에 머무르는 것이 목표</dd>
+<dt>Jev 입력</dt><dd>Q4의 e</dd>
+<dt>결정 규칙</dt><dd class="formula">검토 큐 정렬 = e 내림차순 ;  분기마다 e 상위 유형을 레드팀 fixture로 승격 ;  규칙 갱신은 fixture 전체에서 최소 탐지율을 올리는 방향</dd>
+<dt>LARM 동작</dt><dd>판단 보류 기록을 자동으로 위험 확정하지 않는다. 사용자가 "회피 맞음·아님"으로 표시한 결과를 저장해 Q4 보정과 fixture 작성에 쓴다</dd>
+<dt>후퇴 규칙</dt><dd>시간순 정렬</dd>
+<dt>검증 지표</dt><dd>사후 확인된 회피 비율, fixture 수, 독립 검증 challenge set 탐지율</dd>
+</dl></div>
+
+<div class="game"><h3>G5 약속 게임: 예외 기한을 얼마로 둘까</h3><dl>
+<dt>참가자</dt><dd>지금의 사용자 대 미래의 사용자. 기한은 미래의 나를 묶는 약속 장치다</dd>
+<dt>보수</dt><dd>짧으면 재검토 부담, 길면 위험이 잊힌다. 연장이 반복되면 예외가 사실상 영구가 된다</dd>
+<dt>Jev 입력</dt><dd>Q6의 d(권장 기한), p_renew(연장 확률)</dd>
+<dt>결정 규칙</dt><dd class="formula">기본 기한 = d ;  p_renew ≥ 0.6이면 기본 기한을 한 단계 줄이고(30→14→7) 사유 재작성 요구 ;  2회 연장부터 무조건 사유 재작성</dd>
+<dt>LARM 동작</dt><dd>예외 입력란의 기본값과 안내 문구만 바꾼다. 최대 30일, 기한 필수라는 요건 F21은 그대로</dd>
+<dt>후퇴 규칙</dt><dd>기본 7일</dd>
+<dt>검증 지표</dt><dd>연장 횟수 분포, 만료 후 실제 조치율</dd>
+</dl></div>
+
+<div class="game"><h3>G6 정보 가치: 무엇을 먼저 확인할까</h3><dl>
+<dt>성격</dt><dd>게임이 아니라 결정 이론. 확인 비용 대비 판단이 바뀔 기대값이 큰 항목을 앞에 둔다</dd>
+<dt>Jev 입력</dt><dd>Q1의 a, Q7의 v</dd>
+<dt>결정 규칙</dt><dd class="formula">오늘 확인할 항목 순서 = (높음 우선) → a·L 내림차순 → v 내림차순 → 오래된 순</dd>
+<dt>LARM 동작</dt><dd>개요의 "오늘 확인할 항목"과 확인 못 한 항목 화면 정렬에 적용하고 각 항목에 "확인하면 알 수 있는 것" 한 줄을 붙인다</dd>
+<dt>후퇴 규칙</dt><dd>높음 → 오래된 순(지금 동작)</dd>
+</dl></div>
+
+<div class="game"><h3>G7 동조 방지 게임: Jev 자체를 누가 검증하나</h3><dl>
+<dt>참가자</dt><dd>개발자(Jev 층을 만드는 쪽) 대 독립 검증자. 둘이 같은 편이 되면 검증이 무너진다</dd>
+<dt>보수</dt><dd>검증자의 보수는 "합의"가 아니라 "적발"에 걸려 있어야 한다. challenge set은 개발자가 보지 못한다</dd>
+<dt>결정 규칙</dt><dd class="formula">브라이어 점수 B = 평균 (p − 결과)² ;  B가 4주 이동 평균으로 0.25(동전 던지기)보다 나쁘거나 신뢰도 곡선 편차가 0.15를 넘으면 Jev 층 자동 끔 + 개요에 사유 표시</dd>
+<dt>LARM 동작</dt><dd>질문별로 확률과 나중의 실제 결과(조치했는가, 해결됐는가, 열어 봤는가, 회피로 확인됐는가)를 로컬에 기록하고 모델 카드(브라이어, 신뢰도 곡선 10구간, 표본 수, 모델 버전)를 보고서 jev.json에 넣는다</dd>
+<dt>검증</dt><dd>독립 검증(N10) 항목에 "Jev 보정 검증"을 추가한다. RYNTA의 ARI·AVI 분리 원칙과 같다</dd>
+</dl></div>
+
+<h2 id="data">4. 데이터와 결과 기록</h2>
+<div class="tbl"><table><thead><tr><th>표</th><th>열</th><th>설명</th></tr></thead><tbody>
+<tr><td><code>jev_estimate</code></td><td>estimate_id, model_version, question_id, subject_id, input_digest, p, value_json, created_at, outcome, outcome_at</td><td>질문별 추정과 나중의 실제 결과. outcome은 질문마다 정의가 다름</td></tr>
+<tr><td><code>jev_call</code></td><td>call_id, at, trigger, latency_ms, questions, cached, error</td><td>호출 비용과 실패 기록. N13의 자원 상한 검증에 씀</td></tr>
+<tr><td><code>strategy_decision</code></td><td>decision_id, game_id, inputs_json, output_json, fallback, at</td><td>게임 층이 낸 결정과 그때의 입력. "왜 이 간격·이 알림이었나"를 나중에 설명</td></tr>
+</tbody></table></div>
+<div class="tbl"><table><thead><tr><th>질문</th><th>결과(outcome)의 정의</th><th>기록 시점</th></tr></thead><tbody>
+<tr><td>Q1</td><td>사용자가 조치 중·예외·해결 중 하나로 처리했으면 1, 30일 방치면 0</td><td>상태 변경 또는 30일 경과</td></tr>
+<tr><td>Q2</td><td>알림 후 24시간 안에 앱을 열었으면 1</td><td>24시간 경과</td></tr>
+<tr><td>Q3</td><td>사용자가 기준 상태로 지정했으면 1, 발견 사항으로 조치했으면 0</td><td>기준 지정 또는 조치</td></tr>
+<tr><td>Q4</td><td>사용자가 "회피 맞음"으로 표시하면 1</td><td>사용자 표시</td></tr>
+<tr><td>Q5</td><td>실제 다음 변경까지 걸린 시간</td><td>다음 변경 감지</td></tr>
+<tr><td>Q6</td><td>연장했으면 1</td><td>만료 시점</td></tr>
+<tr><td>Q7</td><td>확인 후 판단이 바뀌었으면 1</td><td>해당 항목 재점검 성공</td></tr>
+</tbody></table></div>
+
+<h2 id="ui">5. 화면과 보고서</h2>
+<ul>
+<li>확률은 항상 "참고 확률 · Jev v버전" 칩으로, 규칙 판정 배지와 다른 모양으로 표시한다. 칩을 누르면 입력 필드와 결정 규칙(위 공식)을 보여 준다.</li>
+<li>설정 화면에 "Jev 결정 층 사용" 스위치(로컬 실행이면 기본 켜기, 원격이면 기본 끄기), 알림 문턱 3단계, 대조 간격 범위, "전송되는 상태 미리보기"(연결 등록과 같은 확인 흐름)를 둔다.</li>
+<li>개요에 "결정 근거" 줄을 추가한다. 예: "다음 대조 22분 뒤 (변경 확률 0.18) · 중간 위험 2건은 알림 대신 배지 (반응 확률 0.31)".</li>
+<li>보고서에 jev.json(추정·결과·모델 카드)과 strategy.json(게임 결정 이력)을 추가한다. 형식은 larm-evidence/1.2로 올린다.</li>
+</ul>
+
+<h2 id="bounds">6. 요건과의 경계</h2>
+<div class="tbl"><table><thead><tr><th>요건</th><th>지키는 방법</th></tr></thead><tbody>
+<tr><td>F17 결정론 규칙</td><td>판정 경로에 Jev를 넣지 않는다. Jev가 꺼져도 판정은 동일</td></tr>
+<tr><td>F42·F43 제외</td><td>Jev와 게임 층 어디에도 허용·차단 결정이 없다</td></tr>
+<tr><td>N02 비밀정보 비저장</td><td>Jev 입력은 보고서와 같은 마스킹 상태만 쓴다. 새 필드가 생기면 canary 시험에 추가</td></tr>
+<tr><td>N04 오프라인</td><td>로컬 실행이 기본. 원격 API는 사용자 동의와 전송 내용 미리보기 뒤에만, 실패 시 규칙만으로 동작</td></tr>
+<tr><td>N10 독립 검증</td><td>보정 검증(브라이어·신뢰도 곡선)을 검증 항목에 추가하고 challenge set을 개발자에게 숨긴다</td></tr>
+<tr><td>N13 자원 상한</td><td>호출당 200ms, 하루 호출 수 상한, 캐시. jev_call 표로 실측</td></tr>
+<tr><td>F22 단일 점수 금지</td><td>확률은 질문별로만 표시하고 합산 점수를 만들지 않는다</td></tr>
+</tbody></table></div>
+
+<h2 id="phases">7. 단계별 도입</h2>
+<div class="phase">
+<div><h4>0단계 · 그림자 (2주)</h4><p>Jev 어댑터와 로컬 스텁, 질문 7개 호출과 결과 기록만. 동작은 바꾸지 않음. 성공 기준: 호출 실패율 1% 미만, 200ms 이내, 결과 기록 누락 0</p></div>
+<div><h4>1단계 · 정렬과 알림</h4><p>G6 정렬, G2 알림 게이트. 성공 기준: 놓친 높은 위험 0, 알림 반응률 상승</p></div>
+<div><h4>2단계 · 간격과 기한</h4><p>G1 무작위 대조 간격, G5 예외 기본 기한. 성공 기준: 감지 지연 p95 개선, 유휴 CPU 1% 유지</p></div>
+<div><h4>3단계 · 신뢰와 회피</h4><p>G3 기준 상태 권장, G4 판단 보류 큐와 fixture 승격. 성공 기준: 권장 수용률, fixture 10종 이상</p></div>
+<div><h4>4단계 · 검증과 자동 끔</h4><p>G7 모델 카드, 브라이어 감시, 자동 끔, 독립 검증 항목. 성공 기준: 독립 검증 통과</p></div>
+</div>
+
+<h2 id="risks">8. 위험과 대응</h2>
+<ul>
+<li>과신: 보정이 나쁜 확률로 전략이 틀어질 수 있다. 0단계 그림자 기간에 보정을 먼저 재고, 운영 중에는 G7의 자동 끔이 막는다.</li>
+<li>사용자 신뢰: 확률이 "왜"를 말하지 않으면 무시된다. 칩마다 입력 필드와 공식을 열어 보여 준다.</li>
+<li>데이터 부족: 개인 사용자의 결과 표본은 적다. 초기에는 규칙 우선·Jev 보조로 두고 표본 수가 질문당 30건을 넘기 전에는 전략 변화 폭을 절반으로 제한한다.</li>
+<li>프라이버시: 입력 스키마를 고정하고 필드 추가는 검토를 거친다. 원격 호출이면 전송 미리보기를 강제한다.</li>
+</ul>
+
+<h2 id="needs">9. 시작에 필요한 것</h2>
+<ol>
+<li>Jev 호출 방식: 로컬 실행인지 API인지, Swift에서 부르는 방법(SDK, 로컬 HTTP, CLI).</li>
+<li>입력·출력 스키마 예시 하나. 위 2절의 개념 계약을 실제 형식에 맞춘다.</li>
+<li>응답 시간 목표. 수십 ms면 알림 결정 경로에 동기적으로, 아니면 비동기로 순서만 갱신한다.</li>
+</ol>
+<p>이 셋이 확정되면 0단계(어댑터·스텁·결과 기록)를 바로 구현한다.</p>
+</div>
