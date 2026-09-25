@@ -13,7 +13,7 @@ final class AppState: ObservableObject {
         var id: String { rawValue }
         var title: String {
             switch self { case .overview: return "개요"; case .findings: return "발견 사항"; case .activity: return "AI 도구 활동"; case .games: return "사용자와 AI 도구"; case .changes: return "바뀐 설정"; case .coverage: return "점검한 파일"
-            case .graph: return "대시보드"; case .evidence: return "보고서와 설정" }
+            case .graph: return "한눈에 보기"; case .evidence: return "보고서와 설정" }
         }
         var symbol: String {
             switch self { case .overview: return "gauge"; case .findings: return "exclamationmark.triangle"; case .activity: return "waveform.path.ecg"; case .games: return "person.2"; case .changes: return "arrow.left.arrow.right"; case .coverage: return "checklist"
@@ -173,6 +173,30 @@ final class AppState: ObservableObject {
         guard let db, let s = try? ScanRepo.latestCompletedOrPartial(db), let obs = try? ScanRepo.observations(db, scanID: s.scanID) else { galaxyJSON = nil; return }
         let g = GraphBuilder().build(observations: obs, findings: findings, scopes: scopes, scanID: s.scanID)
         galaxyJSON = try? GraphExport.json(g, scopes: scopes, findings: findings)
+        larmHookNodeIDs = g.nodes.filter { $0.type == .hook && $0.attrs["owner"] == "larm" }.map(\.id)
+        refreshActive()
+    }
+
+    /// 최근 15분 안에 활동이 기록된 별: AI 도구, 활동이 있었던 프로젝트, LARM 연결(hook).
+    @Published var activeNodeIDs: [String] = []
+    private var larmHookNodeIDs: [String] = []
+    func refreshActive() {
+        let cutoff = Date().addingTimeInterval(-15 * 60)
+        let recent = events.filter { Clock.parse($0.receivedAt).map { $0 > cutoff } ?? false }
+        var ids = Set<String>()
+        if !recent.isEmpty { ids.insert("agent:claude-code"); ids.formUnion(larmHookNodeIDs) }
+        for e in recent { if let s = e.scopeID { ids.insert(s == "scope_user" ? "device:local" : "project:\(s)") } }
+        let sorted = ids.sorted()
+        if sorted != activeNodeIDs { activeNodeIDs = sorted }
+    }
+    var moodMessage: String {
+        switch mood {
+        case .paused: return "쉬는 중: 감시를 잠시 멈춘 상태. 메뉴바에서 다시 시작 가능"
+        case .risk: return "확인 필요: 높은 위험 \(openHighCount)건이 열려 있음. '발견 사항'에서 확인"
+        case .empty: return "기록 없음: 아직 점검하지 않았음. 오른쪽 위 '점검'으로 시작"
+        case .clear: return "이상 없음: 열린 발견 사항이 없고 감시가 켜져 있음"
+        case .watching: return "지켜보는 중: 중간 위험 \(openFindings.count)건을 두고 설정 변화를 감시함"
+        }
     }
 
     func computeDiff() throws -> [DiffEntry] {
@@ -483,6 +507,7 @@ final class AppState: ObservableObject {
             notify(NotificationPolicy.forNewHigh(ruleID: rule, count: 1))
         }
         events = (try? EventIngest.list(db)) ?? []
+        refreshActive()
     }
 
     func prepareHookInstall(remove: Bool) {

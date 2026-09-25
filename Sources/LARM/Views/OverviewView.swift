@@ -33,7 +33,7 @@ struct OverviewView: View {
 
     var headline: some View {
         HStack(alignment: .top, spacing: 14) {
-        Mascot(mood: state.mood, size: 56)
+        Mascot(mood: state.mood, size: 56).help(state.moodMessage)
         VStack(alignment: .leading, spacing: 4) {
             Text("LARM 개요").font(AppFont.largeTitle)
             HStack {

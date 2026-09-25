@@ -35,7 +35,7 @@ button,.chip{background:var(--panel);border:1px solid var(--line);color:var(--in
 <canvas id="c" aria-label="LARM 온톨로지 그래프를 별자리처럼 표시한 3차원 지도"></canvas>
 <div id="top" class="hud">
   <h1>LARM 갤럭시 탐색</h1><p class="sub">별 하나가 설정·서버·규칙·발견 사항 하나. 누르면 그 별로 날아가고 이웃이 밝아짐</p>
-  <div class="bar"><button id="ds-real" class="on">이 Mac</button><button id="ds-demo">예시 데이터</button><button id="home">전체 보기</button><button id="nb">이웃만</button></div>
+  <div class="bar"><button id="ds-real" class="on">이 Mac</button><button id="ds-demo">예시 데이터</button><button id="home">전체 보기</button><button id="nb">이웃만</button><button id="pause" aria-pressed="true">움직임 켜기</button></div>
   <div class="bar"><input id="q" type="search" placeholder="검색 (이름, 종류)" aria-label="검색"><span id="count"></span></div>
   <div id="types"></div>
 </div>
@@ -54,6 +54,8 @@ const TYPE = {
 };
 const EDGE_KO = {HAS_CONFIGURATION:'설정을 가짐',SCOPED_TO:'범위',DECLARES_MCP:'MCP 선언',POINTS_TO:'주소 참조',HAS_CANDIDATE:'비밀정보 후보',HAS_FINDING:'발견 사항',EVALUATED_BY:'판단 규칙',DECLARES_RULE:'허용 규칙',DECLARES_HOOK:'훅 선언',HAS_INSTRUCTION:'지시 파일',STORED_IN:'저장 파일'};
 const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+let paused = true; try { paused = localStorage.getItem('larm.galaxy.paused') !== '0'; } catch(e) {}
+let ACTIVE = new Set(window.LARM_ACTIVE || []);
 const isNarrow = () => innerWidth < 700;
 
 // ---------- 3D 배치 ----------
@@ -141,6 +143,7 @@ function draw(t){
   const order=nodes.map((_,i)=>i).filter(i=>proj[i]).sort((i,j)=>proj[j][2]-proj[i][2]);
   const pulse=0.75+0.25*Math.sin(t*0.003);
   for(const i of order){const p=proj[i];let al=1;if(!visible[i])al=0.06;else if(dim)al=rel.has(i)?1:0.14;const r=Math.max(1.4,size[i]*p[3]*0.62);const sp=sprite(color[i],Math.min(28,Math.max(2,r)));const s=r*6;ctx.globalAlpha=al;ctx.drawImage(sp,p[0]-s/2,p[1]-s/2,s,s);
+    if(ACTIVE.has(nodes[i].id)&&visible[i]){const ap=0.55+0.45*Math.sin(t*0.004+i);ctx.globalAlpha=al*0.6*ap;const gs=s*2.6;ctx.drawImage(sprite('#FFD27A',22),p[0]-gs/2,p[1]-gs/2,gs,gs);ctx.globalAlpha=al;ctx.strokeStyle=`rgba(255,210,122,${0.5+0.5*ap})`;ctx.lineWidth=1.2;ctx.beginPath();ctx.arc(p[0],p[1],r+4+2*ap,0,Math.PI*2);ctx.stroke();}
     if(nodes[i].type==='Finding'&&nodes[i].severity==='high'&&visible[i]){ctx.globalAlpha=al*0.35*pulse;const hs=s*2.2;ctx.drawImage(sprite('#FF5A4E',20),p[0]-hs/2,p[1]-hs/2,hs,hs);}
     if(i===focus){ctx.globalAlpha=1;ctx.strokeStyle='#FFE2AA';ctx.lineWidth=1.5;ctx.beginPath();ctx.arc(p[0],p[1],r+6,0,Math.PI*2);ctx.stroke();}}
   ctx.globalAlpha=1; ctx.globalCompositeOperation='source-over';
@@ -172,14 +175,14 @@ canvas.addEventListener('contextmenu',e=>e.preventDefault());
 canvas.addEventListener('wheel',e=>{e.preventDefault();cam.dist=Math.min(900,Math.max(12,cam.dist*Math.exp(e.deltaY*0.0012)));},{passive:false});
 window.addEventListener('keydown',e=>{if(e.key==='Escape')home();if(e.key==='n'&&G.focus>=0)toggleNeighbor();});
 const tip=document.getElementById('tip');
-function hover(e){if(e.pointerType!=='mouse')return;const i=pick(e.clientX,e.clientY);if(i>=0){const d=G.nodes[i];tip.style.display='block';tip.style.left=Math.min(innerWidth-330,e.clientX+14)+'px';tip.style.top=(e.clientY+12)+'px';tip.innerHTML=`<b>${esc(d.label)}</b><br><span style="color:var(--ink-3)">${TYPE[d.type]?.k||d.type} · 연결 ${G.deg[i]}</span>`;canvas.style.cursor='pointer';}else{tip.style.display='none';canvas.style.cursor='grab';}}
+function hover(e){if(e.pointerType!=='mouse')return;const i=pick(e.clientX,e.clientY);if(i>=0){const d=G.nodes[i];tip.style.display='block';tip.style.left=Math.min(innerWidth-330,e.clientX+14)+'px';tip.style.top=(e.clientY+12)+'px';tip.innerHTML=`<b>${esc(d.label)}</b><br><span style="color:var(--ink-3)">${TYPE[d.type]?.k||d.type} · 연결 ${G.deg[i]}${ACTIVE.has(d.id)?' · <b style="color:var(--gold)">지금 활동 중</b>':''}</span>`;canvas.style.cursor='pointer';}else{tip.style.display='none';canvas.style.cursor='grab';}}
 
 // ---------- 선택·패널 ----------
 function focusNode(i){G.focus=i;try{if(IN_APP&&window.webkit&&window.webkit.messageHandlers&&window.webkit.messageHandlers.larm){window.webkit.messageHandlers.larm.postMessage({event:'focus',id:G.nodes[i].id,type:G.nodes[i].type});}}catch(e){}flyTo(G.P[i],Math.max(isNarrow()?36:28,18+G.deg[i]*1.2),900);showPanel(i);crumb();if(G.neighborOnly)filter();}
 function home(){G.focus=-1;G.neighborOnly=false;document.getElementById('nb').classList.remove('on');flyTo([0,0,0],G.fitDist,900);document.getElementById('panel').classList.remove('show');crumb();filter();}
 function toggleNeighbor(force){G.neighborOnly=force===true?true:!G.neighborOnly;document.getElementById('nb').classList.toggle('on',G.neighborOnly);filter();if(G.focus>=0)showPanel(G.focus);}
 function showPanel(i){const d=G.nodes[i];const p=document.getElementById('panel');p.classList.add('show');
-  let h=`<button id="close" aria-label="닫기">✕</button><div class="type">${esc(TYPE[d.type]?.k||d.type)}${d.severity?`<span class="sev ${d.severity}">${d.severity==='high'?'높음':'중간'}</span>`:''}</div><h2>${esc(d.label)}</h2>`;
+  let h=`<button id="close" aria-label="닫기">✕</button><div class="type">${esc(TYPE[d.type]?.k||d.type)}${d.severity?`<span class="sev ${d.severity}">${d.severity==='high'?'높음':'중간'}</span>`:''}</div><h2>${esc(d.label)}</h2>${ACTIVE.has(d.id)?'<div style="color:var(--gold);font-size:12px;margin-bottom:6px">● 최근 15분 안에 활동이 기록된 별</div>':''}`;
   h+=`<dl><dt>범위</dt><dd>${esc(d.scope)}</dd><dt>연결</dt><dd>${G.deg[i]}개</dd>${d.state?`<dt>상태</dt><dd>${esc(d.state)}</dd>`:''}`;
   for(const [k,v] of Object.entries(d.attrs||{}).slice(0,8))h+=`<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`; h+='</dl>';
   h+=`<div class="bar"><button id="p-nb">${G.neighborOnly?'전체 다시 보기':'이웃만 보기'}</button><button id="p-home">전체 보기</button>${IN_APP&&(d.type==='Finding'||(d.findingID))?`<button id="p-open">발견 사항 열기</button>`:''}</div>`;
@@ -198,6 +201,9 @@ function setDS(k){document.getElementById('ds-real').classList.toggle('on',k==='
 resize(); if(IN_APP){document.getElementById('ds-real').style.display='none';document.getElementById('ds-demo').style.display='none';document.querySelector('#top .sub').style.display='none';}
 buildGraph(DATA.real); cam.dist=G.fitDist;
 window.larmReload=function(d){DATA.real=d;buildGraph(d);home();};
-function loop(t){requestAnimationFrame(loop);stepTween();if(!reduced&&!gesture&&G.focus<0)cam.theta+=0.0006;try{draw(t);}catch(err){ctx.setTransform(1,0,0,1,0,0);ctx.fillStyle='#fff';ctx.fillText('그리기 오류: '+err.message,20,60);}}
+window.larmSetActive=function(ids){ACTIVE=new Set(ids||[]);};
+function setPaused(v){paused=v;const b=document.getElementById('pause');b.textContent=paused?'움직임 켜기':'정지';b.setAttribute('aria-pressed',String(paused));try{localStorage.setItem('larm.galaxy.paused',paused?'1':'0');}catch(e){}}
+document.getElementById('pause').onclick=()=>setPaused(!paused);setPaused(paused);
+function loop(t){requestAnimationFrame(loop);stepTween();if(!reduced&&!paused&&!gesture&&G.focus<0)cam.theta+=0.0004;try{draw(t);}catch(err){ctx.setTransform(1,0,0,1,0,0);ctx.fillStyle='#fff';ctx.fillText('그리기 오류: '+err.message,20,60);}}
 requestAnimationFrame(loop);
 </script>

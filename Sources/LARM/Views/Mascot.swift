@@ -5,6 +5,7 @@ struct Mascot: View {
     enum Mood { case watching, paused, risk, clear, empty }
     var mood: Mood
     var size: CGFloat = 64
+    @State private var blink = false
 
     var body: some View {
         ZStack {
@@ -13,6 +14,12 @@ struct Mascot: View {
             face
         }
         .frame(width: size, height: size)
+        .animation(.easeInOut(duration: 0.25), value: mood)
+        .onReceive(Timer.publish(every: 4, on: .main, in: .common).autoconnect()) { _ in
+            guard mood != .paused else { return }
+            blink = true
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) { blink = false }
+        }
         .accessibilityLabel(label)
     }
 
@@ -45,7 +52,7 @@ struct Mascot: View {
 
     func eye(open: Bool) -> some View {
         Group {
-            if open { Circle().fill(Theme.indigo).frame(width: size * 0.12, height: size * 0.12) }
+            if open && !blink { Circle().fill(Theme.indigo).frame(width: size * 0.12, height: size * 0.12) }
             else { Capsule().fill(Theme.indigo).frame(width: size * 0.16, height: size * 0.04) }
         }
     }

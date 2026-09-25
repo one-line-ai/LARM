@@ -19,7 +19,8 @@ struct GraphView: View {
             }
             if mode == "galaxy" {
                 if let json = state.galaxyJSON {
-                    GalaxyView(json: json) { fid in state.selectedFindingID = fid; state.section = .findings }
+                    GalaxyView(json: json, active: state.activeNodeIDs) { fid in state.selectedFindingID = fid; state.section = .findings }
+                        .onReceive(Timer.publish(every: 60, on: .main, in: .common).autoconnect()) { _ in state.refreshActive() }
                 } else {
                     Text("점검 결과가 없음. 먼저 점검 필요").foregroundStyle(Theme.inkSoft).frame(maxWidth: .infinity, maxHeight: .infinity)
                 }
@@ -56,7 +57,7 @@ struct GraphView: View {
     var dashboardStrip: some View {
         VStack(alignment: .leading, spacing: 10) {
             HStack(alignment: .center, spacing: 12) {
-                Mascot(mood: state.mood, size: 44)
+                Mascot(mood: state.mood, size: 44).help(state.moodMessage)
                 VStack(alignment: .leading, spacing: 2) {
                     Text(headline).font(AppFont.title3)
                     HStack(spacing: 6) {

@@ -9,7 +9,7 @@ struct GamesView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
                 HStack(alignment: .top, spacing: 14) {
-                    Mascot(mood: state.mood, size: 56)
+                    Mascot(mood: state.mood, size: 56).help(state.moodMessage)
                     VStack(alignment: .leading, spacing: 4) {
                         Text("사용자와 AI 도구").font(AppFont.largeTitle)
                         Text("AI 도구는 일을 빨리 끝내려 넓은 권한을 원하고, 사용자는 일은 끝내되 위험은 줄이려 함. LARM은 막지 않고 기록·표시·기본값으로 둘의 선택을 바꾸는 심판 역할. 아래 숫자는 모두 규칙으로 계산한 참고값이며 판단은 사용자 몫").font(AppFont.callout).foregroundStyle(Theme.inkSoft)
