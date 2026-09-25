@@ -43,7 +43,7 @@ struct EvidenceSettingsView: View {
                         Text("• 읽는 위치: ~/.claude/settings.json, ~/.claude.json(mcpServers, projects[*].mcpServers만), 프로젝트 .claude/settings*.json, .mcp.json, ~/.codex/config.toml, 프로젝트 .codex/config.toml, ~/.cursor/mcp.json, 프로젝트 .cursor/mcp.json")
                         Text("• LARM은 설정, 파일, 프로세스, 네트워크를 자동 변경하지 않음 발견한 실행 파일을 실행하지 않음")
                         Text("• 업데이트: 새 빌드를 install.sh로 설치함. 제거: uninstall.sh (앱 데이터까지 지우려면 --purge)")
-                        Text("• 오류 복구: 범위 재선택 → 재시도. '확인 범위' 화면에서 사유 확인 가능")
+                        Text("• 오류 복구: 범위 재선택 → 재시도. '점검한 파일' 화면에서 사유 확인 가능")
                         Text("• 보고서 검증기: /Applications/LARM.app/Contents/MacOS/larm-verify <zip> [--expect-목록 파일(manifest)-sha256 <hex>]")
                     }.frame(maxWidth: .infinity, alignment: .leading)
                 }

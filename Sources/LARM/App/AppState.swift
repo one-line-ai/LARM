@@ -9,21 +9,21 @@ import LARMCore
 final class AppState: ObservableObject {
     enum Boot: Equatable { case starting, ready, failed(String) }
     enum Section: String, CaseIterable, Identifiable {
-        case overview, findings, activity, games, changes, coverage, graph, evidence
+        case graph, overview, findings, activity, games, changes, coverage, evidence
         var id: String { rawValue }
         var title: String {
-            switch self { case .overview: return "개요"; case .findings: return "발견 사항"; case .activity: return "AI 도구 활동"; case .games: return "사용자와 AI 도구"; case .changes: return "바뀐 설정"; case .coverage: return "확인 범위"
-            case .graph: return "그래프"; case .evidence: return "보고서와 설정" }
+            switch self { case .overview: return "개요"; case .findings: return "발견 사항"; case .activity: return "AI 도구 활동"; case .games: return "사용자와 AI 도구"; case .changes: return "바뀐 설정"; case .coverage: return "점검한 파일"
+            case .graph: return "대시보드"; case .evidence: return "보고서와 설정" }
         }
         var symbol: String {
             switch self { case .overview: return "gauge"; case .findings: return "exclamationmark.triangle"; case .activity: return "waveform.path.ecg"; case .games: return "person.2"; case .changes: return "arrow.left.arrow.right"; case .coverage: return "checklist"
-            case .graph: return "point.3.connected.trianglepath.dotted"; case .evidence: return "doc.badge.gearshape" }
+            case .graph: return "sparkles.rectangle.stack"; case .evidence: return "doc.badge.gearshape" }
         }
     }
 
     @Published var boot: Boot = .starting
     @Published var installation: Installation?
-    @Published var section: Section = .overview
+    @Published var section: Section = .graph
     @Published var scopes: [Scope] = []
     @Published var findings: [Finding] = []
     @Published var lastScan: ScanSummary?

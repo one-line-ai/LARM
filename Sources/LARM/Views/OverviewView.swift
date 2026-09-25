@@ -10,7 +10,7 @@ struct OverviewView: View {
             VStack(alignment: .leading, spacing: 16) {
                 headline
                 HStack(alignment: .top, spacing: 12) {
-                    tile("높은 위험", "\(state.openHighCount)", state.openHighCount > 0 ? Theme.indigo : Theme.mute, strong: true)
+                    tile("높은 위험", "\(state.openHighCount)", state.openHighCount > 0 ? Theme.accent : Theme.mute, strong: true)
                     tile("중간 위험", "\(state.openFindings.filter { $0.severity == .medium }.count)", Theme.indigoSoft)
                     tile("조치 중", "\(state.findings.filter { $0.state == .inProgress }.count)", Theme.indigoSoft)
                     tile("예외로 둔 항목", "\(state.findings.filter { $0.state == .excepted }.count)", Theme.indigoSoft)
@@ -65,8 +65,9 @@ struct OverviewView: View {
         }
         .padding(12).frame(maxWidth: .infinity, alignment: .leading)
         .background(Theme.surface)
-        .overlay(alignment: .bottom) { Rectangle().fill(strong ? Theme.indigo : Theme.indigoFaint).frame(height: 3) }
-        .clipShape(RoundedRectangle(cornerRadius: 4))
+        .overlay(alignment: .bottom) { Rectangle().fill(strong ? Theme.accent : Theme.indigoFaint).frame(height: 3) }
+        .clipShape(RoundedRectangle(cornerRadius: 6))
+        .overlay(RoundedRectangle(cornerRadius: 6).stroke(Theme.indigoFaint, lineWidth: 1))
         .accessibilityElement(children: .combine)
     }
 
@@ -170,7 +171,7 @@ struct OverviewView: View {
     func support(_ s: String) -> String { s == "supported" ? "정적 점검 지원 (시험 버전)" : s == "limited" ? "제한 지원 (버전 미확인)" : "미지원" }
 
     var scopeBox: some View {
-        GroupBox("확인 범위") {
+        GroupBox("점검 대상 폴더") {
             VStack(alignment: .leading, spacing: 6) {
                 ForEach(state.scopes) { s in
                     HStack {

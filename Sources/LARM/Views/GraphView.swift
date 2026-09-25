@@ -3,7 +3,7 @@ import AppKit
 import Combine
 import LARMCore
 
-/// 옵시디언형 근거 그래프.
+/// 대시보드: 상태 요약 띠 + 갤럭시 지도 (2D 지도로 전환 가능).
 struct GraphView: View {
     @EnvironmentObject var state: AppState
     @StateObject private var vm = GraphViewModel()
@@ -11,11 +11,12 @@ struct GraphView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            HStack {
-                Picker("보기 방식", selection: $mode) { Text("갤럭시").tag("galaxy"); Text("2D 지도").tag("flat") }.pickerStyle(.segmented).frame(width: 200)
-                Spacer()
-                Text(mode == "galaxy" ? "별을 누르면 그 별로 이동, 이웃이 밝아짐. 발견 사항 별에서 '발견 사항 열기'로 상세 이동" : "").font(AppFont.footnote).foregroundStyle(Theme.inkSoft)
-            }.padding(8)
+            if mode == "galaxy" { dashboardStrip } else {
+                HStack {
+                    Picker("보기 방식", selection: $mode) { Text("갤럭시").tag("galaxy"); Text("2D 지도").tag("flat") }.pickerStyle(.segmented).frame(width: 200)
+                    Spacer()
+                }.padding(8)
+            }
             if mode == "galaxy" {
                 if let json = state.galaxyJSON {
                     GalaxyView(json: json) { fid in state.selectedFindingID = fid; state.section = .findings }
@@ -49,6 +50,69 @@ struct GraphView: View {
         .onAppear { vm.load(state: state) }
         .onChange(of: state.lastScan?.scanID) { _ in vm.load(state: state) }
         .onChange(of: state.diff) { _ in vm.applyDiff(state.diff) }
+    }
+
+    /// 앱을 열면 보이는 요약 띠. 숫자를 누르면 해당 화면으로 이동.
+    var dashboardStrip: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(alignment: .center, spacing: 12) {
+                Mascot(mood: state.mood, size: 44)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(headline).font(AppFont.title3)
+                    HStack(spacing: 6) {
+                        Text("감시 \(state.healthLabel)")
+                        if let m = state.monitor, let n = m.nextReconcileAt { Text("· 다음 대조 \(Fmt.local(Clock.utc(n)))") }
+                        if let s = state.lastScan { Text("· 마지막 점검 \(Fmt.elapsed(s.endedAt))") }
+                    }.font(AppFont.footnote).foregroundStyle(Theme.inkSoft)
+                }
+                Spacer()
+                Picker("보기 방식", selection: $mode) { Text("갤럭시").tag("galaxy"); Text("2D 지도").tag("flat") }.pickerStyle(.segmented).frame(width: 170)
+            }
+            HStack(spacing: 10) {
+                stat("높은 위험", state.openHighCount, strong: state.openHighCount > 0) { state.section = .findings }
+                stat("중간 위험", state.openFindings.filter { $0.severity == .medium }.count) { state.section = .findings }
+                stat("확인 못 한 항목", state.gapCount) { state.section = .coverage }
+                stat("바뀐 설정", state.baseline == nil ? nil : state.diff.count) { state.section = .changes }
+                stat("살펴볼 세션", state.sessionSignals.filter { $0.p >= 0.4 && !$0.reviewed }.count) { state.section = .games }
+                todayMini
+            }
+        }
+        .padding(12)
+        .background(Theme.surface)
+        .overlay(alignment: .bottom) { Rectangle().fill(Theme.indigoFaint).frame(height: 1) }
+    }
+    var headline: String {
+        if state.lastScan == nil { return "아직 점검하지 않았음. 오른쪽 위 '점검'으로 시작" }
+        if state.openHighCount > 0 { return "높은 위험 \(state.openHighCount)건이 열려 있음" }
+        if state.openFindings.isEmpty { return state.gapCount > 0 ? "발견 사항 없음, 확인 못 한 항목 있음" : "열린 발견 사항 없음. 지금 상태가 좋음" }
+        return "중간 위험 \(state.openFindings.count)건을 지켜보는 중"
+    }
+    func stat(_ title: String, _ value: Int?, strong: Bool = false, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title).font(AppFont.caption).foregroundStyle(Theme.inkSoft)
+                Text(value.map { "\($0)" } ?? "-").font(AppFont.font(20, strong ? .bold : .semibold)).foregroundStyle(strong ? Theme.accent : Theme.ink)
+            }
+            .padding(.horizontal, 12).padding(.vertical, 8).frame(minWidth: 96, alignment: .leading)
+            .background(Theme.sand).clipShape(RoundedRectangle(cornerRadius: 6))
+            .overlay(RoundedRectangle(cornerRadius: 6).stroke(Theme.indigoFaint, lineWidth: 1))
+            .contentShape(Rectangle())
+        }.buttonStyle(.plain)
+    }
+    var todayMini: some View {
+        VStack(alignment: .leading, spacing: 3) {
+            Text("오늘 확인할 항목").font(AppFont.caption).foregroundStyle(Theme.inkSoft)
+            let top = Array(state.todayItems.prefix(2))
+            if top.isEmpty { Text("없음").font(AppFont.callout).foregroundStyle(Theme.mute) }
+            ForEach(top) { f in
+                Button { state.selectedFindingID = f.findingID; state.section = .findings } label: {
+                    HStack(spacing: 6) { SeverityBadge(severity: f.severity); Text("\(f.ruleID) \(f.title)").font(AppFont.callout).lineLimit(1) }
+                }.buttonStyle(.plain)
+            }
+        }
+        .padding(.horizontal, 12).padding(.vertical, 8).frame(maxWidth: .infinity, alignment: .leading)
+        .background(Theme.sand).clipShape(RoundedRectangle(cornerRadius: 6))
+        .overlay(RoundedRectangle(cornerRadius: 6).stroke(Theme.indigoFaint, lineWidth: 1))
     }
 
     var toolbar: some View {
@@ -568,10 +632,10 @@ final class GraphNSView: NSView {
     static func color(_ t: Ontology.NodeType) -> NSColor {
         func c(_ hex: UInt32) -> NSColor { NSColor(red: CGFloat((hex >> 16) & 0xFF) / 255, green: CGFloat((hex >> 8) & 0xFF) / 255, blue: CGFloat(hex & 0xFF) / 255, alpha: 1) }
         switch t {
-        case .agent: return c(0x2D2A5E); case .project: return c(0x5A57A8); case .configuration: return c(0x8683C4); case .mcpServer: return c(0x6C69B8)
-        case .endpoint: return c(0x4A478F); case .secretCandidate: return c(0x1E1B45); case .finding: return c(0x3B3877); case .rule: return c(0xB4B1D6); case .permissionRule: return c(0x9D9AD0)
-        case .hook: return c(0x7B78BF); case .instructionFile: return c(0xA7A4D8); case .file: return c(0xC3C1DE); case .device: return c(0x2D2A5E)
-        default: return c(0xB4B1D6)
+        case .agent: return c(0x1F2B48); case .project: return c(0x3A4A6E); case .configuration: return c(0x6B7A9C); case .mcpServer: return c(0x51628A)
+        case .endpoint: return c(0x2B3A5C); case .secretCandidate: return c(0x8A6D1F); case .finding: return c(0xC9A23F); case .rule: return c(0xB8C0D2); case .permissionRule: return c(0x8F9BB5)
+        case .hook: return c(0x5E6E93); case .instructionFile: return c(0xA3AEC4); case .file: return c(0xCCD2DF); case .device: return c(0x1F2B48)
+        default: return c(0xB8C0D2)
         }
     }
 }

@@ -16,9 +16,9 @@ struct RootView: View {
                             Label(s.title, systemImage: s.symbol).font(AppFont.font(13, state.section == s ? .semibold : .regular))
                             Spacer()
                             let n = badge(s)
-                            if n > 0 { Text("\(n)").font(AppFont.caption).foregroundStyle(Theme.sidebarText.opacity(0.7)) }
+                            if n > 0 { Text("\(n)").font(AppFont.caption).foregroundStyle(state.section == s ? Theme.sidebarSelectedText.opacity(0.8) : Theme.accent) }
                         }
-                        .foregroundStyle(Theme.sidebarText)
+                        .foregroundStyle(state.section == s ? Theme.sidebarSelectedText : Theme.sidebarText)
                         .padding(.vertical, 6).padding(.horizontal, 10)
                         .background(state.section == s ? Theme.sidebarSelected : Color.clear)
                         .clipShape(RoundedRectangle(cornerRadius: 4))
@@ -31,6 +31,7 @@ struct RootView: View {
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
             .background(Theme.sidebar.ignoresSafeArea())
+            .overlay(alignment: .trailing) { Rectangle().fill(Theme.indigoFaint).frame(width: 1).ignoresSafeArea() }
             .toolbarBackground(Theme.sidebar, for: .windowToolbar)
             .navigationSplitViewColumnWidth(min: 200, ideal: 220, max: 260)
         } detail: {

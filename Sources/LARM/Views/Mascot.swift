@@ -9,7 +9,7 @@ struct Mascot: View {
     var body: some View {
         ZStack {
             Circle().fill(Theme.indigo)
-            Circle().fill(Theme.sand).scaleEffect(0.86)
+            Circle().fill(Theme.surface).scaleEffect(0.86)
             face
         }
         .frame(width: size, height: size)
@@ -33,7 +33,7 @@ struct Mascot: View {
         case .risk:
             HStack(spacing: s * 0.16) { eye(open: true); eye(open: true) }.offset(y: -s * 0.05)
             mouth(curve: -0.15).offset(y: s * 0.22)
-            Text("!").font(AppFont.font(s * 0.34, .bold)).foregroundStyle(Theme.indigo).offset(x: s * 0.33, y: -s * 0.33)
+            Text("!").font(AppFont.font(s * 0.34, .bold)).foregroundStyle(Theme.accent).offset(x: s * 0.33, y: -s * 0.33)
         case .clear:
             HStack(spacing: s * 0.16) { happyEye; happyEye }.offset(y: -s * 0.05)
             mouth(curve: 0.3).offset(y: s * 0.18)

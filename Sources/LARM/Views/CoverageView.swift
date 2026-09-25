@@ -1,7 +1,7 @@
 import SwiftUI
 import LARMCore
 
-/// 점검 범위.
+/// 점검한 파일: 무엇을 읽었고 무엇을 읽지 못했는지.
 struct CoverageView: View {
     @EnvironmentObject var state: AppState
     @State private var showSuccess = false
@@ -11,11 +11,11 @@ struct CoverageView: View {
     var body: some View {
         VStack(alignment: .leading) {
             HStack {
-                Text("확인 범위").font(AppFont.title2)
+                Text("점검한 파일").font(AppFont.title2)
                 Spacer()
                 Toggle("성공, 부재 항목도 표시", isOn: $showSuccess)
             }.padding([.horizontal, .top])
-            Text("읽지 못한 항목은 없는 것으로 치지 않음").font(AppFont.footnote).foregroundStyle(Theme.inkSoft).padding(.horizontal)
+            Text("점검 때 읽은 설정 파일과 읽지 못한 파일의 목록. 읽지 못한 파일은 \"문제 없음\"으로 치지 않음").font(AppFont.footnote).foregroundStyle(Theme.inkSoft).padding(.horizontal)
             if state.lastScan == nil {
                 Text("아직 점검하지 않았음.").foregroundStyle(Theme.inkSoft).padding()
             } else if items.isEmpty {
