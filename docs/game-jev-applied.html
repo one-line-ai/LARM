@@ -1,0 +1,117 @@
+<title>LARM 게임이론·Jev 적용 현황</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@600;700&family=IBM+Plex+Sans+KR:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{--bg:#F4F6F8;--surface:#FFFFFF;--ink:#1B2430;--ink-2:#4A5563;--ink-3:#7A8594;--line:#D9DEE5;--accent:#2D2A5E;--accent-2:#5A57A8;--accent-soft:#E8E7F3;--mono:'IBM Plex Mono',ui-monospace,Menlo,monospace;--sans:'IBM Plex Sans KR','Apple SD Gothic Neo',system-ui,sans-serif;--serif:'Noto Serif KR','Apple Myungjo',Georgia,serif}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#14131F;--surface:#1E1D2E;--ink:#E9E8F4;--ink-2:#B8B6CF;--ink-3:#8A88A6;--line:#2F2D45;--accent:#C9C6F2;--accent-2:#9C99E0;--accent-soft:#2A2850}}
+:root[data-theme="dark"]{--bg:#14131F;--surface:#1E1D2E;--ink:#E9E8F4;--ink-2:#B8B6CF;--ink-3:#8A88A6;--line:#2F2D45;--accent:#C9C6F2;--accent-2:#9C99E0;--accent-soft:#2A2850}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.7;margin:0}
+a{color:var(--accent);text-decoration:none} a:hover{text-decoration:underline}
+.wrap{max-width:1040px;margin:0 auto;padding:40px 28px 80px}
+.eyebrow{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);font-weight:600}
+h1{font-family:var(--serif);font-size:32px;margin:6px 0 10px;text-wrap:balance} h2{font-family:var(--serif);font-size:22px;margin:52px 0 12px;padding-top:16px;border-top:1px solid var(--line)} h3{font-size:16px;margin:28px 0 8px;color:var(--accent)}
+p{margin:0 0 10px;max-width:74ch} .lead{color:var(--ink-2);font-size:16px}
+.thesis{background:var(--accent-soft);border-left:4px solid var(--accent);padding:14px 18px;margin:18px 0 6px;font-size:16px}
+.thesis b{color:var(--accent)}
+ul,ol{max-width:74ch} li{margin-bottom:6px}
+.tbl{overflow-x:auto;background:var(--surface);border:1px solid var(--line);margin:10px 0 16px} table{border-collapse:collapse;width:100%;font-size:13.5px} th,td{padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top;text-align:left} th{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);background:var(--bg)} tr:last-child td{border-bottom:0}
+.game{background:var(--surface);border:1px solid var(--line);padding:16px 18px;margin:0 0 14px}
+.game h3{margin:0 0 8px} .game dl{display:grid;grid-template-columns:118px 1fr;gap:5px 14px;margin:0;font-size:14px} .game dt{color:var(--ink-3);font-weight:500} .game dd{margin:0;color:var(--ink-2)}
+.game dd.formula{font-family:var(--mono);font-size:13px;color:var(--ink);background:var(--bg);padding:6px 10px;border-radius:3px}
+code{font-family:var(--mono);font-size:12.5px;background:var(--bg);padding:1px 5px;border-radius:3px}
+pre{font-family:var(--mono);font-size:12.5px;background:var(--surface);border:1px solid var(--line);padding:12px 14px;overflow-x:auto;line-height:1.5}
+.phase{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px} .phase div{background:var(--surface);border:1px solid var(--line);padding:12px 14px} .phase h4{margin:0 0 4px;font-size:13.5px;color:var(--accent)} .phase p{font-size:13px;color:var(--ink-2);margin:0}
+.diagram{background:var(--surface);border:1px solid var(--line);padding:12px;overflow-x:auto}
+</style>
+<style>
+.pill{display:inline-block;font-size:11px;padding:2px 8px;border-radius:3px;font-weight:600;letter-spacing:.02em;vertical-align:middle}
+.pill.done{background:#DDEFE3;color:#1F5A36} .pill.part{background:#F6E8C6;color:#6B4D07} .pill.todo{background:var(--accent-soft);color:var(--accent)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .pill.done{background:#1F3A2B;color:#A9E2BE} :root:not([data-theme="light"]) .pill.part{background:#4A3A12;color:#F1D48A}}
+:root[data-theme="dark"] .pill.done{background:#1F3A2B;color:#A9E2BE} :root[data-theme="dark"] .pill.part{background:#4A3A12;color:#F1D48A}
+.tiers{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;margin:18px 0}
+.tier{background:var(--surface);border:1px solid var(--line);padding:18px 20px;display:flex;flex-direction:column;gap:8px}
+.tier.now{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-soft)}
+.tier h3{margin:0;font-size:18px} .tier .price{font-family:var(--serif);font-size:30px;color:var(--accent);margin:2px 0} .tier .price small{font-family:var(--sans);font-size:13px;color:var(--ink-3);font-weight:400}
+.tier .who{font-size:13px;color:var(--ink-2);min-height:44px} .tier ul{padding-left:18px;margin:6px 0 0;font-size:13.5px} .tier li{margin-bottom:4px}
+.tier .tag{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);font-weight:600}
+.matrix td:nth-child(n+2){text-align:center;white-space:nowrap} .matrix td.y{color:#1F5A36;font-weight:600} .matrix td.n{color:var(--ink-3)} .matrix td.p{color:#6B4D07;font-weight:600}
+.note{font-size:13px;color:var(--ink-2);background:var(--surface);border:1px solid var(--line);padding:10px 14px;margin:10px 0}
+</style><div class="wrap">
+<p class="eyebrow">LARM 0.7.0 · 적용 현황 · 2026-09-26</p>
+<h1>게임이론·Jev, 제품에 들어간 것</h1>
+<p class="lead">설계 문서(10장, 플레이어 = 사용자·AI 도구)에서 실제로 0.7.0에 구현된 항목만 정리한 문서. 무엇이 어느 화면에서 어떻게 동작하는지, 어떤 값이 저장되는지, 무엇이 아직 아닌지를 구분한다.</p>
+<div class="thesis"><b>한 줄 요약.</b> 위험 판정은 여전히 규칙(R01~R08, RR01~RR02)이 한다. 게임이론은 <b>언제 검사하고, 무엇을 알리고, 무엇을 먼저 볼지</b>만 바꿨다. Jev는 아직 연결되지 않았고, 그 자리에 규칙 기반 추정(rule-1)이 들어가 같은 질문에 답한다.</div>
+
+<p><span class="pill done">적용됨</span> 제품에서 동작 &nbsp; <span class="pill part">일부</span> 계산·표시는 되나 자동 동작은 아님 &nbsp; <span class="pill todo">미적용</span> 설계만 있음</p>
+
+<h2>1. 다섯 게임의 적용 현황</h2>
+<div class="tbl"><table>
+<tr><th>게임</th><th>사용자의 선택</th><th>AI 도구의 선택</th><th>제품에서 하는 일</th><th>화면</th><th>상태</th></tr>
+<tr><td>1. 권한 위임</td><td>허용 범위를 넓힐지 좁힐지</td><td>주어진 범위를 끝까지 씀</td><td>넓은 허용 규칙(R02)마다 최근 30일 활동 기록으로 "좁히면 늘어날 확인 요청"을 세션당 횟수로 계산. 2회 이내면 좁혀도 부담이 작다고 안내</td><td>발견 사항 상세 "좁히면 어떻게 되나", 사용자와 AI 도구 1번</td><td><span class="pill done">적용됨</span></td></tr>
+<tr><td>2. 신호 읽기</td><td>계속 맡길지, 살펴볼지</td><td>행동 자체가 신호</td><td>세션별 "살펴볼 필요" 점수를 숨김·우회형 명령, 높은 위험 판정, 민감 경로, 범위 밖 접근 수로 계산해 순서를 매김. "살펴봄, 문제 있음/없음"으로 결과 기록</td><td>AI 도구 활동 상단, 사용자와 AI 도구 2번, 한눈에 보기 타일</td><td><span class="pill done">적용됨</span></td></tr>
+<tr><td>3. 기억 있는 신뢰</td><td>프로젝트마다 얼마나 믿을지</td><td>안전한 변경만 할지, 위험한 설정 변경을 할지</td><td>범위별 최근 30일 새 발견·반복 발견·미조치 높음 건수로 안정/주의/살펴볼 필요 표시. 높은 위험이 없으면 기준 상태 저장을 권장(G3)</td><td>사용자와 AI 도구 3번</td><td><span class="pill done">적용됨</span></td></tr>
+<tr><td>4. 검사</td><td>언제 다시 확인할지</td><td>언제 설정을 바꿀지</td><td>전체 대조 간격을 변경 확률로 정하고 0.7~1.3 무작위 곱을 섞음. 작업 중 10~15분, 유휴 30~60분(G1)</td><td>한눈에 보기·개요의 "다음 대조", 사용자와 AI 도구 4번</td><td><span class="pill done">적용됨</span></td></tr>
+<tr><td>5. 주의 배분</td><td>알림에 반응할지</td><td>사건을 얼마든지 만듦</td><td>중간 위험·감시 공백 알림은 조치 필요 확률 × 반응 확률 − 비용이 문턱을 넘을 때만 전송, 아니면 배지(G2). 오늘 확인할 항목을 조치 필요 추정 순으로 정렬하고 "확인하면 알 수 있는 것"을 붙임(G6)</td><td>알림, 한눈에 보기·개요 "오늘 확인할 항목", 사용자와 AI 도구 5번</td><td><span class="pill done">적용됨</span></td></tr>
+<tr><td>약속 장치</td><td>예외를 얼마나 둘지</td><td>훅 등록으로 기록됨을 앎</td><td>같은 항목에 예외를 2번 이상 두면 "되풀이되는 예외는 허용과 같음" 안내와 7일 권장(G5). 훅 등록은 기존 기능</td><td>발견 사항 상세 "예외와 검토"</td><td><span class="pill part">일부</span> 기본값 자동 축소는 안 함, 안내만</td></tr>
+</table></div>
+
+<h2>2. 전략별 세부 (설계 G1~G7)</h2>
+
+<div class="game"><h3>G1 무작위 대조 간격 <span class="pill done">적용됨</span></h3>
+<dl><dt>질문</dt><dd>Q5 "60분 안에 설정이 바뀔 확률"</dd>
+<dt>규칙 기반 추정</dt><dd>최근 15분 활동 있음 0.70 · 마지막 변경 60분 이내 0.45 · 그 외 0.12</dd>
+<dt>공식</dt><dd class="formula">interval = clamp(30분 / (1 + 2.5·p), 10분, 60분) × U(0.7, 1.3)</dd>
+<dt>효과</dt><dd>작업 중 평균 10~13분, 유휴 시 21~39분. 시각이 매번 달라 검사 사이 틈을 노릴 수 없음</dd>
+<dt>코드</dt><dd><code>InspectionPolicy.nextInterval</code>, <code>Monitor.scheduleReconcile</code></dd></dl></div>
+
+<div class="game"><h3>G2 알림 가치 게이트 <span class="pill done">적용됨</span></h3>
+<dl><dt>질문</dt><dd>Q1 "조치가 필요할 확률", Q2 "24시간 안에 열어 볼 확률"</dd>
+<dt>규칙 기반 추정</dt><dd>Q1: 높음 0.85, 중간 0.45, 재탐지마다 +0.01 · Q2: 조용한 시간 0.15, 최근 30일 반응률(표본 5건 이상), 아니면 0.6</dd>
+<dt>공식</dt><dd class="formula">V = a · b · L − 0.1,  V &gt; 0.25 이면 알림, 아니면 배지</dd>
+<dt>예외</dt><dd>높은 위험, 감시 장애는 게이트를 거치지 않고 항상 알림</dd>
+<dt>반응 기록</dt><dd>알림 후 24시간 안에 앱을 열면 반응 1로 기록. 최근 30일 반응률이 다음 추정에 쓰임</dd>
+<dt>코드</dt><dd><code>AlertGate.shouldSend</code>, <code>AppState.notify</code>, <code>markAlertResponses</code></dd></dl></div>
+
+<div class="game"><h3>G3 기준 상태 권장 <span class="pill done">적용됨</span></h3>
+<dl><dt>조건</dt><dd>미조치 높은 위험 0건이고 (기준 상태가 없음) 또는 (기준을 정한 지 7일 넘게 바뀐 설정이 그대로)</dd>
+<dt>동작</dt><dd>"기준 상태로 저장" 버튼과 한 줄 이유를 표시. 저장은 사용자 클릭으로만</dd>
+<dt>코드</dt><dd><code>PlayerGames.baselineSuggestion</code></dd></dl></div>
+
+<div class="game"><h3>G4 판단 보류·회피 우선 <span class="pill part">일부</span></h3>
+<dl><dt>적용된 것</dt><dd>세션 신호 점수(게임 2)에 숨김·우회형 표시(base64, 인코딩, 셸 래퍼, eval, 파이프 실행, 환경 덤프)를 가장 큰 가중치로 반영. "살펴봄" 결과를 Q4 추정의 실제값으로 기록</dd>
+<dt>안 된 것</dt><dd>판단 보류 활동을 별도 대기열로 모으는 화면은 없음(활동 목록의 "위험 표시만" 필터로 대체)</dd></dl></div>
+
+<div class="game"><h3>G5 예외 반복 안내 <span class="pill part">일부</span></h3>
+<dl><dt>적용된 것</dt><dd>같은 발견 사항의 예외 결정 수를 세어 2회 이상이면 경고 문구와 7일·사유 작성 권장</dd>
+<dt>안 된 것</dt><dd>승인 피로 확률로 기본 기한을 자동 축소하는 것. 기본값은 여전히 7일 고정</dd></dl></div>
+
+<div class="game"><h3>G6 오늘 확인할 항목 정렬 <span class="pill done">적용됨</span></h3>
+<dl><dt>순서</dt><dd>위험도 → 재점검으로 확인된 것 → 여러 번 발견된 것 → 오래된 것</dd>
+<dt>덧붙임</dt><dd>항목마다 "확인하면 알 수 있는 것" 한 줄(규칙별 고정 문구)</dd>
+<dt>코드</dt><dd><code>AppState.todayItems</code>, <code>PlayerGames.whatYouLearn</code></dd></dl></div>
+
+<div class="game"><h3>G7 추정 기록과 검증 <span class="pill part">일부</span></h3>
+<dl><dt>저장</dt><dd>표 <code>jev_estimate</code>(모델 버전, 질문, 대상, 확률, 근거, 나중 결과). 대조 간격 추정과 알림 반응 추정, 세션 살펴봄 결과가 기록됨</dd>
+<dt>검증</dt><dd>질문별 브라이어 점수를 표본 5건부터 계산해 "사용자와 AI 도구" 하단에 표시</dd>
+<dt>안 된 것</dt><dd>브라이어 0.25 초과 시 추정을 자동으로 끄는 동작. 문구로만 예고되어 있음</dd></dl></div>
+
+<h2>3. Jev 자리</h2>
+<p>결정 층은 프로토콜 <code>DecisionLayer</code>로 분리되어 있다. 질문(Q1, Q2, Q4, Q5), 입력(<code>DecisionInput</code>), 답(<code>Estimate</code>: 확률·근거·모델 버전)의 형태가 고정되어 있어, Jev 클라이언트가 이 프로토콜을 구현하면 화면·저장·검증은 그대로 쓰인다.</p>
+<div class="tbl"><table>
+<tr><th>항목</th><th>지금</th><th>Jev 연결 시</th></tr>
+<tr><td>구현체</td><td><code>HeuristicDecisionLayer</code> (모델 "rule-1")</td><td>Jev 호출 계층 (모델 "jev-&lt;버전&gt;")</td></tr>
+<tr><td>화면 표시</td><td>"참고 추정(규칙)"</td><td>"참고 확률 · Jev v…"</td></tr>
+<tr><td>입력</td><td>미조치 높음 수, 15분 활동 수, 마지막 변경 경과, 반응률, 조용한 시간</td><td>같은 입력 + 세션 행동 순서, 프로젝트 이력 (모두 별칭·지문만)</td></tr>
+<tr><td>실패 시</td><td>해당 없음</td><td>rule-1로 즉시 후퇴, 화면에 "규칙만 사용 중" 표시</td></tr>
+<tr><td>미확정</td><td colspan="2">Jev 호출 방식(로컬 프로세스인지 API인지), 요청·응답 스키마, 지연 시간, 비용. 이것이 정해져야 연결 작업을 시작할 수 있음</td></tr>
+</table></div>
+
+<h2>4. 저장되는 것과 저장되지 않는 것</h2>
+<ul>
+<li><b>저장됨</b>: 추정 확률과 근거 문장, 대상 식별자(세션 참조, 발견 사항 ID), 알림 전송·반응 시각, 예외 결정 수.</li>
+<li><b>저장 안 됨</b>: 명령 원문, 파일 내용, 실제 경로. 세션 점수는 이미 별칭·표시(flag)만 남은 활동 기록에서 계산.</li>
+<li><b>증빙 보고서</b>: 추정값은 보고서 ZIP에 들어가지 않음. 판정과 근거만 들어감(F25 범위 유지).</li>
+</ul>
+
+<h2>5. 관측 모드와의 경계</h2>
+<p>모든 적용 항목은 <b>순서·타이밍·기본값·안내</b>만 바꾼다. 허용·차단 결정(F42·F43)은 하지 않으며, 규칙을 실제로 좁히거나 예외를 줄이는 것은 사용자가 직접 한다. 자체 시험은 <code>DecisionTests</code> 7건(간격 경계·무작위성, 게이트, 추정 경계, 브라이어, 세션 순서, 위임 계산, 기준 권장)으로 검증했다.</p>
+</div>

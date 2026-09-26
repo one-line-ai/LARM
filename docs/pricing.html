@@ -1,0 +1,109 @@
+<title>LARM 요금제별 기능</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@600;700&family=IBM+Plex+Sans+KR:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{--bg:#F4F6F8;--surface:#FFFFFF;--ink:#1B2430;--ink-2:#4A5563;--ink-3:#7A8594;--line:#D9DEE5;--accent:#2D2A5E;--accent-2:#5A57A8;--accent-soft:#E8E7F3;--mono:'IBM Plex Mono',ui-monospace,Menlo,monospace;--sans:'IBM Plex Sans KR','Apple SD Gothic Neo',system-ui,sans-serif;--serif:'Noto Serif KR','Apple Myungjo',Georgia,serif}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#14131F;--surface:#1E1D2E;--ink:#E9E8F4;--ink-2:#B8B6CF;--ink-3:#8A88A6;--line:#2F2D45;--accent:#C9C6F2;--accent-2:#9C99E0;--accent-soft:#2A2850}}
+:root[data-theme="dark"]{--bg:#14131F;--surface:#1E1D2E;--ink:#E9E8F4;--ink-2:#B8B6CF;--ink-3:#8A88A6;--line:#2F2D45;--accent:#C9C6F2;--accent-2:#9C99E0;--accent-soft:#2A2850}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.7;margin:0}
+a{color:var(--accent);text-decoration:none} a:hover{text-decoration:underline}
+.wrap{max-width:1040px;margin:0 auto;padding:40px 28px 80px}
+.eyebrow{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);font-weight:600}
+h1{font-family:var(--serif);font-size:32px;margin:6px 0 10px;text-wrap:balance} h2{font-family:var(--serif);font-size:22px;margin:52px 0 12px;padding-top:16px;border-top:1px solid var(--line)} h3{font-size:16px;margin:28px 0 8px;color:var(--accent)}
+p{margin:0 0 10px;max-width:74ch} .lead{color:var(--ink-2);font-size:16px}
+.thesis{background:var(--accent-soft);border-left:4px solid var(--accent);padding:14px 18px;margin:18px 0 6px;font-size:16px}
+.thesis b{color:var(--accent)}
+ul,ol{max-width:74ch} li{margin-bottom:6px}
+.tbl{overflow-x:auto;background:var(--surface);border:1px solid var(--line);margin:10px 0 16px} table{border-collapse:collapse;width:100%;font-size:13.5px} th,td{padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top;text-align:left} th{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);background:var(--bg)} tr:last-child td{border-bottom:0}
+.game{background:var(--surface);border:1px solid var(--line);padding:16px 18px;margin:0 0 14px}
+.game h3{margin:0 0 8px} .game dl{display:grid;grid-template-columns:118px 1fr;gap:5px 14px;margin:0;font-size:14px} .game dt{color:var(--ink-3);font-weight:500} .game dd{margin:0;color:var(--ink-2)}
+.game dd.formula{font-family:var(--mono);font-size:13px;color:var(--ink);background:var(--bg);padding:6px 10px;border-radius:3px}
+code{font-family:var(--mono);font-size:12.5px;background:var(--bg);padding:1px 5px;border-radius:3px}
+pre{font-family:var(--mono);font-size:12.5px;background:var(--surface);border:1px solid var(--line);padding:12px 14px;overflow-x:auto;line-height:1.5}
+.phase{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px} .phase div{background:var(--surface);border:1px solid var(--line);padding:12px 14px} .phase h4{margin:0 0 4px;font-size:13.5px;color:var(--accent)} .phase p{font-size:13px;color:var(--ink-2);margin:0}
+.diagram{background:var(--surface);border:1px solid var(--line);padding:12px;overflow-x:auto}
+</style>
+<style>
+.pill{display:inline-block;font-size:11px;padding:2px 8px;border-radius:3px;font-weight:600;letter-spacing:.02em;vertical-align:middle}
+.pill.done{background:#DDEFE3;color:#1F5A36} .pill.part{background:#F6E8C6;color:#6B4D07} .pill.todo{background:var(--accent-soft);color:var(--accent)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .pill.done{background:#1F3A2B;color:#A9E2BE} :root:not([data-theme="light"]) .pill.part{background:#4A3A12;color:#F1D48A}}
+:root[data-theme="dark"] .pill.done{background:#1F3A2B;color:#A9E2BE} :root[data-theme="dark"] .pill.part{background:#4A3A12;color:#F1D48A}
+.tiers{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;margin:18px 0}
+.tier{background:var(--surface);border:1px solid var(--line);padding:18px 20px;display:flex;flex-direction:column;gap:8px}
+.tier.now{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-soft)}
+.tier h3{margin:0;font-size:18px} .tier .price{font-family:var(--serif);font-size:30px;color:var(--accent);margin:2px 0} .tier .price small{font-family:var(--sans);font-size:13px;color:var(--ink-3);font-weight:400}
+.tier .who{font-size:13px;color:var(--ink-2);min-height:44px} .tier ul{padding-left:18px;margin:6px 0 0;font-size:13.5px} .tier li{margin-bottom:4px}
+.tier .tag{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);font-weight:600}
+.matrix td:nth-child(n+2){text-align:center;white-space:nowrap} .matrix td.y{color:#1F5A36;font-weight:600} .matrix td.n{color:var(--ink-3)} .matrix td.p{color:#6B4D07;font-weight:600}
+.note{font-size:13px;color:var(--ink-2);background:var(--surface);border:1px solid var(--line);padding:10px 14px;margin:10px 0}
+</style><div class="wrap">
+<p class="eyebrow">LARM · 요금제 안 · 2026-09-26</p>
+<h1>요금제별 기능 구성</h1>
+<p class="lead">Basic은 지금 설치된 0.7.0 그대로이며 무료다. Pro와 Enterprise는 아직 만들지 않은 계획으로, 여기서는 어떤 기능이 어느 단계에 들어가는지를 정한다. 가격은 사용자 1명당 월 요금으로 가정한다.</p>
+<div class="thesis"><b>나누는 기준.</b> 혼자 쓰는 Mac 한 대의 안전은 무료로 다 준다(Basic). 판단을 더 정확하게 하고 더 오래 기억하는 것은 Pro. 여러 사람·여러 Mac을 한 곳에서 관리하고 감사에 내야 하는 것은 Enterprise.</div>
+
+<div class="tiers">
+<div class="tier now"><span class="tag">현재 상태</span><h3>Basic</h3><div class="price">무료</div>
+<div class="who">개인 개발자. Mac 한 대에서 Claude Code·Codex·Cursor 설정을 점검하고 지켜봄</div>
+<ul><li>정적 점검 R01~R08, 활동 규칙 RR01~RR02</li><li>발견 사항·수동 조치 안내·재점검</li><li>기준 상태·바뀐 설정·예외(7~30일)</li><li>자동 감시·무작위 대조·알림 게이트</li><li>Claude Code 활동 기록(보존 7~90일 선택)</li><li>갤럭시 지도·사용자와 AI 도구 화면</li><li>증빙 ZIP·오프라인 검증기</li><li>규칙 기반 추정(rule-1)</li></ul></div>
+<div class="tier"><span class="tag">계획</span><h3>Pro</h3><div class="price">$0.99 <small>/ 월</small></div>
+<div class="who">AI 도구를 매일 쓰는 개인·프리랜서. 더 정확한 순서와 더 긴 기억이 필요함</div>
+<ul><li>Jev 연결: 보정된 확률로 알림·순서·간격 결정</li><li>Codex·Cursor 활동 연동</li><li>활동·점검 기록 보존 1년</li><li>서명된 규칙 자동 갱신</li><li>주간 요약 보고서(PDF·HTML)</li><li>저장 보기 무제한, 프로젝트 100개</li><li>브라이어 검증 리포트·추정 자동 끄기</li><li>Mac 2대까지 설정 동기화</li></ul></div>
+<div class="tier"><span class="tag">계획</span><h3>Enterprise</h3><div class="price">$9.9 <small>/ 사용자 · 월</small></div>
+<div class="who">팀·회사. 여러 Mac을 한 화면에서 보고, 정책을 내려보내고, 감사에 제출함</div>
+<ul><li>Pro 전부 포함</li><li>팀 대시보드(사용자별·프로젝트별 집계)</li><li>조직 정책 배포(managed settings, 허용 규칙 기준선)</li><li>맞춤 규칙·맞춤 어댑터</li><li>보고서 자동 제출·SIEM 연동</li><li>감사 기록 보존 3년·독립 검증 지원(N10)</li><li>SSO·역할 권한·관리자 콘솔</li><li>Developer ID 서명·공증 배포(N06), 지원 SLA</li></ul></div>
+</div>
+
+<h2>1. 기능 대조표</h2>
+<p>○ 포함 · △ 제한 · − 없음. Basic 열은 0.7.0의 실제 동작이고, Pro·Enterprise 열은 계획이다.</p>
+<div class="tbl"><table class="matrix">
+<tr><th>영역</th><th>기능</th><th>Basic</th><th>Pro</th><th>Enterprise</th></tr>
+<tr><td rowspan="4">점검</td><td>정적 점검 R01~R08 (Claude Code·Codex·Cursor)</td><td class="y">○</td><td class="y">○</td><td class="y">○</td></tr>
+<tr><td>점검 대상 프로젝트 수</td><td class="p">△ 20개</td><td class="p">△ 100개</td><td class="y">○ 무제한</td></tr>
+<tr><td>규칙 갱신</td><td class="p">△ 앱 업데이트로</td><td class="y">○ 서명 패키지 자동</td><td class="y">○ + 맞춤 규칙</td></tr>
+<tr><td>맞춤 어댑터(사내 도구)</td><td class="n">−</td><td class="n">−</td><td class="y">○</td></tr>
+<tr><td rowspan="4">감시·알림</td><td>자동 감시·무작위 대조(G1)</td><td class="y">○</td><td class="y">○</td><td class="y">○</td></tr>
+<tr><td>알림 게이트(G2)·조용한 시간</td><td class="y">○</td><td class="y">○</td><td class="y">○</td></tr>
+<tr><td>확률 추정 모델</td><td class="p">△ 규칙(rule-1)</td><td class="y">○ Jev</td><td class="y">○ Jev + 조직 보정</td></tr>
+<tr><td>추정 검증(브라이어)·자동 끄기</td><td class="p">△ 점수 표시만</td><td class="y">○</td><td class="y">○</td></tr>
+<tr><td rowspan="4">활동 기록</td><td>Claude Code 연결(hook, 관측 전용)</td><td class="y">○</td><td class="y">○</td><td class="y">○</td></tr>
+<tr><td>Codex·Cursor 활동 연동</td><td class="n">−</td><td class="y">○</td><td class="y">○</td></tr>
+<tr><td>보존 기간</td><td class="p">△ 최대 90일</td><td class="y">○ 1년</td><td class="y">○ 3년</td></tr>
+<tr><td>세션 신호 순서(게임 2)·신뢰 이력(게임 3)</td><td class="y">○</td><td class="y">○</td><td class="y">○ 팀 단위</td></tr>
+<tr><td rowspan="3">보기</td><td>갤럭시 지도·2D 지도·한눈에 보기</td><td class="y">○</td><td class="y">○</td><td class="y">○</td></tr>
+<tr><td>저장 보기</td><td class="p">△ 5개</td><td class="y">○ 무제한</td><td class="y">○ 팀 공유</td></tr>
+<tr><td>팀 대시보드</td><td class="n">−</td><td class="n">−</td><td class="y">○</td></tr>
+<tr><td rowspan="4">보고·감사</td><td>증빙 ZIP·오프라인 검증기(larm-verify)</td><td class="y">○</td><td class="y">○</td><td class="y">○</td></tr>
+<tr><td>주간 요약 보고서</td><td class="n">−</td><td class="y">○</td><td class="y">○</td></tr>
+<tr><td>자동 제출·SIEM 연동</td><td class="n">−</td><td class="n">−</td><td class="y">○</td></tr>
+<tr><td>독립 검증 지원(N10)</td><td class="n">−</td><td class="n">−</td><td class="y">○</td></tr>
+<tr><td rowspan="4">관리·배포</td><td>Mac 여러 대 설정 동기화</td><td class="n">−</td><td class="p">△ 2대</td><td class="y">○</td></tr>
+<tr><td>조직 정책 배포·SSO·역할</td><td class="n">−</td><td class="n">−</td><td class="y">○</td></tr>
+<tr><td>서명·공증된 설치 파일(N06)</td><td class="p">△ ad-hoc</td><td class="p">△ ad-hoc</td><td class="y">○ Developer ID</td></tr>
+<tr><td>지원</td><td class="p">△ 저장소 이슈</td><td class="p">△ 이메일</td><td class="y">○ SLA</td></tr>
+</table></div>
+
+<h2>2. 모든 요금제에서 같은 것</h2>
+<ul>
+<li>관측 모드: 허용·차단 결정을 하지 않음(F42·F43 제외 유지). 설정 파일을 고치지 않음.</li>
+<li>비밀값·실제 경로는 저장·전송하지 않음. 활동 기록은 종류·개수·요약값·표시만.</li>
+<li>결정은 사람이 함. 추정값은 항상 "참고"로 표시.</li>
+<li>Enterprise의 팀 대시보드도 개인 Mac의 원문 데이터가 아니라 집계와 별칭만 받음.</li>
+</ul>
+
+<h2>3. 가격 근거와 가정</h2>
+<div class="tbl"><table>
+<tr><th>항목</th><th>Pro $0.99</th><th>Enterprise $9.9</th></tr>
+<tr><td>비용이 드는 것</td><td>Jev 호출(하루 100회 상한, N13), 규칙 서명 배포</td><td>팀 서버·정책 배포·SSO·감사 보존 3년·공증 계정·지원 인력</td></tr>
+<tr><td>가치</td><td>중간 위험 알림 30~60% 감소, 상위 3개 정밀도 0.7 목표(설계 10.3 추정)</td><td>팀 전체 드리프트 감지, 감사 대응 시간 단축, 정책 일관성</td></tr>
+<tr><td>가정</td><td>월 구독, 앱 안 결제, 14일 체험</td><td>연 계약 가능, 최소 5석, 관리자 1명 무료</td></tr>
+</table></div>
+<div class="note">숫자와 구성은 제안이며 확정이 아니다. 실제 결정 전에 확인할 것: Jev 호출 단가(Pro 원가의 대부분), 앱 안 결제 수수료, Enterprise 서버를 자체 호스팅으로 할지.</div>
+
+<h2>4. 구현 순서 (요금제 도입 시)</h2>
+<div class="phase">
+<div><h4>0. 요금제 스위치</h4><p>설정 표에 plan 값을 두고 기능 게이트를 한 곳(<code>Plan.allows(feature)</code>)에서 판정. Basic이 기본값</p></div>
+<div><h4>1. Pro 핵심</h4><p>Jev 연결(DecisionLayer 구현체), 보존 1년, 규칙 자동 갱신, 주간 보고서</p></div>
+<div><h4>2. Pro 확장</h4><p>Codex·Cursor 활동 연동, 동기화 2대, 브라이어 자동 끄기</p></div>
+<div><h4>3. Enterprise</h4><p>팀 서버·정책 배포·SSO·공증 배포. 요건정의서 밖의 새 요건 정의가 먼저 필요</p></div>
+</div>
+</div>
