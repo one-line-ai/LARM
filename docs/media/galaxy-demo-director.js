@@ -44,7 +44,7 @@ const T=[]; const at=(s,fn)=>T.push([s,fn]);
   ['M','MC','MCP'].forEach((s,i)=>at(36.8+i*0.35,()=>ev(s=>{const q=document.getElementById('q');q.value=s;q.dispatchEvent(new Event('input'));},s)));
   at(40.5,()=>cap('지금 일하고 있는 AI 도구와 프로젝트는 금빛으로 빛납니다.'));
   at(40.6,()=>ev(id=>{const q=document.getElementById('q');q.value='';q.dispatchEvent(new Event('input'));home();larmSetActive(['agent:claude-code',id]);},PROJ));
-  at(45.5,()=>ev(()=>{__caption('');document.getElementById('card').style.transition='opacity .8s';__card('LARM','설치부터 첫 점검까지 1분. 무료입니다.  github.com/one-line-ai/LARM',1);}));
+  at(45.5,()=>ev(()=>{__caption('');document.getElementById('card').style.transition='opacity .8s';__card('LARM','막지 않고, 보여 줍니다. 무료입니다.',1);}));
   const END=49.0; const N=Math.round(END*FPS);
   T.sort((a,b)=>a[0]-b[0]); let ti=0;
   for(let f=0;f<N;f++){const t=f/FPS; while(ti<T.length&&T[ti][0]<=t){await T[ti][1]();ti++;}
