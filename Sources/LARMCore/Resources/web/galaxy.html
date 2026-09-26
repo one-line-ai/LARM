@@ -83,7 +83,7 @@ function layout(nodes, edges){
 const canvas=document.getElementById('c'); const ctx=canvas.getContext('2d');
 let W=0,H=0,DPR=1;
 const spriteCache=new Map();
-function sprite(color,r){const key=color+'|'+r; if(spriteCache.has(key))return spriteCache.get(key); const s=Math.ceil(r*6); const c=document.createElement('canvas');c.width=c.height=s;const g=c.getContext('2d');const cx=s/2;
+function sprite(color,r){r=Math.round(r*4)/4; const key=color+'|'+r; if(spriteCache.has(key))return spriteCache.get(key); if(spriteCache.size>300)spriteCache.clear(); const s=Math.ceil(r*6); const c=document.createElement('canvas');c.width=c.height=s;const g=c.getContext('2d');const cx=s/2;
   const glow=g.createRadialGradient(cx,cx,0,cx,cx,cx);glow.addColorStop(0,color);glow.addColorStop(0.18,color);glow.addColorStop(0.42,hexA(color,.35));glow.addColorStop(1,hexA(color,0));g.fillStyle=glow;g.fillRect(0,0,s,s);
   g.fillStyle='#fff';g.globalAlpha=.9;g.beginPath();g.arc(cx,cx,Math.max(0.8,r*0.42),0,Math.PI*2);g.fill();spriteCache.set(key,c);return c;}
 function hexA(hex,a){const n=parseInt(hex.slice(1),16);return `rgba(${(n>>16)&255},${(n>>8)&255},${n&255},${a})`;}
