@@ -1,0 +1,199 @@
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>LARM</title>
+<style>
+@font-face{font-family:"Pretendard";src:url("../../../Fonts/Pretendard-Regular.otf") format("opentype");font-weight:400}
+@font-face{font-family:"Pretendard";src:url("../../../Fonts/Pretendard-Medium.otf") format("opentype");font-weight:500}
+@font-face{font-family:"Pretendard";src:url("../../../Fonts/Pretendard-SemiBold.otf") format("opentype");font-weight:600}
+@font-face{font-family:"Pretendard";src:url("../../../Fonts/Pretendard-Bold.otf") format("opentype");font-weight:700}
+:root{--navy:#1F2B48;--navy2:#3A4A6E;--line:#D5DAE6;--sand:#F4F5F9;--deep:#E9ECF3;--surface:#FFF;--ink:#1F2B48;--ink2:#6E7891;--mute:#9AA3B5;--gold:#C9A23F;--sel:#2B3A5C}
+*{box-sizing:border-box} html,body{height:100%;margin:0} body{font-family:Pretendard,'Apple SD Gothic Neo',system-ui,sans-serif;font-size:13px;color:var(--ink);background:var(--sand);overflow:hidden}
+#win{display:grid;grid-template-columns:220px 1fr;grid-template-rows:38px 1fr;height:100vh}
+#tb{grid-column:1/3;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;padding:0 14px;gap:8px}
+#tb .dots{display:flex;gap:7px} #tb .dots i{width:12px;height:12px;border-radius:50%;background:#E4E6EE;display:block} #tb .dots i:nth-child(1){background:#FF5F57}#tb .dots i:nth-child(2){background:#FEBC2E}#tb .dots i:nth-child(3){background:#28C840}
+#tb .title{flex:1;text-align:center;font-weight:600;color:var(--ink2)} #tb .scan{border:1px solid var(--line);background:#fff;border-radius:6px;padding:4px 10px;font:inherit;font-weight:500;color:var(--navy)}
+#side{background:#fff;border-right:1px solid var(--line);padding:8px 8px 0} #side .brand{font-weight:700;font-size:15px;padding:8px 8px 14px}
+#side .item{display:flex;align-items:center;gap:0;padding:6px 10px;border-radius:4px;color:var(--ink);cursor:pointer} #side .item i{width:24px;text-align:center;font-style:normal;font-size:13px;opacity:.85} #side .item.on{background:var(--sel);color:#fff;font-weight:600}
+#side .item .n{margin-left:auto;font-size:11px;color:var(--gold)} #side .item.on .n{color:#fff;opacity:.8} #side hr{border:0;border-top:1px solid var(--line);margin:6px 8px}
+#main{overflow:auto;position:relative} section{display:none;padding:24px;max-width:900px} section.on{display:block} section.full{max-width:none;padding:0;height:100%}
+h1{font-size:26px;margin:0 0 4px;font-weight:700} h2{font-size:20px;margin:0 0 8px;font-weight:600} h3{font-size:16px;margin:0 0 6px;font-weight:600}
+.box{background:#fff;border:1px solid var(--line);border-radius:6px;padding:14px;margin:0 0 14px} .box .lab{font-size:12px;font-weight:600;color:var(--navy2);margin-bottom:8px}
+.tiles{display:flex;gap:12px;margin:12px 0 16px} .tile{flex:1;background:#fff;border:1px solid var(--line);border-radius:6px;padding:12px;position:relative;overflow:hidden} .tile:after{content:"";position:absolute;left:0;right:0;bottom:0;height:3px;background:var(--line)} .tile.strong:after{background:var(--gold)}
+.tile .t{font-size:11px;color:var(--ink2)} .tile .v{font-size:24px;font-weight:600;margin-top:4px} .tile.strong .v{color:var(--gold);font-weight:700}
+.badge{display:inline-block;font-size:11px;padding:2px 7px;border-radius:3px;border:1px solid transparent;font-weight:500;vertical-align:middle} .badge.high{background:var(--gold);color:#fff;font-weight:700} .badge.medium{border-color:var(--navy);color:var(--navy)} .badge.st{background:var(--deep);color:var(--ink2)}
+.muted{color:var(--ink2)} .fn{font-size:11.5px;color:var(--ink2)} .cap{font-size:11px;color:var(--mute)} b{font-weight:600}
+.row{display:flex;gap:10px;align-items:flex-start} .grow{flex:1}
+.mascot{width:56px;height:56px;border-radius:50%;background:var(--navy);position:relative;flex:none} .mascot:before{content:"";position:absolute;inset:4px;border-radius:50%;background:#fff}
+.mascot .e{position:absolute;top:22px;width:7px;height:7px;border-radius:50%;background:var(--navy)} .mascot .e.l{left:18px}.mascot .e.r{right:18px} .mascot .m{position:absolute;left:50%;bottom:15px;width:16px;height:8px;margin-left:-8px;border:2.5px solid var(--navy);border-top:0;border-radius:0 0 10px 10px}
+.mascot.risk .m{top:34px;bottom:auto;border:2.5px solid var(--navy);border-bottom:0;border-radius:10px 10px 0 0} .mascot.risk .x{position:absolute;right:6px;top:2px;color:var(--gold);font-weight:800;font-size:17px}
+.mascot.s28{width:28px;height:28px} .mascot.s28:before{inset:2px} .mascot.s28 .e{top:10px;width:4px;height:4px} .mascot.s28 .e.l{left:8px}.mascot.s28 .e.r{right:8px} .mascot.s28 .m{width:9px;height:5px;margin-left:-4.5px;bottom:7px;border-width:2px}
+.strip{background:#fff;border-bottom:1px solid var(--line);padding:12px} .stats{display:flex;gap:10px;margin-top:10px} .stat{background:var(--sand);border:1px solid var(--line);border-radius:6px;padding:8px 12px;min-width:96px} .stat .t{font-size:11px;color:var(--ink2)} .stat .v{font-size:20px;font-weight:600;margin-top:2px} .stat.strong .v{color:var(--gold);font-weight:700} .stat.today{flex:1}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:6px;overflow:hidden;margin-left:auto} .seg span{padding:4px 12px;font-size:12px} .seg span.on{background:var(--sel);color:#fff}
+iframe{border:0;width:100%;height:calc(100% - 140px);display:block;background:#070A1C}
+table{border-collapse:collapse;width:100%;font-size:12.5px} th{text-align:left;font-weight:600;color:var(--ink2);font-size:11px;padding:6px 8px;border-bottom:1px solid var(--line)} td{padding:6px 8px;border-bottom:1px solid #EEF0F5;vertical-align:top}
+.split{display:grid;grid-template-columns:340px 1fr;gap:0;height:calc(100vh - 38px)} .list{border-right:1px solid var(--line);overflow:auto;background:#fff} .list .it{padding:9px 12px;border-bottom:1px solid #EEF0F5;cursor:pointer} .list .it.on{background:var(--deep)} .list .it .l{font-size:11.5px;color:var(--ink2);margin-top:2px}
+.detail{overflow:auto;padding:16px}
+.kv{display:grid;grid-template-columns:110px 1fr;gap:4px 12px;font-size:12.5px;margin:6px 0 10px} .kv .k{color:var(--ink2)}
+.mono{font-family:ui-monospace,Menlo,monospace;font-size:12px}
+.btn{border:1px solid var(--line);background:#fff;border-radius:6px;padding:4px 10px;font:inherit;font-size:12px;color:var(--navy)} .btn.small{padding:2px 8px;font-size:11px} .sel{border:1px solid var(--line);background:#fff;border-radius:6px;padding:4px 8px;font-size:12px} .inp{border:1px solid var(--line);background:#fff;border-radius:6px;padding:4px 8px;font-size:12px;color:var(--mute);flex:1}
+.game{background:#fff;border:1px solid var(--line);border-radius:6px;padding:14px;margin:0 0 14px} .game .who{display:flex;gap:14px;font-size:11.5px;color:var(--ink2);margin:2px 0 10px}
+.pct{font-size:14px;font-weight:600;width:44px;text-align:right} .pct.hi{color:var(--navy)} .pct.lo{color:var(--ink2)}
+.level{font-size:11px;padding:2px 6px;border-radius:3px;background:var(--deep)} .level.warn{background:#D5DAE6}
+.glossary{display:grid;grid-template-columns:90px 1fr;gap:5px 10px;font-size:12.5px} .glossary .k{font-weight:600;color:var(--navy)}
+#cur{position:fixed;z-index:50;width:16px;height:16px;margin:-8px 0 0 -8px;border-radius:50%;background:rgba(31,43,72,.9);box-shadow:0 0 0 3px rgba(201,162,63,.55),0 2px 8px rgba(0,0,0,.35);pointer-events:none;transition:transform .12s} #cur.dn{transform:scale(.6);background:var(--gold)}
+#cap{position:fixed;z-index:40;left:50%;bottom:36px;transform:translateX(-50%) translateY(10px);background:rgba(31,43,72,.93);color:#fff;padding:12px 22px;border-radius:10px;font-size:20px;font-weight:500;opacity:0;transition:opacity .35s,transform .35s;pointer-events:none;max-width:78vw;text-align:center;word-break:keep-all;line-height:1.35;box-shadow:0 8px 30px rgba(0,0,0,.25)} #cap.show{opacity:1;transform:translateX(-50%) translateY(0)}
+#card{position:fixed;inset:0;z-index:60;background:radial-gradient(ellipse at 50% 40%,#2B3A5C 0%,#1F2B48 70%);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;opacity:0;pointer-events:none}
+#card h1{font-size:48px;margin:0;color:#fff;text-align:center;max-width:86vw;line-height:1.2} #card p{font-size:21px;color:#D6DEEE;margin:0;text-align:center;max-width:82vw}
+#card .logo{width:88px;height:88px;border-radius:50%;background:#fff;border:6px solid #C9A23F;position:relative;margin-bottom:6px}
+#card .logo:before,#card .logo:after{content:"";position:absolute;top:30px;width:9px;height:9px;border-radius:50%;background:#1F2B48} #card .logo:before{left:24px} #card .logo:after{right:24px} #card .logo i{position:absolute;left:50%;bottom:20px;width:26px;height:12px;margin-left:-13px;border:3px solid #1F2B48;border-top:0;border-radius:0 0 14px 14px}
+.hl{outline:3px solid var(--gold);outline-offset:3px;border-radius:6px;transition:outline-color .3s}
+</style></head><body>
+<div id="win">
+<div id="tb"><div class="dots"><i></i><i></i><i></i></div><div class="title">LARM</div><button class="scan">🔍 점검</button></div>
+<nav id="side">
+ <div class="brand">LARM</div>
+ <div class="item on" id="nav-graph" onclick="go('graph')"><i>✦</i>한눈에 보기</div>
+ <div class="item" id="nav-overview" onclick="go('overview')"><i>◔</i>개요</div>
+ <hr>
+ <div class="item" id="nav-findings" onclick="go('findings')"><i>⚠</i>발견 사항<span class="n">7</span></div>
+ <div class="item" id="nav-changes" onclick="go('changes')"><i>⇄</i>바뀐 설정<span class="n">3</span></div>
+ <div class="item" id="nav-coverage" onclick="go('coverage')"><i>☑</i>점검한 파일<span class="n">1</span></div>
+ <hr>
+ <div class="item" id="nav-activity" onclick="go('activity')"><i>∿</i>AI 도구 활동<span class="n">1</span></div>
+ <div class="item" id="nav-games" onclick="go('games')"><i>⚇</i>사용자와 AI 도구</div>
+ <hr>
+ <div class="item" id="nav-evidence" onclick="go('evidence')"><i>▤</i>보고서와 설정</div>
+</nav>
+<div id="main">
+
+<section id="sec-graph" class="on full">
+ <div class="strip">
+  <div class="row" style="align-items:center">
+   <div class="mascot risk" id="mascot"><span class="e l"></span><span class="e r"></span><span class="m"></span><span class="x">!</span></div>
+   <div class="grow"><h3 style="margin:0">높은 위험 2건 미조치</h3><div class="fn">감시 중 · 다음 대조 2026. 9. 26. 오후 9:58 · 마지막 점검 3분 전</div></div>
+   <div class="seg"><span class="on">갤럭시</span><span>2D 지도</span></div>
+  </div>
+  <div class="stats">
+   <div class="stat strong" id="st-high"><div class="t">높은 위험</div><div class="v">2</div></div>
+   <div class="stat"><div class="t">중간 위험</div><div class="v">5</div></div>
+   <div class="stat"><div class="t">확인 못 한 항목</div><div class="v">1</div></div>
+   <div class="stat"><div class="t">바뀐 설정</div><div class="v">3</div></div>
+   <div class="stat" id="st-sess"><div class="t">살펴볼 세션</div><div class="v">1</div></div>
+   <div class="stat today"><div class="t">오늘 확인할 항목</div><div style="margin-top:4px"><span class="badge high">높음</span> R02 광범위 도구 허용</div><div style="margin-top:3px"><span class="badge high">높음</span> R03 평문 비밀정보 후보</div></div>
+  </div>
+ </div>
+ <iframe id="gal" src="galaxy-embed.html"></iframe>
+</section>
+
+<section id="sec-overview">
+ <div class="row" style="align-items:flex-start;gap:14px"><div class="mascot risk"><span class="e l"></span><span class="e r"></span><span class="m"></span><span class="x">!</span></div>
+ <div><h1>LARM 개요</h1><div class="muted">감시 상태: <b style="color:var(--navy)">감시 중</b> · 감시 동작 확인 8초 전</div><div style="font-weight:600;margin-top:4px">높은 위험 2건 미조치. 아래 '오늘 확인할 항목'부터 보기</div><div class="fn">다음 전체 대조 2026. 9. 26. 오후 9:58 (변경 확률 70% (최근 15분에 AI 도구 활동 3건) → 12분 뒤)</div></div></div>
+ <div class="tiles"><div class="tile strong"><div class="t">높은 위험</div><div class="v">2</div></div><div class="tile"><div class="t">중간 위험</div><div class="v">5</div></div><div class="tile"><div class="t">조치 중</div><div class="v">1</div></div><div class="tile"><div class="t">예외로 둔 항목</div><div class="v">2</div></div><div class="tile"><div class="t">확인 못 한 항목</div><div class="v">1</div></div><div class="tile"><div class="t">바뀐 설정</div><div class="v">3</div></div></div>
+ <div class="box"><div class="lab">마지막 점검</div><div><b>상태: 완료</b> · 2026. 9. 26. 오후 9:43 (3분 전) · 점검 규칙 1.0.0 · 종류 event</div><div class="fn" style="margin-top:4px">확인한 값 412건 · 확인 항목 31건 · 확인 못 한 구간 1건 · 판단 보류 1건</div></div>
+ <div class="box"><div class="lab">자동 감시 (창을 닫아도 유지)</div><div><b>설정 감시:</b> 감시 중 · 폴더 6개 · 60초 폴링 3파일 · <b>활동 수신:</b> 정상 · <b>일시중지:</b> 없음</div><div class="fn" style="margin-top:4px">감시가 멈춘 동안의 변경은 알 수 없고, 복귀하면 현재 상태만 다시 확인함</div></div>
+ <div class="box" id="today"><div class="lab">오늘 확인할 항목 (조치 필요 추정 순)</div>
+  <div style="margin-bottom:6px"><span class="badge high">높음</span> <b>R02 광범위 도구 허용</b> <span class="muted">&lt;shop-api&gt;/.claude/settings.local.json</span><div class="fn">확인하면 알 수 있는 것: 허용 규칙이 실제 쓰임보다 넓은지</div></div>
+  <div style="margin-bottom:6px"><span class="badge high">높음</span> <b>R03 평문 비밀정보 후보</b> <span class="muted">&lt;shop-api&gt;/.mcp.json</span><div class="fn">확인하면 알 수 있는 것: 설정 파일에 비밀값이 들어 있는지</div></div>
+  <div><span class="badge medium">중간</span> <b>R05 미검토 MCP 구성</b> <span class="muted">~/.claude.json</span><div class="fn">확인하면 알 수 있는 것: 외부 도구 연결(MCP)이 인터넷에 노출됐는지</div></div>
+  <div class="cap" style="margin-top:8px">순서: 위험도 → 재점검으로 확인된 것 → 여러 번 발견된 것 → 오래된 것. 자세한 근거는 '사용자와 AI 도구' 화면</div></div>
+ <div class="box"><div class="lab">용어 안내</div><div class="glossary"><span class="k">점검</span><span class="muted">AI 도구(Claude Code, Codex, Cursor)의 설정 파일을 읽어 위험한 설정이 있는지 확인하는 일. 설정을 바꾸지는 않음</span><span class="k">발견 사항</span><span class="muted">점검에서 찾은 위험한 설정 한 건. 높음·중간 위험도와 함께 이유와 고치는 방법을 보여 줌</span><span class="k">기준 상태</span><span class="muted">"이 설정은 내가 확인했다"고 저장해 둔 상태. 이후 무엇이 바뀌었는지 비교하는 기준</span><span class="k">예외</span><span class="muted">위험을 알지만 당분간 두기로 한 항목. 기한(최대 30일)이 지나면 다시 미조치로 돌아감</span></div></div>
+</section>
+
+<section id="sec-findings" class="full"><div class="split">
+ <div class="list">
+  <div style="padding:10px 12px;border-bottom:1px solid var(--line);display:flex;gap:6px"><span class="inp">검색</span><span class="sel">미조치+조치 중</span></div>
+  <div class="it on"><span class="badge high">높음</span> <b>R02 광범위 도구 허용</b><div class="l">&lt;shop-api&gt;/.claude/settings.local.json · 3회</div></div>
+  <div class="it"><span class="badge high">높음</span> <b>R03 평문 비밀정보 후보</b><div class="l">&lt;shop-api&gt;/.mcp.json · 2회</div></div>
+  <div class="it"><span class="badge medium">중간</span> <b>R05 미검토 MCP 구성</b><div class="l">~/.claude.json · 5회</div></div>
+  <div class="it"><span class="badge medium">중간</span> <b>R06 연결 주소 확인 필요</b><div class="l">&lt;data-pipeline&gt;/.mcp.json · 5회</div></div>
+  <div class="it"><span class="badge medium">중간</span> <b>R07 훅 설정 변경</b><div class="l">&lt;shop-api&gt;/.claude/settings.json · 1회</div></div>
+  <div class="it"><span class="badge medium">중간</span> <b>R02 광범위 도구 허용</b><div class="l">~/.claude/settings.json · 5회</div></div>
+  <div class="it"><span class="badge medium">중간</span> <b>R01 승인·격리 경계 확대</b><div class="l">~/.codex/config.toml · 5회</div></div>
+ </div>
+ <div class="detail" id="fdetail">
+  <div><span class="badge high">높음</span> <span style="font-size:16px;font-weight:600">R02 광범위 도구 허용</span> <span class="badge st">미조치</span></div>
+  <p style="margin:8px 0">전체 셸 실행을 승인 없이 허용하는 규칙이 유효함</p>
+  <div class="kv"><span class="k">신뢰도</span><span>높음</span><span class="k">위치</span><span>&lt;shop-api&gt;/.claude/settings.local.json</span><span class="k">대상</span><span class="mono">perm:cfg:claude-code:scope_shop:local:allow[0]</span><span class="k">범위</span><span>shop-api</span><span class="k">최초 / 최근</span><span>2026. 9. 21. 오전 10:12 / 2026. 9. 26. 오후 9:43 · 3회</span></div>
+  <div class="box"><div class="lab">확인한 값</div><div class="kv" style="margin:0"><span class="mono">list</span><span>allow</span><span class="mono">rule_safe</span><span>Bash(*)</span><span class="mono">tool</span><span>Bash</span><span class="mono">breadth</span><span>full_shell</span><span class="mono">effective</span><span>true</span></div><div class="fn" style="margin-top:6px">출처: &lt;shop-api&gt;/.claude/settings.local.json · 우선순위 local · Claude Code settings (local) (S1/S2) · 읽기 모듈 claude-code 1.0.0</div></div>
+  <div class="box" id="deleg"><div class="lab">좁히면 어떻게 되나 (권한 위임)</div><div><b>이 규칙이 덮었을 최근 30일 요청 41건, 세션 31개 → 좁히면 세션당 약 1.3회 확인 요청이 늘어남</b></div><div style="margin-top:4px">세션당 2회 이내라 좁혀도 작업 흐름에 큰 부담이 없음. 실제 쓰는 명령만 허용하는 규칙으로 바꾸기</div><div class="fn" style="margin-top:4px">근거: 최근 30일 요청 214건, 세션 31개 기준. 규칙을 실제로 바꾸는 것은 사용자 몫이며 LARM은 설정을 고치지 않음</div></div>
+  <div class="box"><div class="lab">한계</div>승인 없이 실행 가능한 범위를 설정 파일 기준으로만 판단함. 실제 실행 여부는 활동 기록으로 따로 확인함</div>
+  <div class="box"><div class="lab">다음 단계</div><b>settings.local.json의 allow에서 Bash(*)를 지우고, 자주 쓰는 명령(예: Bash(npm test *))만 허용하기</b></div>
+  <div class="box" id="exc"><div class="lab">예외와 검토</div><div class="row" style="align-items:center"><span class="sel">기한 7일</span><span class="inp">예외 사유 (필수)</span><button class="btn">기한을 정해 예외 처리</button></div>
+   <div class="fn" style="margin-top:8px;color:var(--navy2)">이 항목은 예외를 2번 두었음. 되풀이되는 예외는 사실상 허용과 같으므로 기한을 7일로 두고, 사유에 '언제 고칠지'를 적기</div>
+   <div class="fn" style="margin-top:4px">예외는 위험을 알고도 당분간 두는 것이며 해결이 아님. 기본 7일, 최대 30일이고, 기한이 지나거나 설정이 바뀌면 다시 미조치로 돌아감</div></div>
+  <div class="box"><div class="lab">이력</div><div class="fn">2026. 9. 26. 오후 9:43 · engine · seen open→open · 재탐지 3회<br>2026. 9. 24. 오전 9:02 · user · exception_expired excepted→open · 예외 기한 만료<br>2026. 9. 21. 오전 10:12 · engine · opened →open · 최초 발견</div></div>
+ </div>
+</div></section>
+
+<section id="sec-games">
+ <div class="row" style="gap:14px;margin-bottom:16px"><div class="mascot risk"><span class="e l"></span><span class="e r"></span><span class="m"></span><span class="x">!</span></div>
+ <div><h1>사용자와 AI 도구</h1><div class="muted" style="font-size:12.5px">AI 도구는 일을 빨리 끝내려 넓은 권한을 원하고, 사용자는 일은 끝내되 위험은 줄이려 함. LARM은 막지 않고 기록·표시·기본값으로 둘의 선택을 바꾸는 심판 역할. 아래 숫자는 모두 규칙으로 계산한 참고값이며 판단은 사용자 몫</div></div></div>
+ <div class="game" id="g1"><h3>1. 권한 위임</h3><div class="who"><span>👤 사용자: 허용 범위를 정함</span><span>⚙ AI 도구: 주어진 범위를 끝까지 씀</span></div>
+  <div class="row"><span class="badge high">높음</span><div><b>R02 광범위 도구 허용 · &lt;shop-api&gt;/.claude/settings.local.json</b><div class="fn">좁히면 늘어나는 확인 요청: 세션당 약 1.3회 (최근 30일 요청 214건, 세션 31개 기준) → 좁혀도 부담 작음</div></div></div>
+  <div class="row" style="margin-top:6px"><span class="badge medium">중간</span><div><b>R02 광범위 도구 허용 · ~/.claude/settings.json</b><div class="fn">좁히면 늘어나는 확인 요청: 세션당 약 4.8회 (최근 30일 요청 214건, 세션 31개 기준) → 좁히면 확인이 잦아짐, 규칙 세분화 권장</div></div></div></div>
+ <div class="game" id="g2"><h3>2. 신호 읽기</h3><div class="who"><span>👤 사용자: 계속 맡길지, 살펴볼지 정함</span><span>⚙ AI 도구: 행동 자체가 신호가 됨</span></div>
+  <div class="row" style="align-items:center"><span class="pct hi">62%</span><div class="grow"><b>세션 a3f9c2e1… · 2026. 9. 26. 오후 8:51 · 요청 18건</b><div class="fn">숨김·우회형 명령 2건, 높은 위험 판정 1건, 민감 경로 접근 1건</div></div><button class="btn small">살펴봄, 문제 있음</button><button class="btn small">살펴봄, 문제 없음</button></div>
+  <div class="row" style="align-items:center;margin-top:6px"><span class="pct lo">23%</span><div class="grow"><b>세션 7be04d10… · 2026. 9. 26. 오후 3:20 · 요청 44건</b><div class="fn">민감 경로 접근 2건, 선택 범위 밖 3건</div></div><span class="fn">살펴봄</span></div>
+  <div class="row" style="align-items:center;margin-top:6px"><span class="pct lo">5%</span><div class="grow"><b>세션 c1d2a9f4… · 2026. 9. 26. 오전 10:05 · 요청 61건</b><div class="fn">특이 표시 없음</div></div><span class="fn">살펴봄</span></div>
+  <div class="fn" style="margin-top:8px">위 순서는 숨김·우회형 명령, 높은 위험 판정, 민감 경로, 범위 밖 접근 수로 계산한 참고값. '살펴봄' 표시는 나중에 추정이 맞았는지 검증하는 데 쓰임</div></div>
+ <div class="game" id="g3"><h3>3. 기억 있는 신뢰</h3><div class="who"><span>👤 사용자: 프로젝트마다 얼마나 믿을지 정함</span><span>⚙ AI 도구: 안전한 변경만 할지, 위험한 설정 변경을 할지</span></div>
+  <div class="row" style="align-items:center"><b style="width:220px">shop-api</b><span class="level warn">살펴볼 필요</span><span class="fn">30일 새 발견 4건 · 반복 1건 · 미조치 높음 2건</span></div>
+  <div class="row" style="align-items:center;margin-top:6px"><b style="width:220px">data-pipeline</b><span class="level warn">주의</span><span class="fn">30일 새 발견 1건 · 반복 0건 · 미조치 높음 0건</span></div>
+  <div class="row" style="align-items:center;margin-top:6px"><b style="width:220px">사용자 설정 위치</b><span class="level">안정</span><span class="fn">30일 새 발견 0건 · 반복 0건 · 미조치 높음 0건</span></div></div>
+ <div class="game" id="g4"><h3>4. 예측할 수 없는 검사</h3><div class="who"><span>👤 사용자: 언제 다시 확인할지</span><span>⚙ AI 도구: 언제 설정을 바꿀지</span></div>
+  <div>다음 전체 대조: 2026. 9. 26. 오후 9:58 · 변경 확률 70% (최근 15분에 AI 도구 활동 3건) → 12분 뒤</div><div class="fn" style="margin-top:4px">작업 중에는 10~15분, 유휴에는 30~60분 사이에서 매번 무작위로 정함. 시각을 예측할 수 없으므로 검사 사이 틈을 노릴 수 없음</div></div>
+ <div class="game" id="g5"><h3>5. 주의 배분</h3><div class="who"><span>👤 사용자: 알림에 반응할지</span><span>⚙ AI 도구: 사건을 얼마든지 만들 수 있음</span></div>
+  <div class="row" style="gap:28px"><div><div class="cap">알림 반응률 (30일)</div><div style="font-size:18px;font-weight:600">71%</div><div class="cap">7건</div></div><div><div class="cap">오늘 확인할 항목</div><div style="font-size:18px;font-weight:600">3건</div><div class="cap">조치 필요 추정 순</div></div><div><div class="cap">높은 위험 알림</div><div style="font-size:18px;font-weight:600">항상 전송</div><div class="cap">게이트 없음</div></div></div>
+  <div class="fn" style="margin-top:8px">최근 게이트: 감시 공백 알림: 가치 0.19 → 배지만 · 반응 확률 45% (최근 알림 7건 중 반응률)</div><div class="fn">중간 위험과 감시 공백 알림은 조치 필요 확률 × 반응 확률이 낮으면 알림 대신 배지로만 표시함. 같은 안전을 더 적은 방해로</div></div>
+ <div class="box" id="g7"><div class="lab">결정 근거와 검증</div><div>추정 모델: 규칙 기반 (rule-1). 외부 모델(Jev) 미연결</div><div class="fn">조치 필요: 표본 5건 미만, 검증 전<br>알림 반응: 브라이어 0.18 (표본 7건)<br>60분 내 변경: 브라이어 0.21 (표본 12건)<br>세션 살펴볼 필요: 표본 5건 미만, 검증 전</div><div class="fn" style="margin-top:4px">추정값은 나중 결과와 함께 저장되어 브라이어 점수로 검증됨. 0.25를 넘으면 추정을 끄고 기본 동작으로 돌아감</div></div>
+</section>
+
+<section id="sec-activity">
+ <h2>AI 도구 활동 (Claude Code)</h2>
+ <div class="box"><div class="lab">연동 상태</div><div><b>Claude Code 연결(hook):</b> 등록됨 · 수신 연결 통로: 정상 · 연결 확인 신호 확인 2시간 전 · 마지막 수신 2분 전</div><div class="row" style="margin-top:8px"><button class="btn">연결 제거 (LARM 항목만)</button><button class="btn">연결 확인 신호 보내기</button></div><div class="fn" style="margin-top:6px">이 연결은 허용이나 차단 결정을 하지 않고 기록만 함. 앱이 꺼져 있으면 보관했다가 다음 실행 때 읽음</div></div>
+ <div class="box" id="sessbox"><div class="lab">먼저 살펴볼 세션 (참고 추정)</div>
+  <div class="row" style="align-items:center"><span class="pct hi">62%</span><div class="grow"><b>세션 a3f9c2e1… · 2026. 9. 26. 오후 8:51 · 요청 18건</b><div class="fn">숨김·우회형 명령 2건, 높은 위험 판정 1건, 민감 경로 접근 1건</div></div><button class="btn small">살펴봄, 문제 있음</button><button class="btn small">살펴봄, 문제 없음</button></div>
+  <div class="row" style="align-items:center;margin-top:6px"><span class="pct lo">23%</span><div class="grow"><b>세션 7be04d10… · 요청 44건</b><div class="fn">민감 경로 접근 2건, 선택 범위 밖 3건</div></div><span class="fn">살펴봄</span></div></div>
+ <div class="fn" style="margin-bottom:8px">원문 프롬프트, 명령 내용, 파일 내용은 수집하지 않음. 명령은 종류, 명령 내용 개수, 요약값, 표시만, 경로는 별칭만 남김</div>
+ <div class="box" style="padding:0"><table><tr><th>시각</th><th>단계</th><th>도구</th><th>대상 별칭</th><th>판단</th><th>처리</th></tr>
+  <tr><td>오후 9:41</td><td>request</td><td>Bash</td><td>echo … | base64 -d | sh</td><td style="color:var(--navy);font-weight:600">RR01 high</td><td>안 함</td></tr>
+  <tr><td>오후 9:40</td><td>request</td><td>Read</td><td>~/.aws/credentials</td><td style="color:var(--navy2)">RR02 medium</td><td>안 함</td></tr>
+  <tr><td>오후 9:39</td><td>request</td><td>Edit</td><td>&lt;shop-api&gt;/src/api/orders.ts</td><td></td><td>안 함</td></tr>
+  <tr><td>오후 9:38</td><td>result</td><td>Bash</td><td>npm test</td><td></td><td>안 함</td></tr>
+  <tr><td>오후 9:38</td><td>request</td><td>Bash</td><td>npm test</td><td></td><td>안 함</td></tr>
+  <tr><td>오후 9:35</td><td>request</td><td>Read</td><td>&lt;shop-api&gt;/CLAUDE.md</td><td></td><td>안 함</td></tr>
+  <tr><td>오후 9:34</td><td>session_start</td><td></td><td></td><td></td><td>안 함</td></tr></table></div>
+</section>
+
+<section id="sec-changes">
+ <h2>바뀐 설정</h2>
+ <div class="box"><div class="lab">기준 상태</div><div><b>2026. 9. 19. 오후 6:30</b> 지정 · 사유 "온보딩 후 확인" · 점검 규칙 1.0.0</div><div class="row" style="margin-top:8px"><button class="btn">지금 상태를 새 기준으로 저장</button></div></div>
+ <div class="box" style="padding:0"><table><tr><th>변화</th><th>대상</th><th>항목</th><th>이전</th><th>현재</th></tr>
+  <tr><td><b style="color:var(--gold)">추가</b></td><td>&lt;shop-api&gt;/.claude/settings.local.json</td><td class="mono">permissions.allow[0]</td><td class="muted">없음</td><td>Bash(*)</td></tr>
+  <tr><td><b>수정</b></td><td>~/.claude.json</td><td class="mono">mcpServers.db.args[1]</td><td>[제거됨: 평문 후보, 길이 41]</td><td>[제거됨: 평문 후보, 길이 57]</td></tr>
+  <tr><td><b class="muted">삭제</b></td><td>&lt;data-pipeline&gt;/.claude/settings.json</td><td class="mono">hooks.PreToolUse[0]</td><td>command · lint.sh</td><td class="muted">없음</td></tr></table></div>
+ <div class="fn">기준 상태 이후 바뀐 값만 표시함. 비밀값 후보는 길이만 남기고 내용은 저장하지 않음</div>
+</section>
+
+<section id="sec-coverage">
+ <h2>점검한 파일</h2><div class="fn" style="margin-bottom:10px">점검 때 읽은 설정 파일과 읽지 못한 파일의 목록. 읽지 못한 파일은 "문제 없음"으로 치지 않음</div>
+ <div class="box" style="padding:0"><table><tr><th>상태</th><th>읽기 모듈</th><th>범위</th><th>항목</th><th>사유</th></tr><tr><td style="color:var(--navy2)">접근 거절</td><td>cursor</td><td>data-pipeline</td><td>&lt;data-pipeline&gt;/.cursor/mcp.json</td><td>권한 없음 (EACCES)</td></tr></table></div>
+</section>
+
+<section id="sec-evidence">
+ <h2>보고서와 설정</h2>
+ <div class="box" id="export"><div class="lab">점검 보고서</div><div>점검 결과를 다른 사람에게 전달할 수 있게 묶은 파일. 비밀값과 실제 경로는 들어가지 않음</div><div class="row" style="margin-top:8px"><button class="btn">보고서 내보내기 (ZIP)</button><button class="btn">받은 보고서 검증</button></div><div class="fn" style="margin-top:6px">마지막 내보내기: larm-evidence-20260926-2140.zip · 파일 9개 · SHA-256 3f8a…c21e · 검증 통과</div></div>
+ <div class="box"><div class="lab">알림</div><div class="row" style="align-items:center"><span>조용한 시간</span><span class="sel">켬 · 22:00 ~ 07:00</span><span class="fn">이 시간에는 알림 대신 배지로만 표시함</span></div></div>
+ <div class="box"><div class="lab">보존과 시작</div><div class="row" style="align-items:center"><span>점검 기록 보존</span><span class="sel">30일</span><span>활동 기록 보존</span><span class="sel">7일</span><span>로그인 시 자동 시작</span><span class="sel">등록됨</span></div></div>
+ <div class="box"><div class="lab">점검 규칙</div><div>static 1.0.0 · activity 1.0.0 · 서명 확인됨</div><div class="row" style="margin-top:8px"><button class="btn">규칙 갱신 파일 적용</button><button class="btn">진단 파일 내보내기</button></div></div>
+</section>
+</div></div>
+<div id="cur"></div><div id="cap"></div><div id="card"><div class="logo"><i></i></div><h1></h1><p></p></div>
+<script>
+function go(id){document.querySelectorAll('section').forEach(s=>s.classList.toggle('on',s.id==='sec-'+id));document.querySelectorAll('#side .item').forEach(i=>i.classList.toggle('on',i.id==='nav-'+id));document.getElementById('main').scrollTop=0;}
+function hl(sel,on){document.querySelectorAll('.hl').forEach(e=>e.classList.remove('hl'));if(on!==false&&sel){const e=document.querySelector(sel);if(e)e.classList.add('hl');}}
+function scrollTo2(sel,container){const c=document.querySelector(container||'#main');const e=document.querySelector(sel);if(!e)return;const top=e.getBoundingClientRect().top-c.getBoundingClientRect().top+c.scrollTop-80;c.scrollTo({top,behavior:'auto'});}
+let __t=0;const __raf=[];window.__cur={x:640,y:400,tx:640,ty:400,click:0};
+window.__step=(dt)=>{__t+=dt;const c=__cur;c.x+=(c.tx-c.x)*0.18;c.y+=(c.ty-c.y)*0.18;if(c.click>0)c.click-=dt;const el=document.getElementById('cur');el.style.left=c.x+'px';el.style.top=c.y+'px';el.classList.toggle('dn',c.click>0);};
+window.__caption=(t)=>{const el=document.getElementById('cap');el.textContent=t;el.classList.toggle('show',!!t);};
+window.__card=(title,sub,op)=>{const el=document.getElementById('card');if(title!=null){el.querySelector('h1').textContent=title;el.querySelector('p').textContent=sub||'';}el.style.opacity=op;};
+window.__elPos=(sel)=>{const r=document.querySelector(sel).getBoundingClientRect();return [r.left+r.width/2,r.top+r.height/2];};
+</script></body></html>
