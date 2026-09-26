@@ -47,7 +47,7 @@ const T=[]; const at=(s,fn)=>T.push([s,fn]);
   at(71.0,()=>page.frames().find(f=>f.url().includes('galaxy-embed')).evaluate(()=>{focusNode(G.idx.get('agent:claude-code'));}));
   at(74.6,()=>cap('점검 결과는 비밀값 없이 보고서로 묶어 전달하고, 받은 사람은 오프라인으로 검증합니다.'));
   at(74.7,()=>cursorEl('#nav-evidence')); at(75.7,()=>clickNav('evidence')); at(76.0,()=>cursorEl('#export'));
-  at(80.0,()=>ev(()=>{__caption('');document.getElementById('card').style.transition='opacity .8s';__card('LARM','막지 않고, 보여 줍니다. 무료입니다.',1);}));
+  at(80.0,()=>ev(()=>{__caption('');document.getElementById('card').style.transition='opacity .8s';__card('LARM','AI 코딩 도구, 이제 안심하고 쓰세요. 무료입니다.',1);}));
   const END=84.0; const N=Math.round(END*FPS);
   T.sort((a,b)=>a[0]-b[0]); let ti=0;
   for(let f=0;f<N;f++){const t=f/FPS; while(ti<T.length&&T[ti][0]<=t){await T[ti][1]();ti++;}
