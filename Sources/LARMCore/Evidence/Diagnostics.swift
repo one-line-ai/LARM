@@ -21,6 +21,6 @@ public enum Diagnostics {
             for a in audits { lines.append("audit \(a["at"]?.string ?? "") \(a["kind"]?.string ?? "")") }
         }
         let text = lines.joined(separator: "\n") + "\n"
-        return text.replacingOccurrences(of: NSHomeDirectory(), with: "~")
+        return text.replacingOccurrences(of: Paths.home, with: "~")
     }
 }

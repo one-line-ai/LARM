@@ -14,7 +14,7 @@ enum Headless {
                 printStatus(db); exit(0)
             }
             if args.contains("--install-hook") || args.contains("--uninstall-hook") {
-                let path = NSHomeDirectory() + "/.claude/settings.json"
+                let path = Paths.home + "/.claude/settings.json"
                 let text = (try? String(contentsOfFile: path, encoding: .utf8)) ?? ""
                 let plan = args.contains("--uninstall-hook") ? try HookInstaller.planRemove(settingsText: text)
                                                               : try HookInstaller.planInstall(settingsText: text, hookPath: "/Applications/LARM.app/Contents/MacOS/larm-hook")
@@ -92,7 +92,7 @@ enum Headless {
         for g in gaps { print("  gap \(g.surface) \(g.reason) \(g.startedAt) ~ \(g.endedAt ?? "open") \(g.recoveryEvidence)") }
         let evs = (try? EventIngest.list(db, limit: 5)) ?? []
         let total = (try? db.scalar("SELECT COUNT(*) FROM runtime_event").int) ?? 0
-        print("activity hook_installed=\(HookInstaller.isInstalled(settingsText: (try? String(contentsOfFile: NSHomeDirectory() + "/.claude/settings.json", encoding: .utf8)) ?? "")) events=\(total) verified_at=\(Settings.get(db, "activity_verified_at") ?? "-")")
+        print("activity hook_installed=\(HookInstaller.isInstalled(settingsText: (try? String(contentsOfFile: Paths.home + "/.claude/settings.json", encoding: .utf8)) ?? "")) events=\(total) verified_at=\(Settings.get(db, "activity_verified_at") ?? "-")")
         for e in evs { print("  event \(e.phase) \(e.toolName) \(e.targetAlias) risk=\(e.riskRule ?? "-")/\(e.riskSeverity ?? "-") delivery=\(e.delivery)") }
         let fs = (try? FindingRepo.list(db)) ?? []
         let counts = Dictionary(grouping: fs, by: { $0.state.rawValue }).mapValues { $0.count }

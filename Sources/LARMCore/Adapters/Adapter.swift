@@ -15,7 +15,7 @@ public final class AdapterContext {
     }
 
     /// 사용자 루트 scope의 실제 경로가 홈이다 (시험에서는 fixture 홈).
-    public var home: String { scope.kind == .userRoot ? scope.realPath : NSHomeDirectory() }
+    public var home: String { scope.kind == .userRoot ? scope.realPath : Paths.home }
 
     public func alias(_ path: String) -> String {
         let home = self.home
@@ -46,7 +46,7 @@ public final class AdapterContext {
         if scope.kind == .project { v = v.replacingOccurrences(of: scope.realPath, with: "<\(scope.alias)>") }
         let home = self.home
         v = v.replacingOccurrences(of: home + "/", with: "~/").replacingOccurrences(of: home, with: "~")
-        let realHome = NSHomeDirectory()
+        let realHome = Paths.home
         if realHome != home { v = v.replacingOccurrences(of: realHome + "/", with: "~/").replacingOccurrences(of: realHome, with: "~") }
         return v
     }

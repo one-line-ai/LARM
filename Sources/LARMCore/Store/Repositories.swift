@@ -12,7 +12,7 @@ public enum ScopeRepo {
     @discardableResult
     public static func ensureUserRoot(_ db: SQLiteDB) throws -> Scope {
         if let s = try all(db).first(where: { $0.kind == .userRoot }) { return s }
-        let s = Scope(scopeID: "scope_user", alias: "user", realPath: NSHomeDirectory(), kind: .userRoot)
+        let s = Scope(scopeID: "scope_user", alias: "user", realPath: Paths.home, kind: .userRoot)
         try insert(db, s)
         return s
     }

@@ -112,7 +112,7 @@ public enum Exporter {
         files.append(("summary.html", Data(summaryHTML(i, exportID: exportID, now: now, scopeAlias: scopeAlias).utf8)))
         files.append(("README.txt", Data(readme(exportID: exportID).utf8)))
         files.sort { fileOrder.firstIndex(of: $0.0)! < fileOrder.firstIndex(of: $1.0)! }
-        let home = NSHomeDirectory()
+        let home = Paths.home
         files = files.map { (name, data) in
             guard var text = String(data: data, encoding: .utf8), text.contains(home) else { return (name, data) }
             text = text.replacingOccurrences(of: home + "/", with: "~/").replacingOccurrences(of: home, with: "~")

@@ -22,8 +22,24 @@ public enum KeychainKey {
         }
     }
 
+    /// 격리 데이터 폴더(LARM_DATA_DIR)를 쓰는 시험·시연 실행에서는 Keychain 대신 그 폴더의 파일 키(0600)를 쓴다.
+    /// 실제 사용자 데이터 폴더에서는 항상 Keychain이다.
+    static var isolatedKeyURL: URL? {
+        guard let d = ProcessInfo.processInfo.environment["LARM_DATA_DIR"], !d.isEmpty else { return nil }
+        return URL(fileURLWithPath: d, isDirectory: true).appendingPathComponent("hmac.key")
+    }
+
     /// 기존 키를 읽거나 새로 만든다.
     public static func loadOrCreate() throws -> Material {
+        if let u = isolatedKeyURL {
+            if let d = try? Data(contentsOf: u), d.count == 32 { return Material(keyID: keyID(for: d), key: d) }
+            var bytes = [UInt8](repeating: 0, count: 32)
+            guard SecRandomCopyBytes(kSecRandomDefault, bytes.count, &bytes) == errSecSuccess else { throw KeyError.keychain(errSecInternalError) }
+            let key = Data(bytes)
+            try key.write(to: u, options: [.atomic])
+            try FileManager.default.setAttributes([.posixPermissions: 0o600], ofItemAtPath: u.path)
+            return Material(keyID: keyID(for: key), key: key)
+        }
         if let existing = try load() { return existing }
         var bytes = [UInt8](repeating: 0, count: 32)
         let rc = SecRandomCopyBytes(kSecRandomDefault, bytes.count, &bytes)

@@ -37,7 +37,7 @@ public enum EventIngest {
     public enum Result: Equatable, Sendable { case stored(String), duplicate(String), rejected(String) }
 
     /// 경로 → 별칭.
-    public static func alias(path: String, scopes: [Scope], home: String = NSHomeDirectory()) -> (alias: String, scopeID: String?, outside: Bool) {
+    public static func alias(path: String, scopes: [Scope], home: String = Paths.home) -> (alias: String, scopeID: String?, outside: Bool) {
         let std = URL(fileURLWithPath: path).standardizedFileURL.path
         for s in scopes where s.kind == .project && !s.excluded {
             if std == s.realPath || std.hasPrefix(s.realPath.hasSuffix("/") ? s.realPath : s.realPath + "/") {

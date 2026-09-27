@@ -2,9 +2,8 @@ import Foundation
 import LARMCore
 
 let args = CommandLine.arguments
-let support = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!.appendingPathComponent("LARM", isDirectory: true)
-let socketPath = support.appendingPathComponent("hook.sock").path
-let spoolDir = support.appendingPathComponent("spool").path
+let socketPath = Paths.socketURL.path
+let spoolDir = Paths.spoolDir.path
 
 var input: [String: Any] = [:]
 if args.contains("--test") {

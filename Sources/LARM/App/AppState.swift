@@ -133,6 +133,7 @@ final class AppState: ObservableObject {
                 try? CoverageGapRepo.close(db, surface: "activity", reason: "not_running", evidence: "spool \(drained.0)건 수집, 실패 \(drained.1)건", lostCount: drained.1)
             }
             events = (try? EventIngest.list(db)) ?? []
+            rebuildGames(); refreshActive()
             let m = Monitor(db: db, trigger: { [weak self] kind, ids in self?.runScan(kind: kind, onlyScopeIDs: ids) },
                             onGapChange: { [weak self] req in self?.notify(req) },
                             onHookData: { [weak self] data in self?.ingestHook(data) })
@@ -145,6 +146,14 @@ final class AppState: ObservableObject {
             m.objectWillChange.sink { [weak self] _ in self?.objectWillChange.send() }.store(in: &cancellables)
             boot = .ready
             m.start(scopes: scopes)
+            // 시연·문서 캡처용 (LARM_DEMO_ACTION): select-first-finding | hook-plan
+            if let act = ProcessInfo.processInfo.environment["LARM_DEMO_ACTION"] {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 6.0) { [weak self] in
+                    guard let self else { return }
+                    if act == "select-first-finding" { self.section = .findings; self.selectedFindingID = self.todayItems.first?.findingID }
+                    if act == "hook-plan" { self.section = .activity; self.prepareHookInstall(remove: false) }
+                }
+            }
             if Settings.get(db, "autostart_enabled") == "true", LoginItem.status != "enabled" { _ = LoginItem.setEnabled(true) }
             autoStartStatus = LoginItem.statusLabel
         } catch {
@@ -207,7 +216,7 @@ final class AppState: ObservableObject {
     }
 
     func refreshInstallStatus() {
-        let home = NSHomeDirectory()
+        let home = Paths.home
         var m: [String: (String, String, String)] = [:]
         for a: Adapter in [ClaudeCodeAdapter(), CodexAdapter(), CursorAdapter()] {
             let i = a.detectInstall(home: home)
@@ -508,6 +517,7 @@ final class AppState: ObservableObject {
         }
         events = (try? EventIngest.list(db)) ?? []
         refreshActive()
+        rebuildGames()
     }
 
     func prepareHookInstall(remove: Bool) {

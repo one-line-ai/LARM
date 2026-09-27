@@ -49,7 +49,7 @@ final class Monitor: ObservableObject {
     }
 
 
-    static var claudeSettingsPath: String { NSHomeDirectory() + "/.claude/settings.json" }
+    static var claudeSettingsPath: String { Paths.home + "/.claude/settings.json" }
 
     func refreshHookInstalled() {
         let text = (try? String(contentsOfFile: Self.claudeSettingsPath, encoding: .utf8)) ?? ""
@@ -146,7 +146,7 @@ final class Monitor: ObservableObject {
         for w in watchers.values { w.stop() }
         watchers = [:]; dirScope = [:]; fileScope = [:]; failedDirs = []
         var files: [String] = []
-        let home = NSHomeDirectory()
+        let home = Paths.home
         for s in scopes where !s.excluded {
             var dirs: [String] = []
             for a: Adapter in [ClaudeCodeAdapter(), CodexAdapter(), CursorAdapter()] {
@@ -173,7 +173,7 @@ final class Monitor: ObservableObject {
         refreshGaps()
     }
 
-    static func alias(_ p: String) -> String { let h = NSHomeDirectory(); return p.hasPrefix(h) ? "~" + p.dropFirst(h.count) : p }
+    static func alias(_ p: String) -> String { let h = Paths.home; return p.hasPrefix(h) ? "~" + p.dropFirst(h.count) : p }
 
 
     private func handle(_ sig: FSEventsWatcher.Signal, scopeID: String) {
